@@ -1,0 +1,4527 @@
+<?php
+session_start();
+ini_set("display_errors", 1);
+
+require_once("../../../libs/php/adodb5/adodb.inc.php");
+require_once("../../../libs/php/configuracion/config.php");
+require_once("../../../libs/php/clases/ConexionComun.php");
+require_once("../../../libs/php/clases/comunes.php");
+require_once("../../../libs/php/clases/login.php");
+include ("../../../libs/php/clases/tfhka/TfhkaPHP.php");
+//include_once("../../../libs/php/clases/compra.php");
+include_once("../../../libs/php/clases/correlativos.php");
+require_once "../../../libs/php/clases/numerosALetras.class.php";
+include("../../../../menu_sistemas/lib/common.php");
+include("../../../../generalp.config.inc.php");
+
+
+if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
+    $conn = new ConexionComun();
+    $login = new Login();
+    $opt = (isset($_GET["opt"])) ? $_GET["opt"] : $_POST["opt"];
+
+    switch ($opt) {
+
+        case "calidadObservacion" :
+        if($_POST['cantidad']==0)
+        {
+        echo "
+        <table width='100%' align='left' style='margin-left: -265px;' border='0'>
+            <tr >
+                <td align='right'>
+                Observacion**&nbsp;&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                <input type='text' size='50' name='observacion[]' class='form-text' id=observacion[]/>
+                </td>
+            </tr>
+            <tr>
+                <td align='right'>
+                Recomendacion**&nbsp;&nbsp;&nbsp;&nbsp;
+                </td>
+                <td>
+                <input type='text' size='50' name='recomendacion[]'  class='form-text' id=recomendacion[]/>
+                </td>
+            </tr>
+            <input type='hidden' name='cantidad_ob' id='cantidad_ob' value='".($_POST['cantidad']+1)."' />
+        </table>
+        ";
+        }
+        else
+        {
+            
+            
+                
+            $i=0;
+            $tabla=
+                "               
+                <table width='100%' align='left' style='margin-left: -265px;' border='0'>
+                ";
+            while($i<$_POST['cantidad']){
+                $tabla.="<tr>
+                        <td align='right'>
+                        Observacion**&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                        <td>
+                        <input type='text' size='50' name='observacion[]' class='form-text' id=observacion[] value=''/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align='right'>
+                        Recomendacion**&nbsp;&nbsp;&nbsp;&nbsp;
+                        </td>
+                        <td>
+                        <input type='text' size='50' name='recomendacion[]'  class='form-text' id=recomendacion[] value=''/>
+                        </td>
+                    </tr>
+                    ";
+            $i++;
+            }
+            $tabla.=
+                "
+                    <input type='hidden' name='cantidad_ob' id='cantidad_ob' value='".($_POST['cantidad']+1)."' />
+                </table>
+                ";
+                
+            echo $tabla;
+            
+        }
+
+
+        break;
+
+        
+        case "actualizar_toma" :
+        
+        if($_POST['boton']==1)
+        {
+        $toma_vacia="toma1";
+        }
+        else
+        {
+            if($_POST['boton']==2)
+            {
+                $toma_vacia="toma2";
+            }
+            else
+            {
+                $toma_vacia="tomadef";
+            }
+        }
+
+        $actualizar=$conn->Execute2("update tomas_fisicas set toma=".($_POST['boton']+1)." where id=".$_POST['id_mov']);
+
+        
+        //toma que se esta trabajando
+        $toma_fisica=$conn->ObtenerFilasBySqlSelect("select toma from tomas_fisicas where id=".$_POST['id_mov']);
+        
+                
+        
+        if($toma_fisica[0]['toma']==1)
+        {
+            $toma='toma1';
+            $buton1="";
+            $buton2="disabled";
+            $buton3="disabled";
+        }
+        if($toma_fisica[0]['toma']==2)
+        {
+            $toma='toma2';
+            $buton1="disabled";
+            $buton2="";
+            $buton3="disabled";
+        }
+        if($toma_fisica[0]['toma']==3)
+        {
+            $toma='tomadef';
+            $buton1="disabled";
+            $buton2="disabled";
+            $buton3="";
+
+        }
+
+        if($toma_fisica[0]['toma']==4)
+        {
+            $toma='';
+            $buton1="disabled";
+            $buton2="disabled";
+            $buton3="disabled";
+            //ver inv en caso de mov_sug
+        
+        $inv_tomas_vacias=$conn->ObtenerFilasBySqlSelect("select inv_sistema, id from tomas_fisicas_detalle where id_mov=".$_POST['id_mov']." and tomadef is null");
+
+        foreach ($inv_tomas_vacias as $key => $value) 
+        {
+        $update=$conn->Execute2("update tomas_fisicas_detalle set mov_sugerido=".($value['inv_sistema']*-1)."  where id=".$value['id']);
+        }
+        }
+        
+        $actualizar_detalles=$conn->Execute2("update tomas_fisicas_detalle set ".$toma_vacia."=0 where ".$toma_vacia." is null and id_mov=".$_POST['id_mov']);
+        
+        //realizar chequeo de tomas iguales
+        if($toma=='toma2')
+        {
+            
+            $buscar=$conn->ObtenerFilasBySqlSelect("select toma1, inv_sistema, id from tomas_fisicas_detalle where id_mov=".$_POST['id_mov']);
+            foreach ($buscar as $key => $value) 
+            {
+                
+            if($value['toma1']==$value['inv_sistema'])
+            {
+            $insert=$conn->Execute2("update tomas_fisicas_detalle set toma2=".$value['toma1']." where id=".$value['id']);       
+            }
+            }//end foreach
+            
+        }//end if toma1
+
+        //realizar chequeo de tomas iguales
+        if($toma=='tomadef')
+        {
+
+            $buscar=$conn->ObtenerFilasBySqlSelect("select toma1, toma2, inv_sistema, id from tomas_fisicas_detalle where id_mov=".$_POST['id_mov']);
+
+            foreach ($buscar as $key => $value) 
+            {
+                
+            if($value['toma1']==$value['toma2'])
+            {
+            $insert=$conn->Execute2("update tomas_fisicas_detalle set tomadef=".$value['toma1'].", mov_sugerido=".($value['toma1']-$value['inv_sistema'])." where id=".$value['id']);       
+            }
+            }//end foreach
+            
+        }//end if toma2
+
+        $formulario="";
+        if($toma_fisica[0]['toma']!=4)
+        {
+        $formulario="
+        <table   width='100%' border='0' align='center'>
+        <tr>
+        <td class='btn' style='float:center; padding-right: 15px;' colspan='1' border=0>
+        
+        <div id=boton_agregar> 
+        <table class='btn_bg' onclick='agregarProducto()' align='center' border='0'>
+            <tr style='border-width: 0px; cursor: pointer;'>
+                <td><img src='../../../includes/imagenes/bt_left.gif' style='border-width: 0px; width: 4px; height: 21px;' />
+                </td>
+                <td><img src='../../../includes/imagenes/add.gif' width='16' height='16' />
+                </td>
+                <td style='padding: 0px 6px;'>Agregar Producto
+                </td>
+                <td><img src='../../../includes/imagenes/bt_right.gif' style='border-width: 0px; width: 4px; height: 21px;' />
+                </td>
+            </tr>
+        </table>
+        </div>
+        
+        </td>
+        </tr>
+        </table>";
+        }
+        $formulario.="
+        <table   width='100%' border='0' >
+            <thead>
+                <tr class='tb-head'>
+                    <th style='width:220px;' >Codigo de Barras</th>
+                    <th style='width:200px;'>Producto</th>
+                    <th>Inventario Ini.</th>
+                    <th>Toma 1</th>
+                    <th>Toma 2</th>
+                    <th>Toma Def.</th>
+                    <th>Mov. Sugerido</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                ";
+
+        $consulta=$conn->ObtenerFilasBySqlSelect("SELECT a.*,b.descripcion1 as nombre_producto from tomas_fisicas_detalle a, item b WHERE a.cod_bar=b.codigo_barras and id_mov=".$_POST['id_mov']."");
+
+        foreach ($consulta as $key => $value) {
+            if($value['mov_sugerido']>0){
+                $value['mov_sugerido']='+'.$value['mov_sugerido'];
+            }
+            $formulario.=
+            "
+            <input type='hidden' name='tiene_filtro' id='tiene_filtro' value='1'/>
+            <input type='hidden' name='ubicacion' id='tiene_filtro' value=''/>
+            <input type='hidden' name='fecha_apertura' id='fecha_apertura' value=''/>
+            <input type='hidden' name='tipo_toma' id='tipo_toma' value=''/>
+            
+            
+            <tr>
+                <td style='padding-top:2px; padding-bottom: 2px;'>
+                    
+                    <input type='text' name='codigo_barras[]' id='codigo_barras[]' style='float: left;' class='form-text' value='".$value['cod_bar']."' readonly='readonly'/>
+                </td>
+                <td style='padding-top:2px; padding-bottom: 2px;'>
+                    <input class='form-text' type='text' name='precio{counter}' size='50' id='precio{counter}' value='".$value['nombre_producto']."' readonly='readonly'>
+                </td>            
+                <td style='padding-top:2px; padding-bottom: 2px;'>
+                    <input class='form-text' type='text' name='inv_ini[]' size='10' id='inv_ini[]' value='".$value['inv_sistema']."' readonly='readonly'>
+                </td>
+
+                <td style='padding-top:2px; padding-bottom: 2px;'>
+                    <input class='form-text' type='text' name='toma1[]' size='10' id='toma1[]' value='".$value['toma1']."' readonly>
+                </td>
+
+                <td>
+                    <input class='form-text' type='text' name='toma2[]' size='10' id='toma2[]' value='".$value['toma2']."' readonly='readonly'>
+                </td>
+                <td>
+                    <input class='form-text' type='text' name='tomadef[]' size='10' id='tomadef[]' value='".$value['tomadef']."' readonly='readonly'>
+                </td>
+                <td>
+                    <input class='form-text' type='text' name='mov_sug[]' size='10' id='mov_sug[]' value='".$value['mov_sugerido']."'>
+                </td>
+            </tr>
+        ";
+        }
+
+
+        $formulario.= "    
+            <tr class='tb-head'>
+                <td colspan='3'>
+                    <input type='hidden' name='id_mov' id='id_mov' value='".$_POST['id_mov']."'/>
+                </td>
+                
+                <td align='left'>
+                    <input type='button'  style='margin-right: 80px;' class='form-text' id='enviarajax' name='toma1_submit' value='Cerrar' ".$buton1." align='center'  onclick='recargar(1)'/>
+                </td>
+                <td align='center'>
+                    <input type='button' id='enviarajax'   style='margin-right: 40px;' class='form-text' name='toma2_submit'  value='Cerrar'  ".$buton2." onclick='recargar(2)'/>
+                </td>
+                <td align='center'>
+                    <input type='button' id='enviarajax' style='margin-right: 40px;' class='form-text' name='toma3_submit'   value='Cerrar'  ".$buton3." onclick='recargar(3)'/>
+                </td>
+                                    
+            </tr>
+        </form>
+        ";
+
+        echo $formulario;
+
+        break;
+
+
+        case "toma_fisica_actualizar" :
+
+    //toma que se esta trabajando
+    $toma_fisica=$conn->ObtenerFilasBySqlSelect("select toma from tomas_fisicas where id=".$_POST['id_mov']);
+    
+    if($toma_fisica[0]['toma']==1)
+    {
+        $toma='toma1';
+        $buton1="";
+        $buton2="disabled";
+        $buton3="disabled";
+    }
+    if($toma_fisica[0]['toma']==2)
+    {
+        $toma='toma2';
+        $buton1="disabled";
+        $buton2="";
+        $buton3="disabled";
+    }
+    if($toma_fisica[0]['toma']==3)
+    {
+        $toma='tomadef';
+        $buton1="disabled";
+        $buton2="disabled";
+        $buton3="";
+    }
+    
+        //seleccionamos los almacenes
+    $almacenes=$conn->ObtenerFilasBySqlSelect("select id_ubicacion, id_almacen from tomas_fisicas where id=".$_POST['id_mov']);
+
+    //buscamos los datos de los productos en el almacen
+    $producto_almacen=$conn->ObtenerFilasBySqlSelect("select a.descripcion1, a.codigo_barras, b.cantidad from item as a, item_existencia_almacen as b where a.id_item=b.id_item and cod_almacen=".$almacenes[0]['id_almacen']." and id_ubicacion=".$almacenes[0]['id_ubicacion']." and a.codigo_barras='".$_POST['codigo_barras']."'");
+
+    $codigo_barras_item=$producto_almacen[0]['codigo_barras'];
+    $cantidad_item=$producto_almacen[0]['cantidad'];
+    //si el producto no existe se debe insertar
+    if($producto_almacen[0]['codigo_barras']=="")
+    {
+    $sql_insert=$conn->Execute2("insert into item_existencia_almacen (cod_almacen, id_item, cantidad, id_ubicacion) values (".$almacenes[0]['id_almacen'].", ".$_POST['id_producto'].", 0, ".$almacenes[0]['id_ubicacion'].")");
+    
+    $codigo_barras_item=$_POST['codigo_barras'];
+    $descripcion=$conn->ObtenerFilasBySqlSelect("select descripcion1 from item where id_item=".$_POST['id_producto']);
+    $descripcion1_item=$descrupcion[0]['descripcion1'];
+    $cantidad_item=0;
+    
+    }
+    //actualizamos o insertamos las tomas de acuerdo al caso
+    //ver si existe en detalle
+    $existencia=$conn->ObtenerFilasBySqlSelect("select id from tomas_fisicas_detalle where id_mov=".$_POST['id_mov']." and cod_bar='".$_POST['codigo_barras']."'");    
+    if($existencia[0]['id']!="")
+    {
+    $filtrosuma="";
+        if($toma=='tomadef')
+        { 
+            $filtrosuma=",mov_sugerido=".($_POST['cantidad']-$cantidad_item);
+        }
+
+    $insert=$conn->Execute2("update tomas_fisicas_detalle set ".$toma."=".$_POST['cantidad'].$filtrosuma." where id_mov=".$_POST['id_mov']." and cod_bar='".$_POST['codigo_barras']."'");
+    }
+    else
+    {
+        //insertar el detalle de producto
+        $filtro="";
+        $filtro1="";
+        if($toma=='toma2')
+        {
+            $filtro=",toma1";
+            $filtro1=" ,0";
+        }
+        if($toma=='tomadef')
+        {
+            $filtro=",toma1,toma2";
+            $filtro1=" ,0,0";
+        }
+
+    $insert=$conn->Execute2("insert into tomas_fisicas_detalle(id_mov,cod_bar,inv_sistema,".$toma.$filtro.", mov_sugerido) values (".$_POST['id_mov'].", '".$codigo_barras_item."', ".$cantidad_item.", ".$_POST['cantidad'].$filtro1.",0)");
+    }
+
+    
+    $formulario="";
+    if($toma_fisica[0]['toma']!=4)
+        {
+        $formulario="
+        <table   width='100%' border='0' align='center'>
+        <tr>
+        <td class='btn' style='float:center; padding-right: 15px;' colspan='1' border=0>
+        
+        <div id=boton_agregar> 
+        <table class='btn_bg' onclick='agregarProducto()' align='center' border='0'>
+            <tr style='border-width: 0px; cursor: pointer;'>
+                <td><img src='../../../includes/imagenes/bt_left.gif' style='border-width: 0px; width: 4px; height: 21px;' />
+                </td>
+                <td><img src='../../../includes/imagenes/add.gif' width='16' height='16' />
+                </td>
+                <td style='padding: 0px 6px;'>Agregar Producto
+                </td>
+                <td><img src='../../../includes/imagenes/bt_right.gif' style='border-width: 0px; width: 4px; height: 21px;' />
+                </td>
+            </tr>
+        </table>
+        </div>
+        
+        </td>
+        </tr>
+        </table>";
+        }
+    $formulario.="
+    <table   width='100%' border='0' >
+        <thead>
+            <tr class='tb-head'>
+                <th style='width:220px;' >Codigo de Barras</th>
+                <th style='width:200px;'>Producto</th>
+                <th>Inventario Ini.</th>
+                <th>Toma 1</th>
+                <th>Toma 2</th>
+                <th>Toma Def.</th>
+                <th>Mov. Sugerido</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            ";
+
+    $consulta=$conn->ObtenerFilasBySqlSelect("SELECT a.*,b.descripcion1 as nombre_producto from tomas_fisicas_detalle a, item b WHERE a.cod_bar=b.codigo_barras and id_mov=".$_POST['id_mov']."");
+    foreach ($consulta as $key => $value) {
+
+        $formulario.=
+        "
+        <input type='hidden' name='tiene_filtro' id='tiene_filtro' value='1'/>
+        <input type='hidden' name='ubicacion' id='tiene_filtro' value=''/>
+        <input type='hidden' name='fecha_apertura' id='fecha_apertura' value=''/>
+        <input type='hidden' name='tipo_toma' id='tipo_toma' value=''/>
+        
+        
+        <tr>
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                
+                <input type='text' name='codigo_barras[]' id='codigo_barras[]' style='float: left;' class='form-text' value='".$value['cod_bar']."' readonly='readonly'/>
+            </td>
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                <input class='form-text' type='text' name='precio{counter}' size='50' id='precio{counter}' value='".$value['nombre_producto']."' readonly='readonly'>
+            </td>            
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                <input class='form-text' type='text' name='inv_ini[]' size='10' id='inv_ini[]' value='".$value['inv_sistema']."' readonly='readonly'>
+            </td>
+
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                <input class='form-text' type='text' name='toma1[]' size='10' id='toma1[]' value='".$value['toma1']."' readonly>
+            </td>
+
+            <td>
+                <input class='form-text' type='text' name='toma2[]' size='10' id='toma2[]' value='".$value['toma2']."' readonly='readonly'>
+            </td>
+            <td>
+                <input class='form-text' type='text' name='tomadef[]' size='10' id='tomadef[]' value='".$value['tomadef']."' readonly='readonly'>
+            </td>
+            <td>
+                <input class='form-text' type='text' name='mov_sug[]' size='10' id='mov_sug[]' value='".$value['mov_sugerido']."' readonly='readonly'>
+            </td>
+        </tr>
+    ";
+    }
+
+
+    $formulario.= "    
+        <tr class='tb-head'>
+            <td colspan='3'>
+                <input type='hidden' name='id_mov' id='id_mov' value='".$_POST['id_mov']."'/>
+            </td>
+            
+            <td align='left'>
+                <input type='button'  style='margin-right: 80px;' class='form-text' id='enviarajax' name='toma1_submit' value='Cerrar' ".$buton1." align='center'  onclick='recargar(1)'/>
+            </td>
+            <td align='center'>
+                <input type='button' id='enviarajax'   style='margin-right: 40px;' class='form-text' name='toma2_submit'  value='Cerrar'  ".$buton2." onclick='recargar(2)'/>
+            </td>
+            <td align='center'>
+                <input type='button' id='enviarajax' style='margin-right: 40px;' class='form-text' name='toma3_submit'   value='Cerrar'  ".$buton3." onclick='recargar(3)'/>
+            </td>
+                                
+        </tr>
+    </form>
+    ";
+
+    echo $formulario;
+        break;
+        
+        case "toma_fisica_update" : 
+        $bandera1=0;
+        $bandera2=0;
+        $bandera3=0;        
+        $i=0;
+        $cantidad_items=isset($_POST['cantidad_items']) ? $_POST['cantidad_items'] : '';
+        
+        $items=isset($_POST['items']) ? $_POST['items'] : '';
+        $arrtoma1=isset($_POST['toma1']) ? $_POST['toma1'] : '';
+        $arrtoma2=isset($_POST['toma2']) ? $_POST['toma2'] : '';
+        $arrtoma3=isset($_POST['toma3']) ? $_POST['toma3'] : '';
+        
+        
+
+       if(isset($arrtoma3) && $_POST['boton']==3){
+        while($i<$cantidad_items){
+        if($arrtoma3[$i]==""){
+            $arrtoma3[$i]=0;
+           }
+            if(!is_numeric($arrtoma3[$i])){
+            $bandera3=1;     
+            }
+
+        $i++;
+        }
+        $i=0;
+        if($bandera3==0){
+        while($i<$cantidad_items){
+       $sql="UPDATE tomas_fisicas_detalle SET tomadef=".$arrtoma3[$i]." WHERE cod_bar='".$items[$i]."' and id_mov=".$_POST['id_mov']."";
+        $detalle_toma=$conn->Execute2($sql);
+
+        $i++;
+        } //fin del while
+    }
+    }
+    $i=0;
+
+
+
+        if(isset($arrtoma2)  && $_POST['boton']==2){
+        while($i<$cantidad_items){
+        if($arrtoma2[$i]=="" ){
+        $arrtoma2[$i]=0;
+        }
+         if(!is_numeric($arrtoma2[$i])){
+            $bandera2=1;     
+            }
+        $i++;
+        }
+        $i=0;
+        if($bandera2==0){
+        $iguales=0;
+        $toma1_igual=$conn->ObtenerFilasBySqlSelect("select toma1 from tomas_fisicas_detalle where id_mov=".$_POST['id_mov']."");
+
+        while($i<$cantidad_items){
+        $sql="UPDATE tomas_fisicas_detalle SET toma2=".$arrtoma2[$i]." WHERE cod_bar='".$items[$i]."' and id_mov=".$_POST['id_mov']."";
+        $detalle_toma=$conn->Execute2($sql);
+        
+        
+        if($toma1_igual[$i]['toma1']>$arrtoma2[$i] || $toma1_igual[$i]['toma1']<$arrtoma2[$i]){
+        $iguales=1;
+        
+        }// iguales tiene que actualizarse la tercera columna
+        else{
+        $sql="UPDATE tomas_fisicas_detalle SET tomadef=".$arrtoma2[$i]." WHERE cod_bar='".$items[$i]."' and id_mov=".$_POST['id_mov']."";
+        $detalle_toma=$conn->Execute2($sql);
+        }
+        $i++;
+
+    }// fin del while
+   /* if($iguales==0){
+        $i=0;
+        while($i<$cantidad_items){
+
+        $sql="UPDATE tomas_fisicas_detalle SET tomadef=".$arrtoma2[$i]." WHERE cod_bar='".$items[$i]."' and id_mov=".$_POST['id_mov']."";
+        $detalle_toma=$conn->Execute2($sql);
+        $i++;
+        }//fin while
+    }//fin del if banderaiguales*/
+    }//fin del if bandera
+    }   
+
+$i=0;
+       if(isset($arrtoma1) && $_POST['boton']==1){
+
+        while($i<$cantidad_items){
+        if($arrtoma1[$i]=="" || !is_numeric($arrtoma1[$i]) ){
+            $arrtoma1[$i]=0;
+        }
+        if(!is_numeric($arrtoma1[$i])){
+            $bandera1=1;     
+            }
+        $i++;
+        }
+        $i=0;
+        if($bandera1==0){
+        while($i<$cantidad_items){
+        $sql="UPDATE tomas_fisicas_detalle SET toma1=".$arrtoma1[$i]." WHERE cod_bar='".$items[$i]."' and id_mov=".$_POST['id_mov']."";
+        $detalle_toma=$conn->Execute2($sql);
+        $i++;
+        }// fin del while
+    }//fin del if de bandera
+    }
+    
+    $query=$conn->ObtenerFilasBySqlSelect("SELECT a.*,b.descripcion1 as nombre_producto from tomas_fisicas_detalle a, item b WHERE a.cod_bar=b.codigo_barras and id_mov=".$_POST['id_mov']."");
+
+    $i=0;
+    $resultado=$conn->getFilas($query);
+    
+
+    while($i<$resultado){
+    $datos[$i]=$query[$i]; //se guardan los datos en un arreglo
+    $i++;
+    }
+    $consulta=$datos;
+    
+        $nulltoma1="0";
+        $nulltoma2="0";
+        $nulltoma3="0";
+        
+        $sql="SELECT * FROM tomas_fisicas_detalle WHERE toma1 is NULL and id_mov=".$_POST['id_mov'];
+        $query=$conn->ObtenerFilasBySqlSelect($sql);
+        $nulltoma1=$conn->getFilas($query);
+
+
+        if($nulltoma1==0){
+            $sql="SELECT * FROM tomas_fisicas_detalle WHERE toma2 is NULL and id_mov=".$_POST['id_mov'];
+            $query=$conn->ObtenerFilasBySqlSelect($sql);
+            $nulltoma2=$conn->getFilas($query);
+            
+            if($nulltoma2==0){
+                $sql="SELECT * FROM tomas_fisicas_detalle WHERE tomadef is NULL and id_mov=".$_POST['id_mov'];
+                $query=$conn->ObtenerFilasBySqlSelect($sql);
+                $nulltoma3=$conn->getFilas($query);
+            }
+            
+
+
+            }
+        if($nulltoma1=="0")
+        {
+        $toma1="readonly='readonly'";
+        $toma1_boton="disabled='disabled'";
+    }
+        if($nulltoma2=="0")
+        {
+    $toma2="readonly='readonly'";
+    $toma2_boton="disabled='disabled'";
+
+        }
+        if($nulltoma3=="0")
+        {
+        $toma3="readonly='readonly'";
+        $toma3_boton="disabled='disabled'";
+
+        }
+
+
+        //creando input para saber si falta algun campo por cargar
+        $valor_vacio="";
+        if($bandera1!=0 || $bandera2!=0 || $bandera3!=0)
+        {
+           $valor_vacio=1;
+
+        }        
+         $campo="<input type='hidden' name='falta_campo' id='falta_campo' value=".$valor_vacio." />";
+
+        $formulario="
+        <table   width='100%' border='0' >
+    <thead>
+        <tr class='tb-head'>
+            <th style='width:220px;' >Codigo de Barras</th>
+            <th style='width:200px;'>Producto</th>
+            <th>Inventario Ini.</th>
+            <th>Toma 1</th>
+            <th>Toma 2</th>
+            <th>Toma Def.</th>
+            <th>Mov. Sugerido</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <form name='formulario2' id='formulario2' method='post' >";
+    foreach ($consulta as $key => $value) {
+        # code...
+
+    if(isset($value['tomadef']) && $value['tomadef']!=""){
+        
+        $suma=$value['tomadef']-$value['inv_sistema'];
+
+        if($suma>0)
+        $value['mov_sugerido']="+".$suma;
+        else
+        $value['mov_sugerido']=$suma;
+         
+         $sql="UPDATE tomas_fisicas_detalle SET mov_sugerido=".$suma." WHERE cod_bar='".$value['cod_bar']."' and id_mov=".$_POST['id_mov']."";
+        $detalle_toma=$conn->Execute2($sql);
+    }
+
+        $formulario.=
+        "
+        <input type='hidden' name='tiene_filtro' id='tiene_filtro' value='1'/>
+        <input type='hidden' name='ubicacion' id='tiene_filtro' value=''/>
+        <input type='hidden' name='fecha_apertura' id='fecha_apertura' value=''/>
+        <input type='hidden' name='tipo_toma' id='tipo_toma' value=''/>
+        ".$campo."
+
+        
+        <tr>
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                
+                <input type='text' name='codigo_barras[]' id='codigo_barras[]' style='float: left;'   class='form-text' value='".$value['cod_bar']."' readonly='readonly' />
+            </td>
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                <input class='form-text' type='text' name='precio{counter}' size='50' id='precio{counter}' value='".$value['nombre_producto']."' readonly='readonly'>
+            </td>            
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                <input class='form-text' type='text' name='inv_ini[]' size='10' id='inv_ini[]' value='".$value['inv_sistema']."' readonly='readonly'>
+            </td>
+
+            <td style='padding-top:2px; padding-bottom: 2px;'>
+                <input class='form-text' type='text' name='toma1[]' size='10' id='toma1[]' value='".$value['toma1']."' ".$toma1.">
+            </td>
+
+            <td>
+                <input class='form-text' type='text' name='toma2[]' size='10' id='toma2[]' value='".$value['toma2']."' ".$toma2.">
+            </td>
+            <td>
+                <input class='form-text' type='text' name='tomadef[]' size='10' id='tomadef[]' value='".$value['tomadef']."' ".$toma3.">
+            </td>
+            <td>
+                <input class='form-text' type='text' name='mov_sug[]' size='10' id='mov_sug[]' value='".$value['mov_sugerido']."'>
+            </td>
+        </tr>
+    ";
+    }
+
+    $formulario.= "    
+        <tr class='tb-head'>
+                                <td colspan='3'>
+                                <input type='hidden' name='cantidad_items' id='cantidad_items' value='".$resultado."' />
+                                <input type='hidden' name='id_mov' id='id_mov' value='".$_POST['id_mov']."'/>
+                                </td>
+
+                                
+                                <td align='left'>
+                                
+                                
+                                  <input type='button'  style='margin-right: 40px;' class='form-text' id='enviarajax' name='toma1_submit' ".$toma1_boton." value='Cerrar' align='center'  onclick='recargar(1)'/>
+                                
+                                
+                                </td>
+
+
+                                <td>
+                                  <input type='button' id='enviarajax'   style='margin-right: 40px;' class='form-text' name='toma2_submit'  ".$toma2_boton." value='Cerrar'  onclick='recargar(2)'/>
+                                </td>
+
+                                <td align='left'>
+                                  <input type='button' id='enviarajax' style='margin-right: 40px;' class='form-text' name='toma3_submit'  ".$toma3_boton."value='Cerrar'  onclick='recargar(3)'/>
+                                </td>
+                                
+        </tr>
+        </form>
+        ";
+
+        echo $formulario;
+        exit();
+
+        break;
+
+
+        case "det_items_calidad_estatus":
+       $campos= $conn->ObtenerFilasBySqlSelect("select b.estatus as estatus, c.codigo_barras, c.descripcion1, m.marca, c.pesoxunidad, d.nombre_unidad, b.cantidad, b.observacion from calidad_almacen as a, calidad_almacen_detalle as b, item as c LEFT JOIN marca m ON c.id_marca= m.id, unidad_medida as d where b.id_item=c.id_item and a.id_transaccion=b.id_transaccion and c.unidadxpeso=d.id and a.id_transaccion=".$_GET['id_transaccion']);
+
+ 
+        echo '<tr class="detalle_items">
+          <td colspan="8">
+            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+               <table >
+                    <thead>
+                        
+                       <th style="width:150px; font-weight: bold;">Codigo Barras</th>
+                       <th style="width:350px; font-weight: bold;">Nombre</th>
+                        <th style="width:150px; font-weight: bold;">Cantidad</th>
+                        <th style="width:110px; font-weight: bold; text-align: center;">Observación</th>
+                        <!--<th style="width:150px; font-weight: bold;">Estatus</th>-->
+                    </thead>
+                   <tbody>';
+          foreach ($campos as $key => $item) {
+                //if(empty($item["marca"])
+                  //      $item["marca"]='SIN MARCA';
+                  echo '
+                       <tr>
+                        <td style="width:150px; padding-left:10px;">' . $item["codigo_barras"] . '</td>
+                        <td style="width:110px; text-align: right; padding-right:10px;">' .$item["descripcion1"].'- '.$item["marca"].' '.$item["pesoxunidad"].' '.$item["nombre_unidad"].'</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["cantidad"] . '</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["observacion"] . '</td>
+                        <!--<td style="width:150px; padding-left:10px;">' . $item["estatus"] . '</td>-->
+                        </tr>';
+                   }
+      break;
+
+
+      case "itempendiente" : 
+        $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM calidad_almacen_detalle WHERE id_item = '" . $_GET["v2"] . "' and id_almacen_salida = '" . $_GET["v1"] . "' and id_ubi_salida='". $_GET["ubicacion"]."' and estatus=3");
+        //echo "SELECT * FROM calidad_almacen_detalle WHERE id_item = '" . $_GET["v2"] . "' and id_almacen_salida = '" . $_GET["v1"] . "' and id_ubi_salida='". $_GET["ubicacion"]."' and estatus=2"; exit();
+        if (count($campos) == 0 || empty($campos)) {
+                echo "[{id:'-1'}]";
+            } else {
+
+                foreach ($campos as $key => $value) {
+                $total+= $value['cantidad'];
+                }
+
+                echo "[{id:".$total."}]";//json_encode($total);
+            }
+        break;
+        
+
+        case "guardar_arqueo_retiro" :
+
+
+       /* if($_POST['efectivo']>$_POST['sistema']){
+        $observacion="Existe un Sobrante de:".$_POST['efectivo']-$_POST['sistema'];    
+        }else{
+            if($_POST['efectivo']<$_POST['sistema']){
+            $observacion="Existe un Faltante de:".$_POST['efectivo']-$_POST['sistema'];    
+            }else{
+                $observacion="Sin Observaciones";    
+            }
+        }*/
+        if(isset($_POST['tipo_venta_pyme'])){
+            $tipo_venta_pyme=$_POST['tipo_venta_pyme'];
+        }else{
+            $tipo_venta_pyme=1;
+        }
+        $conn->BeginTrans();
+        $total= ($_POST['billete_100']*100)+
+                ($_POST['billete_50']*50)+
+                ($_POST['billete_20']*20)+
+                ($_POST['billete_10']*10)+
+                ($_POST['billete_5']*5)+
+                ($_POST['billete_2']*2)+
+                ($_POST['total_monedas']);
+
+        $insert=$conn->Execute2("INSERT INTO retiro_efectivo(id_cajero, billetes_100, billetes_50, billetes_20, billetes_10, billetes_5, billetes_2, monedas, efectivo, cod_usuario, tipo_venta) 
+            VALUES
+            (   '".$_POST['cajero']."',
+                ".$_POST['billete_100'].",
+                ".$_POST['billete_50'].",
+                ".$_POST['billete_20'].",
+                ".$_POST['billete_10'].",
+                ".$_POST['billete_5'].",
+                ".$_POST['billete_2'].",
+                ".$_POST['total_monedas'].",
+                ".$total.",
+                '".$_SESSION["cod_usuario"]."',
+                '".$tipo_venta_pyme."'
+                )
+            ");
+
+            $conn->CommitTrans(1);
+            $retiro=1;
+
+            if($retiro==1)
+                echo 1;
+            else
+                echo 2;
+
+        break;
+
+
+
+        case "formulario_arqueo_cajero_retiro" :
+
+        echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px; align:left;">Cantidad Billetes De 100:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;"><input type="text" name="billete_100" id="billete_100"  class="form-text serialSec " onBlur="cargar_total();" style="width:100px; align:center" value="0"/></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Cantidad Billetes De 50:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;"><input type="text" name="billete_50" id="billete_50"  class="form-text serialSec " onBlur="cargar_total();" style="width:100px; align:center" value="0"/></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Cantidad Billetes De 20:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_20" id="billete_20"  class="form-text serialSec" onBlur="cargar_total(); " style="width:100px; align:center" value="0"/></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Cantidad Billete De 10:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_10" id="billete_10"  class="form-text serialSec " onBlur="cargar_total();" style="width:100px; align:center" value="0"/></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Cantidad Billetes De 5:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_5" id="billete_5"  class="form-text serialSec" onBlur="cargar_total();" style="width:100px; align:center" value="0"/></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Cantidad Billetes De 2:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_2" id="billete_2"  class="form-text serialSec" onBlur="cargar_total();" style="width:100px; align:center" value="0" /></th>
+                    </thead>
+                     <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Total Monedas:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="total_monedas" id="total_monedas"  class="form-text serialSec" onBlur="cargar_total();" style="width:100px; align:center" value="0" /></th>
+                    </thead>
+                     <thead>
+                       
+                    </thead>
+                     <thead>
+                    <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Total Bs:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:110px;">
+                        <input type="text" name="total_efectivo" id="total_efectivo"  class="form-text serialSec"  style="width:100px; align:center">                                                   
+                        <input type="hidden" name="cajero" id="cajero" value='.$_POST['cajero'].' /> 
+                        </th>
+                    </thead>
+
+                    ';
+
+                    break;
+
+
+
+
+
+        case "verificar_cajero_pyme":
+
+        $obtener_fecha_cajero=$conn->ObtenerFilasBySqlSelect("SELECT fecha_fin, id_cajero from control_cierre_cajero where id_cajero='".$_POST['cajero']."' and tipo=0 order by secuencia desc limit 1");
+        if($obtener_fecha_cajero[0]['fecha_fin']==""){
+            echo "-1"; //no existe cajero en la tabla tenemos que abrir el formulari de registro por primera vez
+        }else{
+           
+        echo 1;
+
+        }
+
+
+        break;
+
+
+
+
+        case "calcular_pyme":
+        $fechas_secuencia=$conn->ObtenerFilasBySqlSelect("select date(a.fecha_fin) as DATEEND, money from $bd_pyme.closedcash_pyme as a 
+where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(fecha_fin)>(select min(fecha) from $bd_pyme.fechas_minimas) and a.nombre_caja='".$_POST['caja']."' group by nombre_caja order by nombre_caja, fecha_fin  asc"); 
+        $calcular=$conn->ObtenerFilasBySqlSelect("SELECT sum(totalizar_base_imponible) as base, sum(totalizar_total_general) as bruto, sum(totalizar_monto_iva) as iva, sum(case when totalizar_monto_iva=0 then totalizar_base_imponible else 0 end) as exento  FROM `factura` WHERE date(`fecha_creacion`)='".$_POST[fecha]."' and money='".$fechas_secuencia[0]['money']."' and impresora_serial='".$_POST['serial']."' ");
+
+        
+        //$calcular=$conn->ObtenerFilasBySqlSelect("SELECT sum(c.base) as base, sum(c.amount) as iva, sum(c.base+c.amount) as bruto, sum(case when c.amount=0 then c.base else 0 end) as exento FROM ".POS.".closedcash as a, ".POS.".receipts as b, ".POS.".taxlines as c where a.money=b.money and b.id=c.receipt and date(a.dateend)='".$_POST[fecha]."' and a.MONEY='".$fechas_secuencia[0]['money']."' and a.HOST='".$_POST['caja']."' ORDER BY a.HOSTSEQUENCE ASC"); 
+        if($calcular[0]['bruto']>0){
+            echo $calcular[0]['base']." ".$calcular[0]['bruto']." ".$calcular[0]['exento']." ".$calcular[0]['iva'];
+
+        }else{
+            echo -1;
+        }
+
+        break;
+
+
+
+        case "formulario_libro_ventas_pyme":
+        $serial =$conn->ObtenerFilasBySqlSelect("Select serial_impresora from caja_impresora where caja_host='".$_POST['caja']."'");
+        $ultimo_z=$conn->ObtenerFilasBySqlSelect("select numero_z_usuario+1 as z from libro_ventas where serial_impresora='".$serial[0]['serial_impresora']."' order by numero_z_usuario desc limit 1");
+        
+        //$ultimo_z=$conn->ObtenerFilasBySqlSelect("select numero_z_usuario+1 as z, money from libro_ventas where serial_impresora='".$serial[0]['serial_impresora']."' order by numero_z_usuario desc limit 1");
+        $fecha_venta=$conn->ObtenerFilasBySqlSelect("select  money from $bd_pyme.closedcash_pyme as a 
+where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(fecha_fin)>=(select min(fecha) from $bd_pyme.fechas_minimas) and a.nombre_caja='".$_POST['caja']."' group by nombre_caja order by nombre_caja, fecha_fin  asc");
+        //echo "select  money from $bd_pyme.closedcash_pyme as a 
+//where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(fecha_fin)>(select min(fecha) from $bd_pyme.fechas_minimas) and a.nombre_caja='".$_POST['caja']."' group by nombre_caja order by nombre_caja, fecha_fin  asc"; exit();
+        $numero_facturas=$conn->ObtenerFilasBySqlSelect("select count(a.id_factura) as total_factura from $bd_pyme.factura as a where a.money='".$fecha_venta[0]['money']."'");
+        $obtener_fecha_ultima_venta=$conn->ObtenerFilasBySqlSelect("select date(fecha_creacion) as fecha from $bd_pyme.factura where money='".$fecha_venta[0]['money']."'");
+         if(!isset($ultimo_z[0]['z'])){
+            $ultimo_z[0]['z']="";
+            
+            }else{
+                $ultimo_z[0]['z']=$ultimo_z[0]['z'];}
+         echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                    <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px; align:left;">Serial Impresora</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Nro. Z</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Ultima Factura</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Nro. Facturas</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;" value=0>Ultima Nota Credito</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;" value=0>Nro. Notas De Credito</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Fecha</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Monto Bruto</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Monto Exento</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Base Imponible</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">IVA</th>
+                    </thead>
+
+                    <tbody>
+                    <td align="center" ><input type="text" name="serial" id="serial"  class="form-text serialSec " required style="width:100px;" value='.$serial[0]['serial_impresora'].' readonly></td>
+                    <td align="center" ><input  type="hidden" name="z" id="z"  class="form-text serialSec " style="width:40px;" value='.$ultimo_z[0]['z'].'><input  type="text" name="z_usuario" id="z_usuario"  class="form-text serialSec " style="width:40px;" value='.$ultimo_z[0]['z'].'></td>
+                    <th align="center" ><input type="text" name="ultima_factura" id="ultima_factura"  class="form-text serialSec " style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name="nro_facturas" id="nro_facturas"  class="form-text serialSec" value='.$numero_facturas[0]['total_factura'].' style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name="ultima_nc" id="ultima_nc"  class="form-text serialSec " style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name="nro_ncs" id="nro_ncs"  class="form-text serialSec " style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name=fecha id="fecha" value='.$obtener_fecha_ultima_venta[0]['fecha'].' readonly="readonly" class="form-text serialSec " required  style="width:80px; align:center"></th>
+
+                    <script type="text/javascript">//<![CDATA[
+                        var cal = Calendar.setup({
+                            onSelect: function(cal) {
+                                cal.hide();
+                            }
+                        });
+                        cal.manageFields("fecha", "fecha", "%Y-%m-%d");
+                    //]]>
+                    </script>
+                    
+                
+                    <th align="center" ><input type="hidden" name="monto_bruto" id="monto_bruto" class="form-text serialSec " style="width:100px; align:center"><input type="text" name="monto_bruto_usuario" id="monto_bruto_usuario" onfocus=calcular_pyme();  class="form-text serialSec " style="width:100px; align:center"></th>
+                    <th align="center" ><input type="hidden" name="monto_exento" id="monto_exento"  class="form-text serialSec " style="width:100px; align:center"><input type="text" name="monto_exento_usuario" id="monto_exento_usuario"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    <th align="center" ><input type="hidden" name="base_imponible" id="base_imponible"  class="form-text serialSec " style="width:100px; align:center"><input type="text" name="base_imponible"_usuarrio id="base_imponible_usuario"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    <th align="center" ><input type="hidden" name="iva" id="iva"  class="form-text serialSec " style="width:100px; align:center"><input type="text" name="iva_usuario" id="iva_usuario"  class="form-text serialSec " style="width:100px; align:center">
+                    <input type="hidden" name="caja" id="caja"  value="'.$_POST['caja'].'"/>
+                    <input type="hidden" name="tipo_venta" id="tipo_venta"  value="'.$_POST['tipo'].'"/>
+                    <input type="hidden" name="cierres" id="cierres"  value="'.$_POST['cierres'].'"/>
+                    <input type="hidden" name="money" id="money"  value="'.$fecha_venta[0]['money'].'"/>
+                    </th>
+                    </tbody>';
+
+
+
+        break;
+
+        case "comprobar_cierre_caja_pyme":
+ 
+        $comprobar_cierre_caja=$conn->ObtenerFilasBySqlSelect("SELECT (max(a.secuencia)) as max_pyme, max(b.secuencia) as max_venta_pyme FROM cierre_caja_control_pyme as a, closedcash_pyme as b WHERE a.serial_cajas=b.serial_caja and b.nombre_caja='".$_POST['caja']."' and b.fecha_fin is not  null");
+        //echo "SELECT max(a.secuencia) as max_pyme, max(b.secuencia) as max_venta_pyme FROM cierre_caja_control_pyme as a, closedcash_pyme as b WHERE a.serial_cajas=b.serial_caja and b.nombre_caja='".$_POST['caja']."' and b.fecha_fin is not null"; exit();       
+       
+        if(($comprobar_cierre_caja[0]['max_pyme']+1)==$comprobar_cierre_caja[0]['max_venta_pyme']){
+            echo 1; //caja de cierre correcto y no posee mas cierre al dia
+        }else{
+
+             if($comprobar_cierre_caja[0]['max_pyme']==$comprobar_cierre_caja[0]['max_venta_pyme']){
+                    echo -1; //error no se ha cerrado la caja
+             }else{
+                if(($comprobar_cierre_caja[0]['max_pyme']+1)<$comprobar_cierre_caja[0]['max_venta_pyme']){
+                    echo 2; //cierre de caja correcto, pero han habido varios cierres.
+                }
+             }
+
+        }
+       
+
+        break;
+
+
+         case "verificar_tipo_venta":
+
+        $obtener_tipo_venta=$conn->ObtenerFilasBySqlSelect("select venta_pyme from parametros_generales");
+        if($obtener_tipo_venta[0]['venta_pyme']=="2"){
+            echo "1"; //no existe cajero en la tabla tenemos que abrir el formulari de registro por primera vez
+        }else{
+           
+        echo 2;
+
+        }
+
+
+
+
+        break;
+
+
+        case "pendiente_producto":
+        $obtener=$conn->ObtenerFilasBySqlSelect("select count(id) as total from sincronizacion_productos_detalle where id<".$_POST['id_det_sincro']." and codigo_barra=".$_POST['codigo_barra']." and estatus=1");
+        //echo "select count(id) as total from sincronizacion_productos_detalle where id<".$_POST['id_det_sincro']." and codigo_barra='".$_POST['codigo_barra']."' and estatus=1"; exit();       
+        if($obtener[0]['total']>0){
+            echo 0;
+        }else{
+            echo 1;
+        }
+
+        break;
+
+        case "insertar_cajas_operativas":
+        $obtener_id=$conn->ObtenerFilasBySqlSelect("Select id from operaciones where libro_venta=-1 limit 1");
+        $conn->Execute2("update operaciones set libro_venta='".$_POST['cajas_operativas']."' where id=".$obtener_id[0]['id']."");
+
+        break;
+
+        case "insertar_cajeros_activos":
+        $obtener_id=$conn->ObtenerFilasBySqlSelect("Select id from operaciones where cierre_cajero=-1 limit 1");
+        $conn->Execute2("update operaciones set cierre_cajero='".$_POST['cajeros_activos']."' where id=".$obtener_id[0]['id']);
+        echo "1";
+        break;
+
+
+    case "abrir_cajeros":
+
+// si es -1 nunca entro a libro de ventas, si es un numero distinto de 0 es que falta cerrar cajero y si es 0 todo fue bien
+//pregunto si es -1 si es correcto es primera entrada a cajero  debo preguntar cuantos cajeros abriran
+        $verificar = $conn->ObtenerFilasBySqlSelect("Select max(fecha) as fecha from operaciones where cierre_cajero=-1");
+        if(isset($verificar[0]['fecha'])){
+
+
+         echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:200px; align:left;">¿Indique La Cantidad De Cajeros A Cerrar?:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;"><input type="text" name="cajeros_activos" id="cajeros_activos"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                       
+                    '; 
+                }else{
+                    // si no es -1 quiere decir q ya declaro cuantas cajas operativas y debe ir al proceso normal.
+                    echo "1";
+                }
+
+        break;
+        case "verificar_cataporte":
+        $existe_cataporte =$conn->ObtenerFilasBySqlSelect("SELECT count(*) as resultado FROM $bd_pyme.cataporte WHERE nro_cataporte = '".$_POST['val']."'");
+        if($existe_cataporte[0]['resultado'] == 0){
+                echo "<span style='font-weight:bold;color:green;'>Nro de Cataporte Disponible.</span>
+                <input hidden='hidden' type='text' name='cat_val' value=2 >";
+            }else{
+                echo "<span style='font-weight:bold;color:red;'>El Nro de Cataporte ya existe.</span>
+                <input hidden='hidden' type='text' name='cat_val' value=1 >";
+            }
+
+        break;
+
+        case "abrir_cajas":
+
+// si es -1 nunca entro a libro de ventas, si es un numero distinto de 0 es que falta cerrar libro y si es 0 todo fue bien
+//pregunto si es -1 si es correcto es primera entrada a libro de venta debo preguntar cuantas cajas operativas
+        $verificar = $conn->ObtenerFilasBySqlSelect("Select max(fecha) as fecha from operaciones where libro_venta=-1");
+        if(isset($verificar[0]['fecha'])){
+
+
+         echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:200px; align:left;">¿Indique La Cantidad De Cajas A Cerrar?:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;"><input type="text" name="cajas_operativas" id="cajas_operativas"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                       
+                    '; 
+                }else{
+                    // si no es -1 quiere decir q ya declaro cuantas cajas operativas y debe ir al proceso normal.
+                    echo "1";
+                }
+
+        break;
+
+        case "cambiar_estatus_cataporte":
+        require_once("../../../libs/php/clases/login.php");
+        $login = new Login();
+        //buscamos los datos del deposito
+        $nro_cataporte=$conn->ObtenerFilasBySqlSelect("select * from cataporte where id=".$_POST['id']."");
+        $existe_ingreso=$conn->ObtenerFilasBySqlSelect("select count(id) as id from ingresos_xenviar where nro_cataporte='".$nro_cataporte[0]['nro_cataporte']."'");
+        //si existe se le hace update
+        if($existe_ingreso[0]['id']>0){
+            $update=$conn->Execute2("update ingresos_xenviar set fecha_retiro='".date('Y-m-d H:i:s')."' where nro_cataporte='".$nro_cataporte[0]['nro_cataporte']."'");
+        }else{
+        //caso contrario se le hace un insert por lo que hay q buscar los valores del deposito
+        $deposito=$conn->ObtenerFilasBySqlSelect("select * from deposito where id_cataporte='".$nro_cataporte[0]['nro_cataporte']."'");
+        foreach ($deposito as $deposito1) {
+     
+        $ingre_insert=$conn->ExecuteTrans("insert into ingresos_xenviar 
+        (nro_deposito, fecha_deposito, monto_deposito, cuenta_banco, usuario_creacion, nro_cataporte, fecha_cataporte, fecha_retiro, usuario_creacion_cataporte)
+        VALUES
+        ('".$deposito1['nro_deposito']."', '".$deposito1['fecha_deposito']."', '".$deposito1['monto']."', '".$deposito1['cod_banco']."', '".$deposito1['usuario_creacion']."', '".$nro_cataporte[0]['nro_cataporte']."', '".$nro_cataporte[0]['fecha']."', '".date('Y-m-d H:i:s')."', '".$login->getNombreApellidoUSuario()."')");
+        }
+        }
+
+
+        $cambiando=$conn->Execute2("update cataporte set retirado=now() where id=".$_POST['id']);
+        if($cambiando){
+            echo 1;
+        }else{
+            echo 2;
+        }
+
+        break;
+
+        case "cambiar_estatus_nota_entrega":
+
+        $cambiando=$conn->Execute2("update nota_entrega set cod_estatus=2 where cod_nota_entrega=".$_POST['id']);
+        if($cambiando){
+            echo 1;
+        }else{
+            echo 2;
+        }
+        break;
+
+
+        case "calcular_monto_cataporte":
+        $_POST['arreglo']=str_replace("\\", "", $_POST['arreglo']);
+
+        $deposito=$conn->ObtenerFilasBySqlSelect("Select * from deposito where nro_deposito in (".$_POST['arreglo'].")");
+//echo "Select * from deposito where nro_deposito in (".$_POST['arreglo'].")"; 
+
+        //creando formulario
+        echo "<table border=1 width='25%'>
+        <thead class='tb-head'>
+        <tr>
+            <th colspan=2><center>Cataporte</center></th>
+        </tr>
+        </thead>
+        <tr>
+            <td width='40%' align='center'><b>Nro Deposito</b></td>
+            <td width='40%' align='center'><b>Monto</b></td>
+        </tr>
+        ";
+        $total=0;
+        //$total_format=0;
+        foreach ($deposito as $key ) {
+            if(isset($key['monto'])){
+            $total+=$key['monto'];
+            $monto_format=number_format($key['monto'],2,'.', '');
+            $total_format=number_format($total,2,'.', '');
+            
+       echo "
+        <tr>
+            <td width='40%' align='center'><input type='hidden' name=nro_depositos[] value=".$key['nro_deposito']." />".$key['nro_deposito']."</td>
+            <td width='40%' align='right'>".$monto_format."</td>
+        </tr>";
+       }} echo"
+            <tr>
+        <th><center><b>TOTAL</b><center></th>
+        <td align='right'><b>".$total_format."</b></th>
+        </tr>
+        </table>
+        <br>
+        <table cellspacing=2>
+        <tr>
+        <td align='right'><b>Nro Cataporte:</b></td><td><input type='text' name='nro_cataporte' id='nro_cataporte' size=20 onkeyup='aMays(event, this)' onBlur='comprobar(this.id)'/></td>
+        <div id='resultado2' width='50%' align='center'></div>
+        </tr>
+        <tr>
+        <td colspan=2><p>&nbsp;</p></td>
+        </tr>
+        <br>
+        <tr>
+        <td align='right'><b>Bolsas Cataporte:</b></td><td> <input type='text' name='cantidad' id='cantidad' value='' onkeyup='crearCampos(this.value);' size=3/></center></td>
+        </tr>
+        </table>
+        <br><div id='campos_dinamicos'></div>
+        <br>
+        <table border=0 width='25%' cellspacing=2>
+        <tr>        
+        <td align='center' colspan=2><button type='button' onClick='enviar()' id='boton_env'>Confirmar Cataporte</button></td>  
+        </tr>
+        </table>";
+
+        
+
+        break;
+
+
+        case "calcular_monto_deposito":
+        //si es pos
+        if($_POST['venta_pyme']==1)
+        {
+        $cajeros=$conn->ObtenerFilasBySqlSelect("Select a.total_efectivo_sistema as total_efectivo_sistema, a.efectivo as efectivo, a.tarjeta as tarjeta, a.tickets as tickets, a.total_sistema as total_sistema, b.NAME as NAME, a.fecha_venta_fin as fecha_venta_fin, a.id as id  from arqueo_cajero as a, ".POS.".people as b where a.id in (".$_POST['arreglo'].") and a.id_cajero=b.id");
+        }
+
+        //si es pyme
+        if($_POST['venta_pyme']==0)
+        {
+        $cajeros=$conn->ObtenerFilasBySqlSelect("Select a.total_efectivo_sistema as total_efectivo_sistema, a.efectivo as efectivo, a.tarjeta as tarjeta, a.tickets as tickets, a.total_sistema as total_sistema, b.nombreyapellido as NAME, a.fecha_venta_fin as fecha_venta_fin, a.id as id  from arqueo_cajero as a, usuarios as b where a.id in (".$_POST['arreglo'].") and a.id_cajero=b.cod_usuario");
+        }
+
+        //si es ambas
+         if($_POST['venta_pyme']==2)
+        {
+           
+        $cajeros=$conn->ObtenerFilasBySqlSelect("
+                (Select a.total_efectivo_sistema as total_efectivo_sistema, a.efectivo as efectivo, a.tarjeta as tarjeta, a.tickets as tickets, a.total_sistema as total_sistema, b.nombreyapellido as NAME, a.fecha_venta_fin as fecha_venta_fin, a.id as id  from arqueo_cajero as a, usuarios as b where a.id in (".$_POST['arreglo'].") and a.id_cajero=b.cod_usuario)
+                union all
+                (Select a.total_efectivo_sistema as total_efectivo_sistema, a.efectivo as efectivo, a.tarjeta as tarjeta, a.tickets as tickets, a.total_sistema as total_sistema, b.NAME as NAME, a.fecha_venta_fin as fecha_venta_fin, a.id as id  from arqueo_cajero as a, ".POS.".people as b where a.id in (".$_POST['arreglo'].") and a.id_cajero=b.id)
+                ");
+
+        }
+
+
+
+     //  echo "Select a.efectivo as efectivo, a.tarjeta as tarjeta, a.tickets as tickets, a.total_sistema as total_sistema, b.NAME as NAME, a.fecha_venta_fin as fecha_venta_fin, a.id as id * from arqueo_cajero as a, ".POS.".people as b where a.id in (".$_POST['arreglo'].") and a.id_cajero=b.id";
+        echo "<table border=1 width='25%'>
+        <thead class='tb-head'>
+        <tr>
+            <th colspan=3><center>Deposito</center></th>
+        </tr>
+        </thead>
+        <tr>
+            <td width='40%' align='center'><b>Cajero</b></td>
+            <td width='20%' align='center'><b>Fecha Final</b></td>
+            <td width='40%' align='center'><b>Monto</b></td>
+        </tr>
+        <tr>";
+        $total="";
+        foreach ($cajeros as $key ) {
+            if($key['efectivo']<$key['total_efectivo_sistema'] || $key['efectivo']==$key['total_efectivo_sistema'] )
+                $total+=$key['efectivo'];
+            else//($key['efectivo']>$key['total_efectivo_sistema'])
+            $total+=$key['total_efectivo_sistema'];
+            
+            $sobrante+=$key['efectivo']-$key['total_efectivo_sistema'];//+$key['tarjeta']+$key['tickets'])-$key['total_sistema'];
+            
+        echo "
+            <td width='40%' align='center'>".$key['NAME']."</td>
+            <td width='20%' align='center'>".$key['fecha_venta_fin']."</td>
+            <td width='40%' align='right'>".$key['efectivo']."<input type='hidden' name=arqueos_id[] value=".$key['id']." /></td>
+
+        </tr>";
+
+        }
+        echo "
+        <tr>
+        <th colspan=2><center><b>TOTAL</b><center></th>
+        <td align='right'><b>".number_format($total,2)."</b></th></tr><tr>
+        ";if($sobrante>0){ echo "
+        <th colspan=2><center><b>TOTAL DIFERENCIA</b><center></th>
+        <td align='right'><b>".number_format($sobrante,2)."</b></th> ";} echo "
+        </tr>
+        </table>
+        
+        <br>";
+       
+        $bancos=$conn->ObtenerFilasBySqlSelect("SELECT b.nro_cuenta, b.descripcion as cuenta, a.descripcion as banco FROM banco as a, cuentas_contables as b, parametros_generales as c where a.cod_banco=b.banco and c.cta_captadora=b.nro_cuenta");
+        $cta_sobrante=$conn->ObtenerFilasBySqlSelect("SELECT b.nro_cuenta, b.descripcion as cuenta, a.descripcion as banco FROM banco as a, cuentas_contables as b, parametros_generales as c where a.cod_banco=b.banco and c.cta_sobrante=b.nro_cuenta");
+
+        echo"
+        <table cellspacing=2>
+        <tr>
+        <th><center><b>SELECCIONE CUENTA CAPTABLE</b></center></th>
+        </tr>
+        <td>
+            <select name='banco' id='banco'>";
+            foreach ($bancos as $key ) {
+                echo "             
+                <option value=".$key['nro_cuenta'].">".$key['cuenta']."- Banco: ".$key['banco']."</option>
+               ";}
+                echo"
+                 </select>
+                 <input type='hidden' name='monto' id='monto' value=".$total." />
+                 <input type='hidden' name='sobrante' id='sobrante' value=".$sobrante." />
+        </td>
+        </tr>
+        <tr>
+        ";
+        if ($sobrante>0){ echo "
+        <th><center><b>SELECCIONE CUENTA SOBRANTE</b></center></th>
+        </tr>
+         <td>
+            <select name='sobrante' id='sobrante'>";
+            foreach ($cta_sobrante as $key ) {
+                echo "             
+                <option value=".$key['nro_cuenta'].">".$key['cuenta']."- Banco: ".$key['banco']."</option>
+               ";}
+                echo"
+                 </select>
+                 <input type='hidden' name='monto' id='monto' value=".$total." />
+                 <input type='hidden' name='cta_sobrante' id='cta_sobrante' value=".$sobrante." />
+        </td>
+        </table>
+        ";} echo "
+        <br>
+        <table border=0 width='25%' cellspacing=2>
+        <tr>        
+        <td align='center' colspan=2><button type='button' onClick='enviar()'>Confirmar Deposito</button></td>  
+        </tr>
+        </table>";
+
+
+        break;
+
+        case "Validarnombre_caja":
+        
+        $verificar=$conn->ObtenerFilasBySqlSelect("select count(caja_host) as existe from caja_impresora where caja_host='".$_GET['v1']."'");
+        if($verificar[0]['existe']==0){
+            echo 1;
+        }else{
+            echo -1;
+        }
+        break;
+
+        case "Validarserial_caja":
+        $verificar=$conn->ObtenerFilasBySqlSelect("select count(serial_impresora) as existe from caja_impresora where serial_impresora='".$_GET['v1']."'");
+        if($verificar[0]['existe']==0){
+            echo 1;
+        }else{
+            echo -1;
+        }
+        break;
+
+        case "insertar_libro_ventas":
+        
+         $obtener_serial=$conn->ObtenerFilasBySqlSelect("SELECT count(serial_impresora) as seriales from caja_impresora where serial_impresora='".$_POST['serial']."'");
+         if($obtener_serial['0']['seriales']==0){
+            echo -4;
+            exit();
+         }
+
+
+
+        // $obtenr_nuevo_money=$conn->ObtenerFilasBySqlSelect("select money as money from ".POS.".closedcash where host='".$_POST['caja']."'  and dateend is null");
+       
+        $conn->BeginTrans();
+
+        if(!isset($_POST['tipoventa'])){
+            
+
+        $obtener_secuencia=$conn->ObtenerFilasBySqlSelect("SELECT max(b.HOSTSEQUENCE) as max_pos FROM ".POS.".closedcash as b WHERE b.HOST='".$_POST['caja']."' and b.dateend is not null order by dateend desc limit 1");
+        $campos2=$conn->ExecuteTrans("update cierre_caja_control set secuencia='".$obtener_secuencia[0]['max_pos']."', estatus_cierre=0 where cajas='".$_POST['caja']."' ");
+        if($_POST['ultima_nc']==""){
+        $_POST['ultima_nc']='NULL';
+            }
+        if($_POST['nro_ncs']==""){
+        $_POST['nro_ncs']='NULL';
+        }
+        
+       /* $campos = $conn->ExecuteTrans("INSERT INTO libro_ventas(
+                serial_impresora,
+                numero_z,
+                numero_z_usuario,
+               
+              
+                money
+                ) 
+            VALUES
+                (
+                '".$_POST['serial']."',
+                '".($_POST['z']+1)."',
+                '".($_POST['z_usuario']+1)."',
+                '".$obtenr_nuevo_money[0]['money']."'
+                )
+                ");*/
+        $campos = $conn->ExecuteTrans("INSERT INTO libro_ventas(
+                
+                serial_impresora,
+                numero_z,
+                numero_z_usuario,
+                ultima_factura,
+                numeros_facturas,
+                ultima_nc,
+                numeros_ncs,
+                fecha,
+                monto_bruto,
+                monto_exento,
+                base_imponible,
+                iva,
+                monto_bruto_usuario,
+                monto_exento_usuario,
+                base_imponible_usuario,
+                iva_usuario,
+                fecha_emision,
+                 money,
+                id_usuario_creacion
+               
+
+                ) 
+            VALUES
+                (
+                '".$_POST['serial']."',
+                '".($_POST['z'])."',
+                '".($_POST['z_usuario'])."',
+                '".$_POST['ultima_factura']."',
+                '".$_POST['nro_facturas']."',
+                ".$_POST['ultima_nc'].",
+                ".$_POST['nro_ncs'].",
+                '".$_POST['fecha']."',
+                '".$_POST['monto_bruto']."',
+                '".$_POST['monto_exento']."',
+                '".$_POST['base_imponible']."',
+                '".$_POST['iva']."',
+                '".$_POST['monto_bruto_usuario']."',
+                '".$_POST['monto_exento_usuario']."',
+                '".$_POST['base_imponible_usuario']."',
+                '".$_POST['iva_usuario']."',
+                now(),
+                '".$_POST['money']."',
+                '".$_SESSION['cod_usuario']."'
+
+                )
+                ");
+
+/*echo 
+"INSERT INTO libro_ventas(
+                
+                serial_impresora,
+                numero_z,
+                numero_z_usuario,
+                ultima_factura,
+                numeros_facturas,
+                ultima_nc,
+                numeros_ncs,
+                fecha,
+                monto_bruto,
+                monto_exento,
+                base_imponible,
+                iva,
+                monto_bruto_usuario,
+                monto_exento_usuario,
+                base_imponible_usuario,
+                iva_usuario,
+                fecha_emision,
+                 money,
+                id_usuario_creacion
+               
+
+                ) 
+            VALUES
+                (
+                '".$_POST['serial']."',
+                '".($_POST['z'])."',
+                '".($_POST['z_usuario'])."',
+                '".$_POST['ultima_factura']."',
+                '".$_POST['nro_facturas']."',
+                ".$_POST['ultima_nc'].",
+                ".$_POST['nro_ncs'].",
+                '".$_POST['fecha']."',
+                '".$_POST['monto_bruto']."',
+                '".$_POST['monto_exento']."',
+                '".$_POST['base_imponible']."',
+                '".$_POST['iva']."',
+                '".$_POST['monto_bruto_usuario']."',
+                '".$_POST['monto_exento_usuario']."',
+                '".$_POST['base_imponible_usuario']."',
+                '".$_POST['iva_usuario']."',
+                now(),
+                '".$_POST['money']."',
+                '".$_SESSION['cod_usuario']."'
+
+                )
+                "; exit();*/
+
+            /*$update = $conn->ExecuteTrans("
+            update libro_ventas set
+           
+            ultima_factura= '".$_POST['ultima_factura']."',
+            numeros_facturas='".$_POST['nro_facturas']."',
+            numero_z_usuario='".$_POST['z_usuario']."',
+            ultima_nc= ".$_POST['ultima_nc'].",
+            numeros_ncs= ".$_POST['nro_ncs'].",
+            fecha= '".$_POST['fecha']."',
+            monto_bruto='".$_POST['monto_bruto']."',
+            monto_exento= '".$_POST['monto_exento']."',
+            base_imponible='".$_POST['base_imponible']."',
+            iva=  '".$_POST['iva']."',
+            monto_bruto_usuario='".$_POST['monto_bruto_usuario']."',
+            monto_exento_usuario='".$_POST['monto_exento_usuario']."',
+            base_imponible_usuario='".$_POST['base_imponible_usuario']."',
+            iva_usuario='".$_POST['iva_usuario']."',
+            fecha_emision= now(),
+            id_usuario_creacion= '".$_SESSION['cod_usuario']."',
+            secuencia= '".($obtener_secuencia[0]['max_pos']-1)."' 
+            where money = '".$_POST['money']."'");*/
+
+
+
+        //insertar en libro_ventas_xenviar
+    
+        $insert_enviar=$conn->ExecuteTrans("
+           INSERT INTO libroventas_xenviar(serial_impresora, numero_z, ultima_factura, numeros_facturas, ultima_nc, numeros_ncs, fecha, monto_bruto, monto_exento, base_imponible, iva, fecha_emision, id_usuario_creacion, secuencia, numero_z_usuario, monto_bruto_usuario, monto_exento_usuario, base_imponible_usuario, iva_usuario, money)
+           SELECT serial_impresora, numero_z, ultima_factura, numeros_facturas, ultima_nc, numeros_ncs, fecha, monto_bruto, monto_exento, base_imponible, iva, fecha_emision, '".$login->getNombreApellidoUSuario()."', secuencia, numero_z_usuario, monto_bruto_usuario, monto_exento_usuario, base_imponible_usuario, iva_usuario, money FROM libro_ventas WHERE money= '".$_POST['money']."'" 
+           );
+
+        }else{
+
+
+            if($_POST['ultima_nc']==""){
+        $_POST['ultima_nc']='NULL';
+        }
+        if($_POST['nro_ncs']==""){
+        $_POST['nro_ncs']='NULL';
+        }
+        
+        $campos = $conn->ExecuteTrans("INSERT INTO libro_ventas(
+                
+                serial_impresora,
+                numero_z,
+                numero_z_usuario,
+                ultima_factura,
+                numeros_facturas,
+                ultima_nc,
+                numeros_ncs,
+                fecha,
+                monto_bruto,
+                monto_exento,
+                base_imponible,
+                iva,
+                monto_bruto_usuario,
+                monto_exento_usuario,
+                base_imponible_usuario,
+                iva_usuario,
+                fecha_emision,
+                money,
+                id_usuario_creacion,
+                tipo_venta
+
+                ) 
+            VALUES
+                (
+                '".$_POST['serial']."',
+                '".($_POST['z'])."',
+                '".($_POST['z_usuario'])."',
+                '".$_POST['ultima_factura']."',
+                '".$_POST['nro_facturas']."',
+                ".$_POST['ultima_nc'].",
+                ".$_POST['nro_ncs'].",
+                '".$_POST['fecha']."',
+                '".$_POST['monto_bruto']."',
+                '".$_POST['monto_exento']."',
+                '".$_POST['base_imponible']."',
+                '".$_POST['iva']."',
+                '".$_POST['monto_bruto_usuario']."',
+                '".$_POST['monto_exento_usuario']."',
+                '".$_POST['base_imponible_usuario']."',
+                '".$_POST['iva_usuario']."',
+                now(),
+                '".$_POST['money']."',
+                '".$_SESSION['cod_usuario']."',
+                '0'
+
+                )
+                ");
+
+
+
+        $obtener_secuencia=$conn->ObtenerFilasBySqlSelect("SELECT max(b.secuencia) as max_pyme_secuencia FROM closedcash_pyme as b WHERE b.nombre_caja='".$_POST['caja']."' and b.fecha_fin is not null");
+        $campos2=$conn->ExecuteTrans("update cierre_caja_control_pyme set secuencia='".$obtener_secuencia[0]['max_pyme_secuencia']."', estatus_cierre=0 where nombre_cajas='".$_POST['caja']."' ");
+
+
+//insertar en libro_ventas_xenviar
+        $insert_enviar=$conn->ExecuteTrans("
+           INSERT INTO libroventas_xenviar(serial_impresora, numero_z, ultima_factura, numeros_facturas, ultima_nc, numeros_ncs, fecha, monto_bruto, monto_exento, base_imponible, iva, fecha_emision, id_usuario_creacion, secuencia, numero_z_usuario, monto_bruto_usuario, monto_exento_usuario, base_imponible_usuario, iva_usuario, tipo_venta, money)
+           SELECT serial_impresora, numero_z, ultima_factura, numeros_facturas, ultima_nc, numeros_ncs, fecha, monto_bruto, monto_exento, base_imponible, iva, fecha_emision, '".$login->getNombreApellidoUSuario()."', secuencia, numero_z_usuario, monto_bruto_usuario, monto_exento_usuario, base_imponible_usuario, iva_usuario, tipo_venta, money FROM libro_ventas WHERE fecha= '".$_POST['fecha']."' and serial_impresora='".$_POST['serial']."'" 
+           );
+
+
+            //operaciones
+           // $verificar_limite=$conn->ObtenerFilasBySqlSelect("select id, libro_venta-1 as libros from operaciones order by fecha desc limit 1");
+           // if($verificar_limite[0]['libros']<0){
+            //    echo "5"; exit();
+            //}
+            //$operaciones=$conn->ExecuteTrans(
+              //  "UPDATE operaciones SET libro_venta = libro_venta-1 where id='".$verificar_limite[0]['id']."'"
+               // );
+
+            
+        }
+
+
+       
+       $conn->CommitTrans(1);
+       
+ 
+       $verificar=1;
+        if($verificar==1){
+            echo 1; 
+        }else{
+            echo -1;
+        };
+        
+
+
+        break;
+
+        case "guardar_arqueo":
+
+ if(isset($_POST['tipo_venta_pyme']) && $_POST['tipo_venta_pyme']!=1 ){
+            $tipo_venta_pyme=$_POST['tipo_venta_pyme'];
+        }else{
+            $tipo_venta_pyme=1;
+        }
+ $retiros_pendiente=$conn->ObtenerFilasBySqlSelect("Select sum(billetes_100) as b100,
+        sum(billetes_50) as b50,
+        sum(billetes_20) as b20,
+        sum(billetes_10) as b10,
+        sum(billetes_5) as b5,
+        sum(billetes_2) as b2,
+        sum(monedas) as monedas
+         from retiro_efectivo where id_cajero='".$_POST['cajero']."' and estatus_retiro=0 and tipo_venta='".$tipo_venta_pyme."'");
+
+      
+       
+        $_POST['billete_100']=($_POST['billete_100'])+($retiros_pendiente[0]["b100"]);
+        $_POST['billete_50']=$_POST['billete_50']+($retiros_pendiente[0]["b50"]);
+        $_POST['billete_20']=$_POST['billete_20']+($retiros_pendiente[0]["b20"]);
+        $_POST['billete_10']=$_POST['billete_10']+($retiros_pendiente[0]["b10"]);
+        $_POST['billete_5']=$_POST['billete_5']+($retiros_pendiente[0]["b5"]);
+        $_POST['billete_2']=$_POST['billete_2']+($retiros_pendiente[0]["b2"]);
+       $_POST['total_monedas']=$_POST['total_monedas']+($retiros_pendiente[0]["monedas"]);
+
+        $_POST['efectivo']=0;
+        $_POST['efectivo']+=$_POST['billete_100']*100;
+        $_POST['efectivo']+=$_POST['billete_50']*50;
+        $_POST['efectivo']+=$_POST['billete_20']*20;
+        $_POST['efectivo']+=$_POST['billete_10']*10;
+        $_POST['efectivo']+=$_POST['billete_5']*5;
+        $_POST['efectivo']+=$_POST['billete_2']*2;
+        $_POST['efectivo']+=$_POST['total_monedas'];
+        $observacion=$_POST['resultado'];
+
+        //sumar retiros sin procesar del cajero
+        
+
+       /* if($_POST['efectivo']>$_POST['sistema']){
+        $observacion="Existe un Sobrante de:".$_POST['efectivo']-$_POST['sistema'];    
+        }else{
+            if($_POST['efectivo']<$_POST['sistema']){
+            $observacion="Existe un Faltante de:".$_POST['efectivo']-$_POST['sistema'];    
+            }else{
+                $observacion="Sin Observaciones";    
+            }
+        }*/
+       
+        $conn->BeginTrans();
+        $obtener_fechas=$conn->ObtenerFilasBySqlSelect("select fecha_inicio, fecha_fin, secuencia from control_cierre_cajero where id_cajero='".$_POST['cajero']."' order by secuencia desc limit 1");
+
+        $obtener_apertura=$conn->ObtenerFilasBySqlSelect("select max(id_apertura) as id_apertura from apertura_tienda");
+        $cambiar_estatus=$conn->Execute2("update  usuarios set visible_vendedor=0 where cod_usuario='".$_POST['cajero']."'");
+        $insert=$conn->Execute2("INSERT INTO arqueo_cajero(id_cajero, billetes_100, billetes_50, billetes_20, billetes_10, billetes_5, billetes_2, monedas, efectivo, tarjeta, tickets, total_sistema,total_efectivo_sistema,total_tj_sistema,total_tickets_sistema,total_devolucion, fecha_arqueo, fecha_venta_ini, fecha_venta_fin, observaciones, cod_usuario, tipo_venta, id_apertura) 
+            VALUES
+            (   '".$_POST['cajero']."',
+                ".$_POST['billete_100'].",
+                ".$_POST['billete_50'].",
+                ".$_POST['billete_20'].",
+                ".$_POST['billete_10'].",
+                ".$_POST['billete_5'].",
+                ".$_POST['billete_2'].",
+                ".$_POST['total_monedas'].",
+                '".$_POST['efectivo']."',
+                '".$_POST['total_tarjeta']."',
+                '".$_POST['total_ticket']."',
+                '".$_POST['sistema']."',
+                '".$_POST['total_efectivo_sistema']."',
+                '".$_POST['total_tj_sistema']."',
+                '".$_POST['total_tickets_sistema']."',
+                '".$_POST['total_devolucion']."',
+                now(),
+                '".$obtener_fechas[0]['fecha_fin']."',
+                now(),
+                '".$observacion."',
+                '".$_SESSION["cod_usuario"]."',
+                '".$tipo_venta_pyme."',
+                ".$obtener_apertura[0]['id_apertura']."
+                )
+            ");
+
+        //cambiar_estatus
+        $id_retiros=$conn->ObtenerFilasBySqlSelect("select id from retiro_efectivo where id_cajero='".$_POST['cajero']."' and estatus_retiro=0 and tipo_venta='".$tipo_venta_pyme."'");
+        foreach ($id_retiros as $key ) {
+        $retiro_efectivo_cambiar=$conn->Execute2(
+            "update retiro_efectivo set estatus_retiro=1 where id='".$key['id']."'"
+            );
+        }
+        
+        $obtenerid=$conn->ObtenerFilasBySqlSelect("SELECT LAST_INSERT_ID()");
+        
+        if($tipo_venta_pyme==1){
+        $cambiar_estatus=$conn->Execute2("update  ".POS.".people set visible=0 where id='".$_POST['cajero']."'");
+        $existe=$conn->ObtenerFilasBySqlSelect("select * from ".POS.".people_caja where id_people='".$_POST['cajero']."'");
+       // echo "select * from ".POS.".people_caja where id_people='".$_POST['cajero']."'"; exit();
+       
+        if(empty($existe[0]['id'])){
+        $inserta_visible=$conn->Execute2("insert into ".POS.".people_caja (id_people) values('".$_POST['cajero']."')");
+    }
+    }
+    
+        $inserta_tabla_control=$conn->Execute2("insert into control_cierre_cajero (id_cajero,secuencia,fecha_inicio,fecha_fin, tipo)
+         values('".$_POST['cajero']."', ".($obtener_fechas[0]['secuencia']+1).", '".$obtener_fechas[0]['fecha_fin']."', now(), '".$tipo_venta_pyme."')");
+        
+
+        //operaciones
+            $verificar_limite=$conn->ObtenerFilasBySqlSelect("(select max(fecha) fecha from operaciones)");
+           // if($verificar_limite[0]['cajeros']<0){
+           //     echo "5"; exit();
+           // }
+
+
+        
+            $operaciones=$conn->ExecuteTrans(
+                "UPDATE operaciones SET cierre_cajero = cierre_cajero+1 where fecha='".$verificar_limite[0]['fecha']."'"
+                );
+
+
+
+
+        $conn->CommitTrans(1);
+        $verificar=1;
+        if($verificar==1){
+            
+            echo "1"."_".$obtenerid[0]['LAST_INSERT_ID()'];
+        }else{
+            echo 2;
+        }
+        break;      
+
+        
+        case "calcular_arqueo":
+        $fecha_inicio=$conn->ObtenerFilasBySqlSelect("Select fecha_fin from control_cierre_cajero where id_cajero='".$_POST['cajero']."' order by secuencia desc limit 1");
+
+
+        //ventas por el pyme
+        if(isset($_POST['tipo_venta_pyme']) && $_POST['tipo_venta_pyme']!="1" ){
+           $retiros_pendiente=$conn->ObtenerFilasBySqlSelect("Select sum(billetes_100)*100 as b100,
+        sum(billetes_50)*50 as b50,
+        sum(billetes_20)*20 as b20,
+        sum(billetes_10)*10 as b10,
+        sum(billetes_5)*5 as b5,
+        sum(billetes_2)*2 as b2,
+        sum(monedas) as monedas
+         from retiro_efectivo where id_cajero='".$_POST['cajero']."' and estatus_retiro=0 and tipo_venta=0");
+      
+       
+        $_POST['billete_100']=($_POST['billete_100']*100)+($retiros_pendiente[0]["b100"]);
+        $_POST['billete_50']=$_POST['billete_50']*50+($retiros_pendiente[0]["b50"]);
+        $_POST['billete_20']=$_POST['billete_20']*20+($retiros_pendiente[0]["b20"]);
+        $_POST['billete_10']=$_POST['billete_10']*10+($retiros_pendiente[0]["b10"]);
+        $_POST['billete_5']=$_POST['billete_5']*5+($retiros_pendiente[0]["b5"]);
+        $_POST['billete_2']=$_POST['billete_2']*2+($retiros_pendiente[0]["b2"]);
+       $_POST['total_monedas']=$_POST['total_monedas']+($retiros_pendiente[0]["monedas"]);
+        
+       
+
+        if(!empty($fecha_inicio[0]['fecha_fin'])){
+
+        $resultado=$conn->ObtenerFilasBySqlSelect(
+            "SELECT 
+            sum(totalizar_monto_efectivo) as total_efectivo_sistema, 
+            sum(totalizar_monto_tarjeta) as total_tj_sistema,
+            (select sum(".$_POST['billete_100']."+".$_POST['billete_50']."+".$_POST['billete_20']."+".$_POST['billete_10']."+".$_POST['billete_5']."+".$_POST['billete_2']."+".$_POST['total_monedas']."+".$_POST['total_tarjeta']."+".$_POST['total_ticket'].")) as total_cajero
+            FROM `factura_detalle_formapago` as a, factura as b WHERE a.id_factura=b.id_factura 
+            and b.cod_vendedor='".$_POST['cajero']."'
+            and b.fecha_creacion BETWEEN '".$fecha_inicio[0]['fecha_fin']."' AND now()");
+        /*echo "SELECT 
+            sum(totalizar_monto_efectivo) as total_efectivo_sistema, 
+            sum(totalizar_monto_tarjeta) as total_tj_sistema,
+            (select sum(".$_POST['billete_100']."+".$_POST['billete_50']."+".$_POST['billete_20']."+".$_POST['billete_10']."+".$_POST['billete_5']."+".$_POST['billete_2']."+".$_POST['total_monedas']."+".$_POST['total_tarjeta']."+".$_POST['total_ticket'].")) as total_cajero
+            FROM `factura_detalle_formapago` as a, factura as b WHERE a.id_factura=b.id_factura 
+            and b.cod_vendedor='".$_POST['cajero']."'
+            and b.fecha_creacion BETWEEN '".$fecha_inicio[0]['fecha_fin']."' AND now()"; exit();
+        */
+        $resultado[0]['total_cajero']= number_format($resultado[0]['total_cajero'],2,',','');
+        $resultado[0]['TOTAL_SISTEMA']= $resultado[0]['total_efectivo_sistema']+$resultado[0]['total_tj_sistema'];
+        $devolucion= 0;
+        $resultado[0]['TOTAL_SISTEMA']= number_format($resultado[0]['TOTAL_SISTEMA']-$devolucion,2,',','');
+        $resta=($resultado[0]['total_cajero']-$resultado[0]['TOTAL_SISTEMA']);
+        $resta=number_format($resta,2,',','');
+        $resultado[0]['total_tickets_sistema']=0;
+        $resultado[0]['total_dev_efectivo']=0;
+        $resultado[0]['total_dev_tarjeta']=0;
+
+        
+        if($resultado[0]['TOTAL_SISTEMA']!="0,00"){
+
+
+        if($resta==0){
+            echo "0_".$resultado[0]['total_cajero']."_".$resultado[0]['TOTAL_SISTEMA']."_".$resta."_".$resultado[0]['total_efectivo_sistema']."_".$resultado[0]['total_tj_sistema']."_".$resultado[0]['total_tickets_sistema']."_".($resultado[0]['total_dev_efectivo']+$resultado[0]['total_dev_tarjeta']);
+            exit();
+        }
+        if($resta>0){
+            //sobrante
+            
+            echo "1_".$resultado[0]['total_cajero']."_".$resultado[0]['TOTAL_SISTEMA']."_".$resta."_".$resultado[0]['total_efectivo_sistema']."_".$resultado[0]['total_tj_sistema']."_".$resultado[0]['total_tickets_sistema']."_".($resultado[0]['total_dev_efectivo']+$resultado[0]['total_dev_tarjeta']);
+            exit();
+        }
+        if($resta<0){
+            //faltante
+            echo "2_".$resultado[0]['total_cajero']."_".$resultado[0]['TOTAL_SISTEMA']."_".$resta."_".$resultado[0]['total_efectivo_sistema']."_".$resultado[0]['total_tj_sistema']."_".$resultado[0]['total_tickets_sistema']."_".($resultado[0]['total_dev_efectivo']+$resultado[0]['total_dev_tarjeta']);
+            exit();
+        }
+
+        
+        
+
+        }
+        else{
+        echo "333";
+         exit();
+            }
+
+        }
+
+        else{
+
+            echo "_4";
+            exit();
+        }
+
+
+
+        } //fin del if de ventas por el pyme
+
+
+
+        $retiros_pendiente=$conn->ObtenerFilasBySqlSelect("Select sum(billetes_100)*100 as b100,
+        sum(billetes_50)*50 as b50,
+        sum(billetes_20)*20 as b20,
+        sum(billetes_10)*10 as b10,
+        sum(billetes_5)*5 as b5,
+        sum(billetes_2)*2 as b2,
+        sum(monedas) as monedas
+         from retiro_efectivo where id_cajero='".$_POST['cajero']."' and estatus_retiro=0 and tipo_venta=1");
+      
+       
+        $_POST['billete_100']=($_POST['billete_100']*100)+($retiros_pendiente[0]["b100"]);
+        $_POST['billete_50']=$_POST['billete_50']*50+($retiros_pendiente[0]["b50"]);
+        $_POST['billete_20']=$_POST['billete_20']*20+($retiros_pendiente[0]["b20"]);
+        $_POST['billete_10']=$_POST['billete_10']*10+($retiros_pendiente[0]["b10"]);
+        $_POST['billete_5']=$_POST['billete_5']*5+($retiros_pendiente[0]["b5"]);
+        $_POST['billete_2']=$_POST['billete_2']*2+($retiros_pendiente[0]["b2"]);
+       $_POST['total_monedas']=$_POST['total_monedas']+($retiros_pendiente[0]["monedas"]);
+        if(!empty($fecha_inicio[0]['fecha_fin'])){
+        $resultado=$conn->ObtenerFilasBySqlSelect("SELECT people.NAME,
+        sum(case payment when 'cash' then payments.TOTAL else 0 end) as total_efectivo_sistema,
+        sum(case payment when 'magcard' then payments.TOTAL else 0 end) as total_tj_sistema,
+        sum(case payment when 'paperin' then payments.TOTAL else 0 end) as total_tickets_sistema,
+        sum(case payment when 'magcardrefund' then payments.TOTAL else 0 end) as total_dev_tarjeta,
+        sum(case payment when 'cashrefund' then payments.TOTAL else 0 end) as total_dev_efectivo,
+        (select sum(".$_POST['billete_100']."+".$_POST['billete_50']."+".$_POST['billete_20']."+".$_POST['billete_10']."+".$_POST['billete_5']."+".$_POST['billete_2']."+".$_POST['total_monedas']."+".$_POST['total_tarjeta']."+".$_POST['total_ticket'].")) as total_cajero
+        FROM ".POS.".payments INNER JOIN ".POS.".receipts ON receipts.ID = payments.RECEIPT 
+        INNER JOIN ".POS.".tickets ON tickets.ID = receipts.ID 
+        INNER JOIN ".POS.".people ON tickets.PERSON = people.ID 
+        WHERE DATENEW BETWEEN '".$fecha_inicio[0]['fecha_fin']."' AND now() and people.id='".$_POST['cajero']."' group by people.NAME");
+        
+
+        $devoluciones=$conn->ObtenerFilasBySqlSelect("Select sum(payments.total) as total FROM ".POS.".payments INNER JOIN ".POS.".receipts ON receipts.ID = payments.RECEIPT 
+        INNER JOIN ".POS.".tickets ON tickets.ID = receipts.ID 
+        INNER JOIN ".POS.".people ON tickets.PERSON = people.ID
+        WHERE DATENEW BETWEEN '".$fecha_inicio[0]['fecha_fin']."' 
+        AND now() and people.id='".$_POST['cajero']."' 
+        and payments.id in 
+        (select payments.id from  ".POS.".payments INNER JOIN ".POS.".receipts ON receipts.ID = payments.RECEIPT  
+         WHERE DATENEW BETWEEN '".$fecha_inicio[0]['fecha_fin']."' AND now() 
+         and payment in ('magcardrefund', 'cashrefund'))");
+
+        
+        $resultado[0]['total_cajero']= number_format($resultado[0]['total_cajero'],2,',','');
+        $resultado[0]['TOTAL_SISTEMA']= $resultado[0]['total_efectivo_sistema']+$resultado[0]['total_tj_sistema']+$resultado[0]['total_tickets_sistema'];
+        $devolucion= ($devoluciones[0]['total']*-1);//(($resultado[0]['total_dev_tarjeta']+$resultado[0]['total_dev_efectivo'])*-1);//$devolucion= (($resultado[0]['total_dev_tarjeta']+$resultado[0]['total_dev_efectivo'])*-1);
+        $resultado[0]['TOTAL_SISTEMA']= number_format($resultado[0]['TOTAL_SISTEMA']-$devolucion,2,',','');
+        
+        $resta=($resultado[0]['total_cajero']-$resultado[0]['TOTAL_SISTEMA']);
+        $resta=number_format($resta,2,',','');
+       
+        if($resultado[0]['TOTAL_SISTEMA']!="0,00"){
+         //verificamos 
+        //orden 0=codigo,1=total_cajero,2=total_sistema,3=resta,4=total_efectivo_sistema,5=total_tj_sistema,6=total_tickets_sistema,7=total_devoluciones
+        if($resta==0){
+            echo "0_".$resultado[0]['total_cajero']."_".$resultado[0]['TOTAL_SISTEMA']."_".$resta."_".$resultado[0]['total_efectivo_sistema']."_".$resultado[0]['total_tj_sistema']."_".$resultado[0]['total_tickets_sistema']."_".($resultado[0]['total_dev_efectivo']+$resultado[0]['total_dev_tarjeta']);
+        }
+        if($resta>0){
+            //sobrante
+            
+            echo "1_".$resultado[0]['total_cajero']."_".$resultado[0]['TOTAL_SISTEMA']."_".$resta."_".$resultado[0]['total_efectivo_sistema']."_".$resultado[0]['total_tj_sistema']."_".$resultado[0]['total_tickets_sistema']."_".($resultado[0]['total_dev_efectivo']+$resultado[0]['total_dev_tarjeta']);
+        }
+        if($resta<0){
+            //faltante
+            echo "2_".$resultado[0]['total_cajero']."_".$resultado[0]['TOTAL_SISTEMA']."_".$resta."_".$resultado[0]['total_efectivo_sistema']."_".$resultado[0]['total_tj_sistema']."_".$resultado[0]['total_tickets_sistema']."_".($resultado[0]['total_dev_efectivo']+$resultado[0]['total_dev_tarjeta']);
+        }
+
+
+    }// fin del if
+    else{
+        echo "333";
+    }
+        
+        }else{
+
+            echo "_4";
+        }
+        break;
+
+            case "formulario_arqueo_cajero":
+
+            echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px; align:left;">Cantidad Billetes De 100:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;"><input type="text" name="billete_100" id="billete_100"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Cantidad Billetes De 50:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;"><input type="text" name="billete_50" id="billete_50"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Cantidad Billetes De 20:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_20" id="billete_20"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Cantidad Billete De 10:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_10" id="billete_10"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Cantidad Billetes De 5:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_5" id="billete_5"  class="form-text serialSec " style="width:100px; align:center"></th>
+                        </thead>
+                        <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Cantidad Billetes De 2:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="billete_2" id="billete_2"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    </thead>
+                     <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Total Monedas:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="total_monedas" id="total_monedas"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    </thead>
+                     <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Total Tarjeta:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="total_tarjeta" id="total_tarjeta"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    </thead>
+                     <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Total Tickets:</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;"><input type="text" name="total_ticket" id="total_ticket"  class="form-text serialSec " style="width:100px; align:center"><input type="hidden" name="arqueo" id="arqueo" value="1">
+                        <input type="hidden" name="cajero" id="cajero" value='.$_POST['cajero'].' />
+                        </th>
+                    </thead>
+
+                    ';   
+
+
+            break;
+
+
+        case "insertar_registro_inicial":
+        if(isset($_GET['tipo_venta_pyme'])){
+            $tipo_venta=0;
+        }else{
+            $tipo_venta="";
+        }
+        $sql=$conn->Execute2("insert into control_cierre_cajero (id_cajero, secuencia, fecha_inicio, fecha_fin, tipo) values ('".$_POST['cajero']."', 1, '".$_POST['fecha_inicio']."','".$_POST['fecha_fin']."', '".$tipo_venta."')");
+        if($sql==1){
+            echo 1;
+        }else{
+            -1;
+        }
+        break;
+
+        case "registro_inicial":
+
+                echo '<tr class="edocuenta_detalle">
+                  <td colspan="8">
+                    <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                        <table >
+                            <thead>
+                                
+                                <th align="center" style="border-bottom: 1px solid #949494;width:50px;">Fecha Inicial De Venta</th>
+                                
+                            </thead>
+
+                            <tbody>
+                            
+                           
+                            <th align="center" ><input type="text" name=fecha_fin id="fecha_fin" readonly="readonly" class="form-text serialSec " required  style="width:80px; align:center"></th>
+
+                            
+                                <script type="text/javascript">//<![CDATA[
+                                           
+                                            $("#fecha_fin").datepicker({
+                                                changeMonth: true,
+                                                changeYear: true,
+                                                showOtherMonths:true,
+                                                selectOtherMonths: true,
+                                                //numberOfMonths: 1,
+                                                //yearRange: "-100:+100",
+                                                dateFormat: "yy-mm-dd",
+                                                //timeFormat: "HH:mm:ss",
+                                                showOn: "both",//button,
+                                                onClose: function( selectedDate ) {
+                                                    //$( "#fecha2" ).datepicker( "option", "minDate", selectedDate );
+                                                    $( "#fecha_fin" ).datetimepicker("option", "minDate", selectedDate);
+                                                }
+                                            });
+                                            //]]>
+                                            </script>
+                            
+                            <input type="hidden" name="cajero" id="cajero"  value="'.$_POST['cajero'].'"/>
+                            <input type="hidden" name="registro_inicial" id="registro_inicial"  value=1 />
+
+                            </th>
+                            </tbody>';
+
+
+                break;
+
+        case "verificar_cajero":
+
+        $obtener_fecha_cajero=$conn->ObtenerFilasBySqlSelect("SELECT fecha_fin, id_cajero from control_cierre_cajero where id_cajero='".$_POST['cajero']."' order by secuencia desc limit 1");
+        if($obtener_fecha_cajero[0]['fecha_fin']==""){
+            echo "-1"; //no existe cajero en la tabla tenemos que abrir el formulari de registro por primera vez
+        }else{
+           
+        $obtener_visible=$conn->ObtenerFilasBySqlSelect("SELECT NAME from ".POS.".people where id='".$obtener_fecha_cajero[0]['id_cajero']."' and VISIBLE=1");
+        print_r($obtener_visible);
+        if($obtener_visible[0]['NAME']==""){
+            echo "-2";
+        }else{
+          echo  1;
+        }
+
+        }
+
+
+        break;
+
+        case "calcular":
+         $bd_pos=POS;
+        $bd_pyme=DB_SELECTRA_FAC;
+       // $existencia_money=$conn->ObtenerFilasBySqlSelect("select money from libro_ventas as a, caja_impresora as b where b.caja_host='".$_POST['caja']."' and a.serial_impresora=b.serial_impresora order by numero_z desc limit 1");
+        //echo "select money from libro_ventas as a, caja_impresora as b where a.serial_impresora=b.serial_impresora and b.HOST='".$_POST['caja']."' order by numero_z desc limit 1"; exit();
+         //$existencia_money=$conn->ObtenerFilasBySqlSelect(
+        $selec=""; $tabla="";$filtro=""; $money="";
+        if(isset($existencia_money[0]['money'])){
+            $money="and a.MONEY='".$existencia_money[0]['money']."'";
+            $selec=", c.money as money";
+            $tabla=", libro_ventas as c";
+            $filtro=" and b.MONEY=c.money";
+        }
+
+        //$fechas_secuencia=$conn->ObtenerFilasBySqlSelect("SELECT date(datestart) as inicio, date(dateend) as fin from cierre_caja_control as a, ".POS.".closedcash as b where a.cajas=b.host and b.host='".$_POST['caja']."' and b.HOSTSEQUENCE=(a.secuencia+1)");
+     //   $fechas_secuencia=$conn->ObtenerFilasBySqlSelect("SELECT date(datestart) as inicio, date(dateend) as fin ".$selec." from cierre_caja_control as a, ".POS.".closedcash as b ".$tabla." where a.cajas=b.host and b.host='".$_POST['caja']."' and b.HOSTSEQUENCE=(a.secuencia+1) ".$filtro."");
+//echo "SELECT date(datestart) as inicio, date(dateend) as fin ".$selec." from cierre_caja_control as a, ".POS.".closedcash as b ".$tabla." where a.cajas=b.host and b.host='".$_POST['caja']."' and b.HOSTSEQUENCE=(a.secuencia+1) ".$filtro.""; exit();
+       //if(date($fechas_secuencia[0]['fin'])==$_POST['fecha']){
+
+        $fechas_secuencia=$conn->ObtenerFilasBySqlSelect("select date(a.DATEEND) as DATEEND, money from $bd_pos.closedcash as a 
+where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateend)>=(select min(fecha) from $bd_pyme.fechas_minimas) and a.HOST='".$_POST['caja']."' group by host order by host, dateend asc");
+        //echo "select date(a.DATEEND) as DATEEND, money from $bd_pos.closedcash as a where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateend)>=(select min(fecha) from $bd_pyme.fechas_minimas) and a.HOST='".$_POST['caja']."' group by host order by host, dateend asc"; exit();
+       // $numero_facturas=$conn->ObtenerFilasBySqlSelect("select count(b.id) as total_factura from $bd_pos.receipts as a, $bd_pos.taxlines as b where a.money='".$fecha_venta[0]['money']."' and a.id=b.receipt ");
+
+
+
+        $calcular=$conn->ObtenerFilasBySqlSelect("SELECT sum(c.base) as base, sum(c.amount) as iva, sum(c.base+c.amount) as bruto, sum(case when c.amount=0 then c.base else 0 end) as exento FROM ".POS.".closedcash as a, ".POS.".receipts as b, ".POS.".taxlines as c where a.money=b.money and b.id=c.receipt and date(a.dateend)>='".$_POST[fecha]."' and a.MONEY='".$fechas_secuencia[0]['money']."' and a.HOST='".$_POST['caja']."' ORDER BY a.HOSTSEQUENCE ASC"); 
+        //echo "SELECT sum(c.base) as base, sum(c.amount) as iva, sum(c.base+c.amount) as bruto, sum(case when c.amount=0 then c.base else 0 end) as exento FROM ".POS.".closedcash as a, ".POS.".receipts as b, ".POS.".taxlines as c where a.money=b.money and b.id=c.receipt and date(a.dateend)='".$_POST[fecha]."' and a.MONEY='".$fechas_secuencia[0]['money']."' and a.HOST='".$_POST['caja']."' ORDER BY a.HOSTSEQUENCE ASC"; exit();
+        
+        if($calcular[0]['bruto']>0){
+            echo $calcular[0]['base']." ".$calcular[0]['bruto']." ".$calcular[0]['exento']." ".$calcular[0]['iva'];
+
+        }else{
+            echo -1;
+        }
+
+       
+        break;
+
+        case "comprobar_cierre_caja":
+ 
+        $comprobar_cierre_caja=$conn->ObtenerFilasBySqlSelect("SELECT max(a.secuencia) as max_pyme, max(b.HOSTSEQUENCE) as max_pos FROM cierre_caja_control as a, ".POS.".closedcash as b WHERE a.cajas=b.host and a.cajas='".$_POST['caja']."' and b.dateend is not null");
+//echo "SELECT max(a.secuencia) as max_pyme, max(b.HOSTSEQUENCE) as max_pos FROM cierre_caja_control as a, ".POS.".closedcash as b WHERE a.cajas=b.host and a.cajas='".$_POST['caja']."' and b.dateend is not null"; exit();       
+       
+        if(($comprobar_cierre_caja[0]['max_pyme']+1)==$comprobar_cierre_caja[0]['max_pos']){
+            echo 1; //caja de cierre correcto y no posee mas cierre al dia
+        }else{
+
+             if($comprobar_cierre_caja[0]['max_pyme']==$comprobar_cierre_caja[0]['max_pos']){
+                    echo -1; //error no se ha cerrado la caja
+             }else{
+                if(($comprobar_cierre_caja[0]['max_pyme']+1)<$comprobar_cierre_caja[0]['max_pos']){
+                    echo 2; //cierre de caja correcto, pero han habido varios cierres.
+                }
+             }
+
+        }
+       
+
+        break;
+
+        case "verificar_caja":
+
+        $campos = $conn->ObtenerFilasBySqlSelect("SELECT count(serial_impresora) as existe FROM caja_impresora where caja_host='".$_POST['caja']."'");
+        //echo "SELECT count(serial_impresora) as existe FROM caja_impresora  where caja_host='".$_POST['caja']."'";
+        
+        if($campos[0]['existe']==0){
+            echo -1; 
+        };
+        if($campos[0]['existe']>0){
+            echo 1;
+        };
+
+
+        break;
+
+        case "formulario_libro_ventas":
+        $bd_pos=POS;
+        $bd_pyme=DB_SELECTRA_FAC;
+        $serial =$conn->ObtenerFilasBySqlSelect("Select serial_impresora from caja_impresora where caja_host='".$_POST['caja']."'");
+        $ultimo_z=$conn->ObtenerFilasBySqlSelect("select numero_z_usuario+1 as z, money from libro_ventas where serial_impresora='".$serial[0]['serial_impresora']."' order by numero_z_usuario desc limit 1");
+        $fecha_venta=$conn->ObtenerFilasBySqlSelect("select  money from $bd_pos.closedcash as a 
+where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateend)>=(select min(fecha) from $bd_pyme.fechas_minimas) and a.HOST='".$_POST['caja']."' group by host order by host, dateend   asc");
+        $numero_facturas=$conn->ObtenerFilasBySqlSelect("select count(b.id) as total_factura from $bd_pos.receipts as a, $bd_pos.taxlines as b where a.money='".$fecha_venta[0]['money']."' and a.id=b.receipt ");
+        $obtener_fecha_ultima_venta=$conn->ObtenerFilasBySqlSelect("select date(datenew) as fecha from $bd_pos.receipts where money='".$fecha_venta[0]['money']."'");
+        //echo "select date(datenew) as fecha from receipts where money='".$fecha_venta[0]['money']."'";
+
+         if(!isset($ultimo_z[0]['z'])){
+            $ultimo_z[0]['z']="";
+            $ultimo_z[0]['money']="";
+            }else{
+                $ultimo_z[0]['z']=$ultimo_z[0]['z'];}
+         echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#A9A9F5; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                    <thead>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px; align:left;">Serial Impresora</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Nro. Z</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Ultima Factura</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;">Nro. Facturas</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:40px;" value=0>Ultima Nota Credito</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;" value=0>Nro. Notas De Credito</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Fecha</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Monto Bruto</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Monto Exento</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">Base Imponible</th>
+                        <th align="center" style="border-bottom: 1px solid #949494;width:100px;">IVA</th>
+                    </thead>
+
+                    <tbody>
+                    <td align="center" ><input type="text" name="serial" id="serial"  class="form-text serialSec " required style="width:100px;" value='.$serial[0]['serial_impresora'].' readonly></td>
+                    <td align="center" ><input  type="hidden" name="z" id="z"  class="form-text serialSec " style="width:40px;" value='.$ultimo_z[0]['z'].'><input  type="text" name="z_usuario" id="z_usuario"  class="form-text serialSec " style="width:40px;" value='.$ultimo_z[0]['z'].'></td>
+                    <th align="center" ><input type="text" name="ultima_factura" id="ultima_factura"  class="form-text serialSec " style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name="nro_facturas" id="nro_facturas" value="'.$numero_facturas[0]['total_factura'].'"  class="form-text serialSec " style="width:40px; align:center"/></th>
+                    <th align="center" ><input type="text" name="ultima_nc" id="ultima_nc"  class="form-text serialSec " style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name="nro_ncs" id="nro_ncs"  class="form-text serialSec " style="width:40px; align:center"></th>
+                    <th align="center" ><input type="text" name=fecha id="fecha" readonly="readonly" value="'.$obtener_fecha_ultima_venta[0]['fecha'].'" class="form-text serialSec " required  style="width:80px; align:center"></th>
+
+                   
+                
+                    <th align="center" ><input type="hidden" name="monto_bruto" id="monto_bruto" class="form-text serialSec " style="width:100px; align:center"><input type="text" name="monto_bruto_usuario" id="monto_bruto_usuario" onfocus=calcular();  class="form-text serialSec " style="width:100px; align:center"></th>
+                    <th align="center" ><input type="hidden" name="monto_exento" id="monto_exento"  class="form-text serialSec " style="width:100px; align:center"><input type="text" name="monto_exento_usuario" id="monto_exento_usuario"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    <th align="center" ><input type="hidden" name="base_imponible" id="base_imponible"  class="form-text serialSec " style="width:100px; align:center"><input type="text" name="base_imponible"_usuarrio id="base_imponible_usuario"  class="form-text serialSec " style="width:100px; align:center"></th>
+                    <th align="center" ><input type="hidden" name="iva" id="iva"  class="form-text serialSec " style="width:100px; align:center"><input type="text" name="iva_usuario" id="iva_usuario"  class="form-text serialSec " style="width:100px; align:center">
+                    <input type="hidden" name="caja" id="caja"  value="'.$_POST['caja'].'"/>
+                    <input type="hidden" name="money" id="money"  value="'.$fecha_venta[0]['money'].'"/>
+                    <input type="hidden" name="cierres" id="cierres"  value="'.$_POST['cierres'].'"/>
+                    </th>
+                    </tbody>';
+
+
+
+        break;
+
+
+
+
+
+        case "eliminar_asientoCXP":
+            $instruccion = "SELECT * FROM cxp_edocuenta_detalle WHERE cod_edocuenta_detalle = '" . $_GET["cod"] . "'";
+            $campos = $conn->ObtenerFilasBySqlSelect($instruccion);
+
+            $instruccion = "delete from tabla_impuestos WHERE numero_control_factura = '" . $campos[0]["numero"] . "' and tipo_documento='c' and totalizar_monto_retencion='" . $campos[0]["monto"] . "'";
+            $conn->Execute2($instruccion);
+
+//,fecha_anulacion='".$_GET["fecha"]."',observacion_anulado='".$_GET["motivoAnulacion"]."'
+            $instruccion = "update cxp_edocuenta_detalle set marca='',estado = '0',fecha_anulacion='" . $_GET["fecha"] . "',observacion_anulado='" . $_GET["motivoAnulacion"] . "' WHERE cod_edocuenta_detalle = '" . $_GET["cod"] . "'";
+            $conn->Execute2($instruccion);
+
+            $instruccion = "update cxp_edocuenta set marca = '' WHERE cod_edocuenta = " . $campos[0]["cod_edocuenta"];
+            $conn->Execute2($instruccion);
+
+            $instruccion = "delete from cxp_factura_pago WHERE cxp_edocuenta_detalle_fk = '" . $_GET["cod"] . "'";
+            $conn->Execute2($instruccion);
+
+            $instruccion = "delete from cxp_edocuenta_formapago WHERE cod_edocuenta_detalle = '" . $_GET["cod"] . "'";
+            $conn->Execute2($instruccion);
+//echo $instruccion;
+            break;
+        case "eliminar_asientoCXC":
+
+            $instruccion = "SELECT * FROM cxc_edocuenta_detalle WHERE cod_edocuenta_detalle = '" . $_GET["cod"] . "'";
+            $campos = $conn->ObtenerFilasBySqlSelect($instruccion);
+
+            $instruccion = "delete from cxc_edocuenta_detalle WHERE cod_edocuenta_detalle = '" . $_GET["cod"] . "'";
+            echo $conn->Execute2($instruccion);
+
+            $instruccion = "delete from tabla_impuestos WHERE numero_control_factura = '" . $campos[0]["numero"] . "' and tipo_documento='f' and totalizar_monto_retencion='" . $campos[0]["monto"] . "'";
+            echo $conn->Execute2($instruccion);
+
+            $instruccion = "update cxc_edocuenta set marca = '' WHERE cod_edocuenta = " . $campos[0]["cod_edocuenta"];
+            echo $instruccion;
+            $conn->Execute2($instruccion);
+
+            break;
+        case "impuestos":
+            $instruccion = "SELECT * FROM lista_impuestos as li
+            left join formulacion_impuestos as fi on li.cod_formula=fi.cod_formula
+            WHERE cod_impuesto= '" . $_GET["cod_impuesto"] . "'";
+            $campos = $conn->ObtenerFilasBySqlSelect($instruccion);
+            $PORCENTAJE = $campos[0]["alicuota"];
+            $PAGOMAYORA = $campos[0]["pago_mayor_a"];
+            $MONTOSUSTRACCION = $campos[0]["monto_sustraccion"];
+            $MONTOBASE = $_GET["monto_base"];
+            $formula = $campos[0]["formula"];
+            $resultado = eval($formula);
+
+            $calculo = $_GET["monto_islr"] * $porcentaje;
+            echo "[{'total_retencion':'" . $MONTO . "','porcentaje':'" . $campos[0]["alicuota"] . "','formula':'" . $campos[0]["formula"] . "','resultado':'" . $MONTO . "','codigo_impuesto':'" . $campos[0]["cod_impuesto"] . "','cod_tipo_impuesto':'" . $campos[0]["cod_tipo_impuesto"] . "'}]";
+            break;
+        case "impuesto_iva":
+            $instruccion = "SELECT * FROM impuesto_iva WHERE cod_impuesto_iva = " . $_GET["cod_impuesto_iva"];
+            $campos = $conn->ObtenerFilasBySqlSelect($instruccion);
+            $calculo = $_GET["montoiva"] * ($campos[0]["porcentaje"] / 100);
+            echo "[{'total_iva':'" . ($calculo) . "','porcentaje':'" . $campos[0]["porcentaje"] . "'}]";
+            break;
+        case "ValidarCodigoitem":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item WHERE cod_item = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+            break;
+            
+        case "filtroProveedores":  
+            /**
+             * Procedimiento de busqueda de filtroProveedores
+             *
+             * Realizado por:
+             * Luis E. Viera Fernandez
+             *
+             * Correo:
+             *      levieraf@gmail.com
+             *
+             */
+
+            $busqueda = (isset($_POST["BuscarBy"])) ? $_POST["BuscarBy"] : "";
+            $limit = (isset($_POST["limit"])) ? $_POST["limit"] : 10;
+            $start = (isset($_POST["start"])) ? $_POST["start"] : 0;
+
+            if ($busqueda) {
+
+                // Filtro para los proveedores
+                $id_proveedor = (isset($_POST["id_proveedor"])) ? $_POST["id_proveedor"] : "";
+                $rif = (isset($_POST["ciruc"])) ? $_POST["ciruc"] : "";
+                $cod_proveedor = (!isset($_POST["cod_proveedor"])) ? "" : $_POST["cod_proveedor"];
+                $nombre = (!isset($_POST["proveedor"])) ? "" : $_POST["proveedor"];
+
+                if ($cod_proveedor != "") {
+                    $andWHERE .= " and upper(cod_proveedor) like upper('%" . $cod_proveedor . "%')";
+                }
+
+                if ($nombre != "") {
+                    if ($cod_proveedor != "") {
+                        $andWHERE .= " and ";
+                    } else {
+                        $andWHERE = " and ";
+                    }
+                    $andWHERE .= " upper(descripcion) like upper('%" . $nombre . "%')";
+                }
+
+                $sql = "SELECT * FROM proveedores WHERE estatus = 'A' " . $andWHERE;
+
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+
+                $sql = "SELECT * FROM proveedores WHERE estatus = 'A' " . $andWHERE . " limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+
+            } else {
+                $sql = "SELECT * FROM proveedores WHERE estatus = 'A'";
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+                $sql = "SELECT * FROM proveedores WHERE estatus = 'A' limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes1),
+                "data" => $campos_comunes
+            ));
+            break;
+
+
+       case "filtroClientes":  
+            /**
+             * Procedimiento de busqueda de Clientes
+             *
+             * Realizado por:
+             * Luis E. Viera Fernandez
+             *
+             * Correo:
+             *      levieraf@gmail.com
+             *
+             */
+
+            $busqueda = (isset($_POST["BuscarBy"])) ? $_POST["BuscarBy"] : "";
+            $limit = (isset($_POST["limit"])) ? $_POST["limit"] : 10;
+            $start = (isset($_POST["start"])) ? $_POST["start"] : 0;
+
+            if ($busqueda) {
+
+                // Filtro para los cliente
+                $id_cliente = (isset($_POST["id_cliente"])) ? $_POST["id_cliente"] : "";
+                $rif = (isset($_POST["ciruc"])) ? $_POST["ciruc"] : "";
+                $cod_cliente = (!isset($_POST["cod_cliente"])) ? "" : $_POST["cod_cliente"];
+                $nombre = (!isset($_POST["cliente"])) ? "" : $_POST["cliente"];
+
+                $andWHERE = " and ";
+                if ($rif != "") {
+                    $andWHERE .= " upper(rif) like upper('%" . $rif . "%')";
+                }
+
+                if ($cod_cliente != "") {
+                    $andWHERE .= " upper(cod_cliente) like upper('%" . $cod_cliente . "%')";
+                }
+
+                if ($nombre != "") {
+                    if ($cod_cliente != "") {
+                        $andWHERE .= " and ";
+                    } else {
+                        $andWHERE = " and ";
+                    }
+                    $andWHERE .= " upper(nombre) like upper('%" . $nombre . "%')";
+                }
+
+                if ($rif != "") {
+                    if ($nombre != "" || $cod_cliente != "") {
+                        $andWHERE .= " and ";
+                    } else {
+                        $andWHERE = " and ";
+                    }
+                    $andWHERE .= " upper(rif) like upper('%" . $rif . "%')";
+                }
+
+                if ($rif == "" && $cod_cliente == "" && $nombre == "") {
+                    $andWHERE = "";
+                }
+
+                $sql = "SELECT * FROM clientes WHERE estado = 'A' " . $andWHERE;
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+
+                $sql = "SELECT * FROM clientes WHERE estado = 'A' " . $andWHERE . " limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+
+            } else {
+                $sql = "SELECT * FROM clientes WHERE estado = 'A'";
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+                $sql = "SELECT * FROM clientes WHERE estado = 'A' limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes1),
+                "data" => $campos_comunes
+            ));
+            break;
+        case "DetalleCliente":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM clientes WHERE id_cliente = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : json_encode($campos);
+            break;
+        case "Detalleproveedor":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM proveedor WHERE id_proveedor = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : json_encode($campos);
+            break;
+        case "ValidarCodigoCliente":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM clientes WHERE cod_cliente = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+            break;
+        case "ItemTrasladoTemp":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item_traslado_temp WHERE id_item = '" . $_GET["item"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+            break;
+        case "ValidarCodigoVendedor":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vendedor WHERE cod_vendedor = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+            break;
+        case "ValidarNombreUsuario":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM usuarios WHERE usuario = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+            break;
+        case "Selectitem":
+#$campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM `item` AS i INNER JOIN `item_existencia_almacen` AS ie ON i.id_item = ie.id_item WHERE i.cod_item_forma` = '" . $_GET["v1"] . "' AND i.estatus = 'A' AND ie.cantidad>0");
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM `item` WHERE `cod_item_forma` = '" . $_GET["v1"] . "' and estatus = 'A' order by descripcion1 asc");
+//SELECT * FROM `item` as i left join compra as c on c.id_proveedor=6 left join compra_detalle as cd on c.id_compra=cd.id_compra WHERE i.cod_item_forma = 1 and i.id_item)
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                $i=0;
+                foreach ($campos as $key => $value) {
+                   $campos[$i]["descripcion1"]= utf8_encode($value["descripcion1"]);
+                   $i++;
+                }
+                echo json_encode($campos);
+            }
+            break;
+        case "Selectitemporproveedor":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM `item` WHERE `cod_item_forma` = '" . $_GET["v1"] . "' and estatus = 'A' order by descripcion1 asc");
+//SELECT * FROM `item` as i left join compra as c on c.id_proveedor=6 left join compra_detalle as cd on c.id_compra=cd.id_compra WHERE i.cod_item_forma = 1 and i.id_item)
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+            break;
+        case "DetalleSelectitem":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM `item` WHERE `id_item` = '" . $_GET["v1"] . "'");
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+            break;
+        case "CargarAlmacenesDisponiblesByIdItem":
+        $codAlmacen= $_GET["codAlmacen"];
+         $ubicacion= $_GET["ubicacion"];        
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen WHERE id_item = '" . $_GET["v1"] . "' and cantidad > 0 AND cod_alamcen = '" . $_GET["codAlmacen"] . "' AND id_ubicacion= '" . $_GET["ubicacion"] . "' order by cod_almacen");
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+            break;
+              case "CargarAlmacenes":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM almacen order by cod_almacen");
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+              } else {
+                echo json_encode($campos);
+            }
+            break;
+        case "ExistenciaProductoAlmacenDefaultByIdItem":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT almaexi.* FROM vw_existenciabyalmacen almaexi JOIN parametros_generales pg ON pg.cod_almacen = almaexi.cod_almacen WHERE id_item = '" . $_GET["v1"] . "' and cantidad > 0");
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+        break;
+
+        case "verificarExistenciaItemByAlmacen":
+            //echo $var ="SELECT * FROM vw_item_precomprometidos WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'";
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_item_precomprometidos WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'");
+           
+            
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+        break;
+        case "verificarExistenciaItemByAlmacen2":
+            /*$campos = $conn->ObtenerFilasBySqlSelect("SELECT `st`.`PRODUCT` AS `Producto`,`i`.`cod_item` AS `cod_item`,`i`.`descripcion1` AS `descripcion1`,(`st`.`UNITS` - (select ifnull(sum(`item_precompromiso`.`cantidad`),0) AS `ifnull(sum(cantidad),0)`
+            FROM `pyme_tiendaprueba1`.`item_precompromiso`)) AS `cantidad`
+            FROM (`stockcurrent` `st` join `pyme_tiendaprueba1`.`item` `i` on((`i`.`itempos` = `st`.`PRODUCT`)))
+            ORDER BY `cantidad` DESC");*/
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_item_pisoventa WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'");
+            
+           
+            if (count($campos) == 0 || empty($campos)) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+        break;
+        case "precomprometeritem":
+            
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT grupo.cantidad_rest, grupo.dias_rest, grupo.cod_grupo, departamentos.cod_departamento, item.referencia FROM
+                    grupo INNER JOIN item ON grupo.cod_grupo = item.cod_grupO INNER JOIN departamentos ON grupo.id_rubro = departamentos.cod_departamentoWHERE item.id_item = '".$_GET["v1"]."' ");
+
+            if((CASAEQUIPADA=="SI") && ($campos[0]["cod_departamento"]==2))
+            {
+                $cliente = $conn->ObtenerFilasBySqlSelect("SELECT clientes.id_cliente, clientes.rif FROM clientes WHERE id_cliente = '".$_GET["cliente"]."'");
+                $cantidad = $campos[0]["cantidad_rest"];
+                $dias = $campos[0]["dias_rest"];
+                $grupo = $campos[0]["cod_grupo"];
+                $fecha = date('Y-m-d');
+                $nuevafecha = strtotime ( "-".$dias." day" , strtotime ( $fecha ) ) ;
+                $nuevafecha = date ( 'Y-m-d' , $nuevafecha );
+                $cliente =  $cliente[0][rif];
+
+        
+        //echo "SELECT sum(_item_cantidad) as cantidad FROM factura_detalle INNER JOIN factura ON factura_detalle.id_factura = factura.id_factura join item on item.id_item=factura_detalle.id_item WHERE item.cod_grupo = '".$grupo."' and id_cliente = '".$_GET["cliente"]."' and fechaFactura between  '$nuevafecha' and '$fecha'";
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT ifnull(count(codigo),0) as cantidad FROM mcbe  WHERE codigo = '".$campos[0]['referencia']."' and cedula = '$cliente' ");
+                $cantidadComprada = $campos[0]["cantidad"];
+
+               // echo "SELECT sum(_item_cantidad) as cantidad FROM factura_detalle INNER JOIN factura ON factura_detalle.id_factura = factura.id_factura WHERE id_item = '".$_GET["v1"]."' and id_cliente = '".$_GET["cliente"]."' and fechaFactura between '$nuevafecha' and '$fecha' ";
+               // exit;
+
+                if($cantidadComprada>=$cantidad)
+                {
+                    echo "[{'id':'-98','observacion':'Este cliente a alcazado el limite de compra por persona.'}]";
+                    exit;
+                }
+            }
+
+            if(RESTRICCIONES=="SI")
+            {
+		            
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT grupo.cantidad_rest, grupo.dias_rest, grupo.cod_grupo FROM grupo INNER JOIN item ON grupo.cod_grupo = item.cod_grupo WHERE restringido='1' and item.id_item = '".$_GET["v1"]."' ");
+               if(count($campos)>0){
+                    $cantidad = $campos[0]["cantidad_rest"];
+                    $cantidadPedidad = $_GET["cpedido"];
+                    $dias = $campos[0]["dias_rest"];
+                    $grupo = $campos[0]["cod_grupo"];
+                    $fecha = date('Y-m-d');
+                    $nuevafecha = strtotime ( "-".$dias." day" , strtotime ( $fecha ) ) ;
+                    $nuevafecha = date ( 'Y-m-d' , $nuevafecha );
+                    $id=$login->getIdSessionActual();
+                    $id_item=$_GET["v1"];
+
+                     $preco = $conn->ObtenerFilasBySqlSelect(" SELECT count(*) as cant FROM `item_precompromiso` WHERE `idSessionActualphp`='".$id."' and `id_item`='".$id_item."'");
+                   $cant=$preco[0]["cant"];
+                      $canTotal=$cant + $cantidadPedidad;  
+                    //echo "SELECT sum(_item_cantidad) as cantidad FROM factura_detalle INNER JOIN factura ON factura_detalle.id_factura = factura.id_factura join item on item.id_item=factura_detalle.id_item WHERE item.cod_grupo = '".$grupo."' and id_cliente = '".$_GET["cliente"]."' and fechaFactura between  '$nuevafecha' and '$fecha'";
+                  
+                    $campos = $conn->ObtenerFilasBySqlSelect("SELECT sum(_item_cantidad) as cantidad FROM factura_detalle INNER JOIN factura ON factura_detalle.id_factura = factura.id_factura join item on item.id_item=factura_detalle.id_item WHERE item.cod_grupo = '".$grupo."' and id_cliente = '".$_GET["cliente"]."' and fechaFactura between  '$nuevafecha' and '$fecha'");
+                    if(count($campos[0]["cantidad"])>0 || $campos[0]["cantidad"]!="NULL"){
+                        $cantidadComprada = $campos[0]["cantidad"];
+                    // echo "SELECT sum(_item_cantidad) as cantidad FROM factura_detalle INNER JOIN factura ON factura_detalle.id_factura = factura.id_factura WHERE id_item = '".$_GET["v1"]."' and id_cliente = '".$_GET["cliente"]."' and fechaFactura between '$nuevafecha' and '$fecha' ";
+                    // exit;
+
+                        if($cantidadComprada>=$cantidad || $cantidadPedidad > $cantidad || $canTotal > $cantidad )
+                        {
+                            echo "[{'id':'-98','observacion':'Este cliente a alcazado el limite de compra por persona.'}]";
+                            exit;
+                        }
+
+                    }
+                  
+                }
+                
+            }
+          
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_item_precomprometidos
+            WHERE id_item = '" . $_GET["v1"] . "' and cod_almacen = '" . $_GET["codalmacen"] . "' and id_ubicacion='". $_GET["ubicacion"]."'");
+
+            $cantidadExistenteOLD = $campos[0]["cantidad"];
+            $cantidadPedidad = $_GET["cpedido"];
+
+
+            $cantidadExistenteNEW = $cantidadExistenteOLD - $cantidadPedidad;
+            if ($cantidadExistenteNEW < 0) {
+                echo "[{'id':'-99','observacion':'La cantidad Pedida es mayor a la existente.'}]";
+                exit;
+            }
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item WHERE id_item = " . $_GET["v1"] . " and cod_item_forma = 1"); // 1: item producto
+            if (count($campos) > 0) {
+//if(strcmp($_GET["tipo_transaccion"],"presupuesto")){
+#echo $_GET["tipo_transaccion"];exit;
+                $sql = "INSERT INTO item_precompromiso (
+                        `id_item_precomiso`, `cod_item_precompromiso`, `id_item`, `cantidad`, `usuario_creacion`,
+                        `fecha_creacion`, `idSessionActualphp`, `almacen`,`ubicacion`)
+                        VALUES (
+                        NULL , '" . $_GET["codprecompromiso"] . "','" . $_GET["v1"] . "', '" . $_GET["cpedido"] . "', '" . $login->getUsuario() . "',
+                        CURRENT_TIMESTAMP , '" . $login->getIdSessionActual() . "','" . $_GET["codalmacen"] . "','" . $_GET["ubicacion"] . "');";
+                $conn->Execute2($sql);
+                echo "[{'id':'1','observacion':''}]";
+//}
+            } else {
+                echo "[{'id':'-1','observacion':''}]";
+            }
+            break;
+        case 'seleccionarPedidoPendiente':
+            header("Content-Type: text/plain");
+            $sql = "SELECT * FROM pedido_detalle pd inner join item i on i.id_item = pd.id_item WHERE id_pedido = {$_GET["id_pedido"]};";
+            $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            echo json_encode($campos);
+            break;
+        case 'seleccionarNotaEntregaPendiente':
+            header("Content-Type: text/plain");
+            $sql = "SELECT * FROM nota_entrega_detalle WHERE id_nota_entrega = {$_GET["id_nota"]};";
+            $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            echo json_encode($campos);
+            break;
+        case 'seleccionarCotizacionPendiente':
+            header("Content-Type: text/plain");
+            $sql = "SELECT * FROM cotizacion_presupuesto_detalle WHERE id_cotizacion = {$_GET["id_cotizacion"]};";
+            $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            echo json_encode($campos);
+            break;
+        /* case 'generarCuotas':
+
+          header("Content-Type: text/plain");
+
+          $correlativos = new Correlativos();
+          $cuotas = $_POST["cuota"];
+          $cuota_precios = $_POST["precio"];
+          $cuota_anios = $_POST["anio"];
+          $cuota_meses = $_POST["mes"];
+
+          $conn->Execute2("UPDATE `cuota` SET `estatus` = 1 WHERE `id` = {$_POST["id_cuota"]};");
+
+          foreach ($cuotas as $key => $cuota_descripcion) {//Pendiente de quitar el 1 para `cuota_cuota_id` y eliminar dicho campo de la tabla
+
+          $codigo = $correlativos->getUltimoCorrelativo("cod_producto", 1, "si", "C");
+          $conn->ExecuteTrans("UPDATE correlativos SET contador = contador + 1 WHERE campo = 'cod_producto';");
+
+          $cuota = $conn->ObtenerFilasBySqlSelect("SELECT descripcion FROM cuota WHERE id = {$_POST["id_cuota"]};");
+
+          //$cuota_descripcion = $cuota[0]["descripcion"] . " " . $cuota_anios[$key] . "-" . ($cuota_meses[$key] < 10 ? "0" . $cuota_meses[$key] : $cuota_meses[$key]);
+
+          $instruccion = "INSERT INTO `item`(
+          `cod_item`, `costo_actual`, `descripcion1`,
+          `precio1`, `utilidad1`, `coniva1`, `precio2`, `utilidad2`,
+          `coniva2`, `precio3`, `utilidad3`, `coniva3`, `existencia_min`,
+          `existencia_max`, `monto_exento`, `iva`,
+          `estatus`,`usuario_creacion`, `fecha_creacion`, `cod_item_forma`, unidad_empaque,
+          costo_promedio, costo_anterior)
+          VALUES(
+          '{$codigo}', '{$cuota_precios[$key]}', '{$cuota_descripcion}',
+          '{$cuota_precios[$key]}', '0', '{$cuota_precios[$key]}', '{$cuota_precios[$key]}',
+          '0', '{$cuota_precios[$key]}', '{$cuota_precios[$key]}', '0',
+          '{$cuota_precios[$key]}', '0',  '0', '0', '0',
+          'I', '" . $login->getUsuario() . "', CURRENT_TIMESTAMP, 4, NULL,
+          '{$cuota_precios[$key]}', '{$cuota_precios[$key]}');";
+
+          $conn->ExecuteTrans($instruccion);
+
+          $id_item = $conn->getInsertID();
+
+          $instruccion = "INSERT INTO `cuota_mes` (`id`, `cuota_id`, `cuota_cuota_id`, `id_item`, `precio`, `mes`, `anio`)
+          VALUES (NULL, {$_POST["id_cuota"]}, 1, {$id_item}, {$cuota_precios[$key]}, $cuota_meses[$key], {$cuota_anios[$key]});";
+          $campos = $conn->Execute2($instruccion);
+          //echo (count($campos) == 0) ? "1" : "-1";
+          }
+          break; */
+        case 'ponerCuotaPagada':
+            header("Content-Type: text/plain");
+            /* Aqui debo recibir un array con todas las cuotas seleeccionadas en la pantalla de facturacion */
+            $cuotas = json_decode($_POST["cuotas"]);
+            $cliente = json_decode($_POST["cliente"]);
+            foreach ($cuotas as $cuota) {
+#$conn->Execute2("UPDATE `cuota_cliente` SET estatus = 1 WHERE id = {$cuota};");
+                $seleccionadas .= $cuota . ",";
+            }
+            $seleccionadas = trim($seleccionadas, ",");
+//$campos = $conn->ObtenerFilasBySqlSelect("SELECT cc.id, cc.id_cuota_generada, cc.id_cliente, cm.cuota_id, cm.precio AS precio, cm.mes AS mes, cm.anio AS anio, c.descripcion FROM cuota_cliente AS cc INNER JOIN cuota_mes AS cm ON cc.id_cuota_generada = cm.id INNER JOIN cuota AS c ON cm.cuota_id = c.id WHERE cc.id_cliente = {$cliente} AND cc.estatus = 0 AND cc.id IN ({$seleccionadas});");
+            $campos = $conn->ObtenerFilasBySqlSelect("
+                    SELECT i.cod_item, cc.id, cc.id_cuota_generada, cc.id_cliente, cm.cuota_id, cm.id_item, cm.precio AS precio, cm.mes AS mes, cm.anio AS anio, c.descripcion
+                    FROM cuota_cliente AS cc
+                    INNER JOIN cuota_mes AS cm ON cc.id_cuota_generada = cm.id
+                    INNER JOIN cuota AS c ON cm.cuota_id = c.id
+                    INNER JOIN item AS i ON i.id_item = cm.id_item
+                    WHERE cc.id_cliente = {$cliente} AND cc.estatus = 0 AND cc.id IN ({$seleccionadas});");
+            echo json_encode($campos);
+            break;
+        /* case "asignarCuotas":
+          $clientes_existentes = $conn->ObtenerFilasBySqlSelect("SELECT id_cliente, fdeuda FROM clientes WHERE cod_tipo_cliente = 1 --Contadores;");
+          $datacuota = $conn->ObtenerFilasBySqlSelect("SELECT id, mes, anio FROM cuota_mes WHERE cuota_id = {$_GET["id_cuota"]} AND estado = 0 -- No asignada");
+
+          $cant = count($datacuota);
+
+          foreach ($clientes_existentes as $cli) {
+          $fdeuda = explode("-", $cli["fdeuda"]);
+          if ($cli["fdeuda"] != "0000-00-00") {
+          $asignar = false;
+          foreach ($datacuota as $cuota) {
+          if ($fdeuda[0] == $cuota["anio"] && $fdeuda[1] == $cuota["mes"]) {
+          $asignar = true;
+          }
+          if ($asignar) {
+          $conn->Execute2("INSERT INTO `cuota_cliente` (`id_cuota_generada`, `id_cliente`) VALUES ({$cuota["id"]}, {$cli["id_cliente"]});");
+          }
+          }
+          }
+          $conn->ExecuteTrans("UPDATE cuota_mes SET estado = 1 WHERE cuota_id = {$_GET["id_cuota"]};");
+          }
+          //$cuotas = $conn->Execute2("UPDATE `cuota` SET `estatus` = 2 WHERE `id` = {$_GET["id_cuota"]};");
+          echo json_encode(array(
+          "success" => true,
+          "total" => $cant, //count($cuotas),
+          "data" => $cuotas
+          ));
+          break; */
+        case 'tipoFacturacion':
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT tipo_facuracion FROM parametros_generales");
+            echo json_encode($campos);
+            break;
+        case "delete_precomprometeritem":
+            $sql = "delete from item_precompromiso
+                    WHERE cod_item_precompromiso = '" . $_GET["codprecompromiso"] . "'  and
+                    idSessionActualphp = '" . $login->getIdSessionActual() . "'      and
+                    usuario_creacion = '" . $login->getUsuario() . "' and id_item = '" . $_GET["v1"] . "'";
+            $conn->Execute2($sql);
+            break;
+        case "det_edocuentacxp":
+            $data_parametros = $conn->ObtenerFilasBySqlSelect("SELECT * FROM parametros_generales");
+            foreach ($data_parametros as $key => $lista) {
+                $valueSELECT[] = $lista["cod_empresa"];
+                $outputidfiscalSELECT[] = $lista["moneda"];
+            }
+            $campos = $conn->ObtenerFilasBySqlSelect("
+                SELECT *, vw_cxp.numero AS num_cdet, cxp_edocuenta.vencimiento_persona_contacto, cxp_edocuenta.vencimiento_telefono, cxp_edocuenta.vencimiento_descripcion
+                FROM vw_cxp
+                INNER JOIN cxp_edocuenta ON cxp_edocuenta.cod_edocuenta = vw_cxp.cod_edocuenta
+                WHERE vw_cxp.cod_edocuenta = " . $_GET["cod_edocuenta"]);
+            if (count($campos) == 0) {
+                exit;
+            }
+            echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div style=" background-color:#f3ed8b; border: 1px solid #ededed; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px; margin-left: 10px; font-size: 13px;">
+                <table >
+                    <thead>
+                        <th style="border-bottom: 1px solid #949494;width:110px;">ID</th>
+                        <th style="border-bottom: 1px solid #949494;width:110px;">Documento</th>
+                        <th style="border-bottom: 1px solid #949494;">N&uacute;mero</th>
+                        <th style="border-bottom: 1px solid #949494;width:120px;">Fecha Emisi&oacute;n</th>
+                        <th align="justify" style="border-bottom: 1px solid #949494;width:300px;">Descripci&oacute;n</th>
+                        <th align="right" style="border-bottom: 1px solid #949494;width:110px;">Abonos/Pagos</th>
+                        <th align="right" style="border-bottom: 1px solid #949494;width:110px;">Deuda</th>
+                        <th align="right" style="border-bottom: 1px solid #949494;width:110px;">Opt</th>
+                    </thead>
+                    <tbody>';
+
+            $acuDebitos = 0;
+            $acuCreditos = 0;
+            foreach ($campos as $key => $item) {
+                if ($item["estado"] <> '0') {
+                    echo '
+                        <tr>
+                            <td align="center" style="border-bottom: 1px solid #949494;width:110px;">' . $item["cod_edocuenta_detalle"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;width:110px;">' . $item["documento_cdet"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;">' . $item["num_cdet"] . '</td>
+                            <td align="center" style="border-bottom: 1px solid #949494;width:120px;">' . $item["fecha_emision_edodet"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;width:300px;">' . $item["descripcion"] . '</td>
+                            <td align="right" style="border-bottom: 1px solid #949494;width:110px;">' . number_format($item['debito'], 2, ",", ".") . ' ' . $lista["moneda"] . ' </td>
+                            <td align="right" style="border-bottom: 1px solid #949494;">' . number_format($item['credito'], 2, ",", ".") . ' ' . $lista["moneda"] . ' </td>
+                            <td align="right" style="border-bottom: 1px solid #949494;">';
+
+                    if ($key > 0) {
+                        echo "<input type='hidden' id='detalle_asiento' name='detalle_asiento' value='" . $item["cod_edocuenta_detalle"] . "'>";
+                        echo '<img onclick="javascript: guardarr(' . $item["cod_edocuenta_detalle"] . ')" style="cursor:pointer;" title="Eliminar Asiento" src="../../libs/imagenes/cancel.gif">';
+                    }
+
+                    echo '</td>
+        </tr>';
+                }
+                $acuDebitos += $item['debito'];
+                $acuCreditos += $item['credito'];
+            }
+            echo '
+                        <tr>
+                            <td colspan="8" align="right" style="border-bottom: 1px solid #949494;width:300px;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" align="right" style="border-bottom: 1px solid #949494;width:300px;"><b>Total Pagos,Abonos/Deudas:</b></td>
+                            <td align="right" style="border-bottom: 1px solid #949494;"><b>' . number_format($acuDebitos, 2, ",", ".") . ' ' . $lista["moneda"] . '</b></td>
+                            <td align="right" style="border-bottom: 1px solid #949494;"><b>' . number_format($acuCreditos, 2, ",", ".") . ' ' . $lista["moneda"] . '</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" align="right" style="border-bottom: 1px solid #949494;width:300px;"><b>Saldo Pendiente:</b></td>
+                            <td colspan="2"align="right" style="border-bottom: 1px solid #949494;"><b style="color:red;">' . number_format($acuCreditos - $acuDebitos, 2, ",", ".") . ' ' . $lista["moneda"] . '</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="8" align="right" style="border-bottom: 1px solid #949494;">
+
+                            </td>
+                        </tr>
+    ';
+
+            if ($campos[0]["marca"] != "X") {
+                echo '
+
+                        <tr>
+                            <td colspan="6" style="text-align: left; border-bottom: 1px solid #949494;">
+
+                            <table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=89&opt_seccion=88&opt_subseccion=pagoabonoCXP&cod=' . $_GET["codigo_proveedor"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                    <td class="btn_bg"><img src="../../libs/imagenes/factu.png" width="16" height="16" /></td>
+                                    <td class="btn_bg" nowrap style="padding: 0px 1px;">Agregar Pago/Abono</td>
+                                    <td  style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                </tr>
+                            </table>
+                        </td>
+			<td colspan="7" style="text-align: left; border-bottom: 1px solid #949494;">
+
+                            <table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=89&opt_seccion=88&opt_subseccion=facturasCXP&cod=' . $_GET["codigo_proveedor"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                    <td class="btn_bg"><img src="../../libs/imagenes/list.gif" width="16" height="16" /></td>
+                                    <td class="btn_bg" nowrap style="padding: 0px 1px;">Facturas/Notas de Credito</td>
+                                    <td  style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                </tr>
+                            </table>
+                        </td>
+                        </tr>
+        ';
+            }
+            if ($campos[0]["marca"] == "X") {
+                echo '
+
+                        <tr>
+                            <td colspan="6" style="text-align: left; border-bottom: 1px solid #949494;">
+                        </td>
+			<td colspan="7" style="text-align: left; border-bottom: 1px solid #949494;">
+
+                            <table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=85&opt_seccion=88&opt_subseccion=facturasCXP&cod=' . $_GET["codigo_proveedor"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                    <td class="btn_bg"><img src="../../libs/imagenes/list.gif" width="16" height="16" /></td>
+                                    <td class="btn_bg" nowrap style="padding: 0px 1px;">Facturas/Notas de Credito</td>
+                                    <td  style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                </tr>
+                            </table>
+                        </td>
+                        </tr>
+        ';
+            }
+
+
+            echo
+            '</tbody>
+    </table>
+    </div>
+    </td>
+    </tr>';
+
+
+
+
+            break;
+
+        case "det_edocuenta":
+            $data_parametros = $conn->ObtenerFilasBySqlSelect("SELECT * FROM parametros_generales");
+            foreach ($data_parametros as $key => $lista) {
+                $valueSELECT[] = $lista["cod_empresa"];
+                $outputidfiscalSELECT[] = $lista["moneda"];
+            }
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT *
+,vw_cxc.numero as num_cdet
+,cxc_edocuenta.vencimiento_persona_contacto,
+cxc_edocuenta.vencimiento_telefono,
+cxc_edocuenta.vencimiento_descripcion from vw_cxc
+ inner join cxc_edocuenta on cxc_edocuenta.cod_edocuenta = vw_cxc.cod_edocuenta
+WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
+            if (count($campos) == 0) {
+                exit;
+            }
+            echo '<tr class="edocuenta_detalle">
+          <td colspan="8">
+            <div  style=" background-color:#fdfdfd; border: 1px solid #ededed;-moz-border-radius: 7px;padding:1px; margin-top:0.3%; margin-bottom: 10px;padding-bottom: 7px;margin-left: 10px;  font-size: 13px; ">
+                <table >
+                    <thead>
+                        <th style="border-bottom: 1px solid #949494;width:110px;">ID</th>
+                        <th style="border-bottom: 1px solid #949494;width:110px;">Documento</th>
+                        <th style="border-bottom: 1px solid #949494;">Numero</th>
+                        <th style="border-bottom: 1px solid #949494;width:120px;">Fecha EmisiÃ³n</th>
+                        <th align="justify" style="border-bottom: 1px solid #949494;width:300px;">DescripciÃ³n</th>
+                        <th align="right" style="border-bottom: 1px solid #949494;width:110px;">Deuda</th>
+                        <th align="right" style="border-bottom: 1px solid #949494;width:110px;">Pago/Abono</th>
+                        <th align="right" style="border-bottom: 1px solid #949494;width:110px;">Opt</th>
+                    </thead>
+                    <tbody>';
+
+
+            $acuDebitos = 0;
+            $acuCreditos = 0;
+            foreach ($campos as $key => $item) {
+                echo '
+                        <tr>
+                            <td align="center" style="border-bottom: 1px solid #949494;width:110px;">' . $item["cod_edocuenta_detalle"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;width:110px;">' . $item["documento_cdet"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;">' . $item["num_cdet"] . '</td>
+                            <td align="center" style="border-bottom: 1px solid #949494;width:120px;">' . $item["fecha_emision_edodet"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;width:300px;">' . $item["descripcion"] . '</td>
+                            <td align="right" style="border-bottom: 1px solid #949494;">' . number_format($item['debito'], 2, ",", ".") . ' ' . $lista["moneda"] . '</td>
+                            <td align="right" style="border-bottom: 1px solid #949494;">' . number_format($item['credito'], 2, ",", ".") . ' ' . $lista["moneda"] . '</td>
+                            <td align="right" style="border-bottom: 1px solid #949494;">';
+//if($item['debito']=="0.00"){
+                if ($key > 0) {
+                    echo '<img class="eliminarAsiento"  style="cursor:pointer;" title="Eliminar Asiento" src="../../libs/imagenes/cancel.gif">';
+                    echo "<input type='hidden' id='detalle_asiento' name='detalle_asiento' value='" . $item["cod_edocuenta_detalle"] . "'>";
+                }
+
+                echo '</td>
+        </tr>';
+
+                $acuDebitos += $item['debito'];
+                $acuCreditos += $item['credito'];
+            }
+            echo '
+                        <tr>
+                            <td colspan="8" align="right" style="border-bottom: 1px solid #949494;width:300px;"></td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" align="right" style="border-bottom: 1px solid #949494;width:300px;"><b>Total Deudas,Pagos/Abonos:</b></td>
+                            <td align="right" style="border-bottom: 1px solid #949494;"><b>' . number_format($acuDebitos, 2, ",", ".") . ' ' . $lista["moneda"] . '</b></td>
+                            <td align="right" style="border-bottom: 1px solid #949494;"><b>' . number_format($acuCreditos, 2, ",", ".") . '  ' . $lista["moneda"] . '</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4" align="right" style="border-bottom: 1px solid #949494;width:300px;"><b>Saldo Pendiente:</b></td>
+                            <td colspan="2"align="right" style="border-bottom: 1px solid #949494;"><b style="color:red;">' . number_format($acuDebitos - $acuCreditos, 2, ",", ".") . '  ' . $lista["moneda"] . '</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="7" align="right" style="border-bottom: 1px solid #949494;width:300px;">
+
+                            </td>
+                        </tr>
+    ';
+
+
+            if ($campos[0]["marca"] != "X") {
+                echo '<tr>
+                            <td colspan="6" style="text-align: left; border-bottom: 1px solid #949494;width:110px;">
+                            <table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=5&opt_seccion=59&opt_subseccion=pagooabono&cod=' . $_GET["codigo_cliente"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                    <td class="btn_bg"><img src="../../libs/imagenes/factu.png" width="16" height="16" /></td>
+                                    <td class="btn_bg" nowrap style="padding: 0px 1px;">Agregar Pago/Abono</td>
+                                    <td  style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                </tr>
+                            </table>
+                            <br>
+                            <img src="../../libs/imagenes/ico_user.gif"> Persona de Contacto: ' . $campos[0]["vencimiento_persona_contacto"] . '<br>
+                            <img src="../../libs/imagenes/ico_cel.gif"> Telefono de Contacto: ' . $campos[0]["vencimiento_telefono"] . '<br>
+                            <img src="../../libs/imagenes/ico_view.gif"> ObservaciÃ³n: ' . $campos[0]["vencimiento_descripcion"] . '<br>
+                            <img src="../../libs/imagenes/ew_calendar.gif"> Fecha de Vencimiento: ' . $campos[0]["vencimiento_fecha"] . '<br>
+
+                        </td>
+                        </tr>
+        ';
+            }
+            echo '</tbody></table></div></td></tr>';
+            break;
+        
+
+        case "det_items_calidad":
+       $campos= $conn->ObtenerFilasBySqlSelect("select c.codigo_barras, c.descripcion1, m.marca, c.pesoxunidad, d.nombre_unidad, b.cantidad, b.observacion from calidad_almacen as a, calidad_almacen_detalle as b, item as c LEFT JOIN marca m ON c.id_marca= m.id, unidad_medida as d where b.id_item=c.id_item and a.id_transaccion=b.id_transaccion and c.unidadxpeso=d.id and a.id_transaccion=".$_GET['id_transaccion']);
+
+ 
+        echo '<tr class="detalle_items">
+          <td colspan="8">
+            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+               <table >
+                    <thead>
+                        
+                       <th style="width:150px; font-weight: bold;">Codigo Barras</th>
+                       <th style="width:350px; font-weight: bold;">Nombre</th>
+                        <th style="width:150px; font-weight: bold;">Cantidad</th>
+                        <th style="width:110px; font-weight: bold; text-align: center;">Observación</th>
+                    </thead>
+                   <tbody>';
+          foreach ($campos as $key => $item) {
+                //if(empty($item["marca"])
+                  //      $item["marca"]='SIN MARCA';
+                  echo '
+                       <tr>
+                        <td style="width:150px; padding-left:10px;">' . $item["codigo_barras"] . '</td>
+                        <td style="width:110px; text-align: right; padding-right:10px;">' .$item["descripcion1"].'- '.$item["marca"].' '.$item["pesoxunidad"].' '.$item["nombre_unidad"].'</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["cantidad"] . '</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["observacion"] . '</td>
+                        </tr>';
+                   }
+      break;
+      
+        case "det_items":
+            if ($_GET["id_tipo_movimiento_almacen"] == '3' || $_GET["id_tipo_movimiento_almacen"] == '1') {
+                $operacion = "Entrada";
+
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT ite.*,m.*,kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+        FROM kardex_almacen_detalle AS kad
+        JOIN kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
+        LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
+        LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+        LEFT JOIN marca m ON m.id = ite.id_marca
+        LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+        WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+            } else if ($_GET["id_tipo_movimiento_almacen"] == '4' || $_GET["id_tipo_movimiento_almacen"] == '2' || $_GET["id_tipo_movimiento_almacen"] == '8') {
+                $operacion = "Salida";
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+        FROM kardex_almacen_detalle AS kad
+        join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
+        LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id
+        LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+        LEFT JOIN marca m ON m.id = ite.id_marca
+        LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+        WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+            } else if ($_GET["id_tipo_movimiento_almacen"] == '5') {
+                $operacion = "Traslado";
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+        FROM kardex_almacen_detalle AS kad
+        LEFT JOIN kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
+        LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
+        LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+        LEFT JOIN marca m ON m.id = ite.id_marca
+        LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+        WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+                $campos1 = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen
+        from kardex_almacen_detalle as kad join kardex_almacen as k on kad.id_transaccion=k.id_transaccion left join almacen as alm on kad.id_almacen_salida=alm.cod_almacen LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id left join item as ite on kad.id_item=ite.id_item WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+            }
+//$campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item
+//from kardex_almacen_detalle as kad left join almacen as alm on kad.id_almacen_entrada=alm.cod_almacen left join item as ite on kad.id_item=ite.id_item WHERE id_transaccion = ".$_GET["id_transaccion"]);
+//echo $campos;
+            if (count($campos) == 0) {
+                exit;
+            }
+
+            if ($_GET["id_tipo_movimiento_almacen"] == '5') {
+                echo '<tr class="detalle_items">
+          <td colspan="8">
+            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px;padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+                <table >
+                    <thead>
+                        <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
+                        <th style="width:150px; font-weight: bold;">Almac&eacute;n Entrada</th>
+                        <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n Entrada</th>
+                        <th style="width:150px; font-weight: bold;">Almac&eacute;n Salida</th>
+                         <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n Salida</th>
+                        <th style="width:300px; font-weight: bold;">Item</th>
+                        <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+                    </thead>
+                    <tbody>';
+            } else {
+                echo '<tr class="detalle_items">
+          <td colspan="8">
+            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+                <table >
+                    <thead>
+                        <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
+                        <th style="width:150px; font-weight: bold;">Almac&eacute;n ' . $operacion . '</th>
+                        <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n' . $operacion . '</th>
+                        <th style="width:300px; font-weight: bold;">Item</th>
+                        <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+                    </thead>
+                    <tbody>';
+            }
+
+            foreach ($campos as $key => $item) {
+                if ($_GET["id_tipo_movimiento_almacen"] == '5') {
+                    echo '
+                        <tr>
+                            <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                            <td style="width:150px;">' . $campos1[0]["almacen"] . '</td>
+                            <td style="width:150px;">' . $campos1[0]["ubicacion"] . '</td>
+                            <td style="width:300px;">' . $item["descripcion1"] ." - ". $item["marca"]." ". $item["pesoxunidad"]."". $item["nombre_unidad"]. '</td>
+                            <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
+                        </tr>';
+                } else {
+                    echo '
+                        <tr>
+                            <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                            <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
+                            <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
+                        </tr>';
+                }
+            }
+
+            if ($campos[0]["estado"] == "Pendiente") {
+                echo '<tr>
+                            <td colspan="6" style="text-align: left; border-bottom: 1px solid #949494;width:110px;">
+<br/><!--form>
+<label for="fecha">Fecha</label><input type="text" name="fecha">
+<label for="control">Nro. Control</label><input type="text" name="control">
+<label for="factura">Nro. Factura</label><input type="text" name="factura"-->
+<table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=3&opt_seccion=109&opt_subseccion=add&cod=' . $_GET["id_transaccion"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                <!-- <tr>
+                                     <td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                    <td class="btn_bg"><img src="../../libs/imagenes/factu.png" width="16" height="16" /></td>
+                                    <td class="btn_bg" nowrap style="padding: 0px 1px;">Realizar Entrada</td>
+                                    <td style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td> 
+                                </tr> -->
+                            </table>
+                            <!--/form-->
+                        </td>
+                        </tr>';
+            }
+            echo
+            '</tbody>
+    </table>
+    </div>
+    </td>
+    </tr>';
+
+            break;
+
+        case "getAlmacen":
+
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM almacen");
+
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+            break;
+
+            case "gettipo_uso":
+
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM tipo_uso");
+
+            if (count($campos) == 0) {
+               echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+           }
+            break;
+
+             case "getPuntos":
+            $estado=$_GET["estados"];
+            $sql="SELECT nombre_punto,codigo_siga_punto as siga  from puntos_venta where estatus='A'";
+            if($estado!=9999){
+                $sql.=" AND codigo_estado_punto=$estado";
+            } 
+            $campos = $conn->ObtenerFilasBySqlSelect($sql);
+
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+
+            break;
+
+        case 'listaCXPpendientes':
+            header("Content-Type: text/plain");
+            $groupByBeneficiario = isset($_POST["groupBene"]) ? 'si' : 'no';
+            if ($groupByBeneficiario == "no") {
+                $sql_ = "SELECT   pro.id_proveedor, cxpd. * , pro.descripcion AS beneficiario, pro.rif, cxpd.monto as monto_pagar, (
+    SELECT ifnull( sum( monto ) , 0.00 )
+    FROM cxp_edocuenta_detalle
+    WHERE cod_edocuenta = cxp.cod_edocuenta
+    AND tipo = 'd'
+    ) AS sum_debito, (
+
+    SELECT ifnull( sum( monto ) , 0.00 )
+    FROM cxp_edocuenta_detalle
+    WHERE cod_edocuenta = cxp.cod_edocuenta
+    AND tipo = 'c'
+    ) AS sum_credito, (
+    (
+
+    SELECT ifnull( sum( monto ) , 0.00 )
+    FROM cxp_edocuenta_detalle
+    WHERE cod_edocuenta = cxp.cod_edocuenta
+    AND tipo = 'c'
+    ) - (
+    SELECT ifnull( sum( monto ) , 0.00 )
+    FROM cxp_edocuenta_detalle
+    WHERE cod_edocuenta = cxp.cod_edocuenta
+    AND tipo = 'd' )
+    ) AS monto_pendiente
+    FROM cxp_edocuenta_detalle cxpd
+    INNER JOIN cxp_edocuenta cxp ON cxpd.cod_edocuenta = cxp.cod_edocuenta
+    INNER JOIN proveedores pro ON pro.id_proveedor = cxp.id_proveedor
+    WHERE cxpd.marca = 'P' and cxpd.documento<>'PAGOxCOM'
+    ";
+
+                if (isset($_POST["id_proveedor"])) {
+                    $sql_ .= " and  pro.id_proveedor = " . $_POST["id_proveedor"];
+                }
+
+
+                $campos = $conn->ObtenerFilasBySqlSelect($sql_);
+
+
+
+                $start = isset($_POST['start']) ? $_POST['start'] : 0; //posiciÃ³n a iniciar
+                $limit = isset($_POST['limit']) ? $_POST['limit'] : 30; //nÃºmero de registros a mostrar
+
+                echo json_encode(array(
+                    "success" => true,
+                    "total" => count($campos),
+                    "data" => array_splice($campos, $start, $limit)
+                ));
+            }
+
+            if ($groupByBeneficiario == "si") {
+                $sql_ = "SELECT  distinct  pro.id_proveedor, pro.descripcion AS beneficiario
+FROM cxp_edocuenta_detalle cxpd
+INNER JOIN cxp_edocuenta cxp ON cxpd.cod_edocuenta = cxp.cod_edocuenta
+INNER JOIN proveedores pro ON pro.id_proveedor = cxp.id_proveedor
+WHERE cxpd.marca = 'P' and cxpd.documento<>'PAGOxCOM'";
+
+
+                $campos = $conn->ObtenerFilasBySqlSelect($sql_);
+
+                echo json_encode(array(
+                    "success" => true,
+                    "total" => count($campos),
+                    "data" => $campos
+                ));
+            }
+
+
+
+
+
+            break;
+        case "convertiraLetras":
+
+            header("Content-Type: text/plain");
+
+            $n = new numerosALetras();
+            $numero = $_GET["monto"];
+            $num_letras = $n->convertir($numero);
+
+            $array = array(
+                "success" => true,
+                "monto" => $num_letras
+            );
+            echo json_encode($array);
+            break;
+        case "tesodetasientos":
+            header("Content-Type: text/plain");
+            $cod_cheque = $_POST["cod_cheque"];
+            $sql_ = "
+                SELECT cod_cheque_bauchedet, cod_cheque, descripcion, cuenta_contable,
+                CASE tipo WHEN  'd' THEN monto ELSE  '' END AS debito,
+                CASE tipo WHEN  'c' THEN monto ELSE  '' END AS credito
+                FROM `cheque_bache_det` WHERE cod_cheque = {$cod_cheque} ORDER BY tipo DESC;";
+            /* SELECT
+              cod_cheque_bauchedet,
+              cod_cheque,
+              descripcion,
+              cuenta_contable,
+              case tipo when 'd' then monto else '' end as debito,
+              case tipo when 'c' then monto else '' end as credito
+              FROM `cheque_bache_det` WHERE cod_cheque = " . $cod_cheque . " order by tipo desc
+              "; */
+            $campos = $conn->ObtenerFilasBySqlSelect($sql_);
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos),
+                "data" => $campos
+            ));
+            break;
+        case "store_cuContable":
+            header("Content-Type: text/plain");
+// CONSULTA DE CUENTAS CONTABLES
+            $global = new bd(SELECTRA_CONF_PYME);
+
+            if (isset($_POST["query"])) {
+                /* if ($_POST["query"] == "") {
+                  $cuentalike = " order by cuenta";
+                  } else {
+                  $cuentalike = " and upper(concat(cuenta,' .-',Descrip)) like upper('%" . $_POST["query"] . "%') order by cuenta";
+                  } */
+                $cuentalike = ($_POST["query"] == "") ? " ORDER BY cuenta" : " AND UPPER (CONCAT(cuenta,' .-',Descrip)) LIKE UPPER('%{$_POST["query"]}%') ORDER BY cuenta";
+            }
+            $sentencia = "SELECT * FROM nomempresa WHERE bd = '{$_SESSION['EmpresaFacturacion']}';";
+            $contabilidad = $global->query($sentencia);
+            $fila = $contabilidad->fetch_assoc();
+            $campos_cuentas_cont = $conn->ObtenerFilasBySqlSelect("SELECT CONCAT(cuenta,' .-',Descrip) AS descripcion, cuenta FROM {$fila['bd_contabilidad']}.cwconcue WHERE Tipo = 'P'" . $cuentalike);
+//echo "select cuenta as descripcion, cuenta from ".$fila['bd_contabilidad'].".cwconcue WHERE Tipo='P'".$cuentalike." order Cuenta";
+            $campos_cuentas_cant = $conn->ObtenerFilasBySqlSelect("SELECT cuenta AS descripcion, cuenta FROM {$fila['bd_contabilidad']}.cwconcue WHERE Tipo = 'P'" . $cuentalike);
+
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_cuentas_cant),
+                "data" => $campos_cuentas_cont
+            ));
+            break;
+        case "store_vendedores":
+            $campos_comunes = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vendedor ORDER BY nombre");
+#$campos_comunes = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vendedor WHERE nombre = '".$_GET["nombre_vendedor"]."'");
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes),
+                "data" => $campos_comunes
+            ));
+            break;
+        case "store_tipoCuenta":
+            $campos_comunes = $conn->ObtenerFilasBySqlSelect("SELECT * FROM tipo_cuenta_banco");
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes),
+                "data" => $campos_comunes
+            ));
+            break;
+        case "aCheBaucheDetCRUP":
+
+            if ($_POST["cod_cheque_bauchedet"] != "" && $_POST["in_deleted"] != 1) {//UPDATIAR
+                $sql = "
+            update cheque_bache_det set
+                        `monto` = " . $_POST["monto"] . ",
+                        `tipo` = '" . (($_POST["tipo_a"] == "Debito") ? 'd' : 'c') . "',
+                        `descripcion` = '" . $_POST["descripcion"] . "',
+                        cuenta_contable = '" . $_POST["cuenta_contable"] . "'
+           WHERE cod_cheque_bauchedet = " . $_POST["cod_cheque_bauchedet"];
+                $conn->Execute2($sql);
+            } elseif ($_POST["in_deleted"] == "1") {
+
+                $sql = "delete from cheque_bache_det WHERE cod_cheque_bauchedet = " . $_POST["cod_cheque_bauchedet"];
+                $conn->Execute2($sql);
+            } else {//NUEVO ASIENTO CHEQUE BAUCHE DET
+                $sql = "
+            INSERT INTO `cheque_bache_det` (
+                        `cod_cheque`,
+                        `monto`,
+                        `tipo`,
+                        `fecha`,
+                        `descripcion`,
+                        `fecha_creacion`,
+                        `usuario_creacion`,cuenta_contable)
+                        VALUES (
+                            " . $_POST["cod_cheque"] . ",
+                            " . $_POST["monto"] . ",
+                            '" . (($_POST["tipo_a"] == "Debito") ? 'd' : 'c') . "',
+                            '" . date("Y-m-d") . "',
+                            '" . $_POST["descripcion"] . "',
+                            CURRENT_TIMESTAMP,
+                            '" . $_SESSION['usuario'] . "',
+                            '" . $_POST["cuenta_contable"] . "');";
+                $conn->Execute2($sql);
+            }
+
+            echo json_encode(array(
+                "success" => true,
+                "msg" => "Asiento registrado exitosamente."
+            ));
+
+
+            break;
+        case "listaProveedores":
+            $campos_comunes = $conn->ObtenerFilasBySqlSelect("
+    select
+        id_proveedor,
+        cod_proveedor,
+        descripcion as  beneficiario,
+        direccion,
+        telefonos,
+        fax,
+        email,
+        rif,
+        nit
+    from
+        proveedores
+	WHERE
+	estatus='A'");
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes),
+                "data" => $campos_comunes
+            ));
+            break;
+        case 'movimientos_bancarios_conciliar':
+
+            list($dia1, $mes1, $anio1) = explode("/", $_POST["fecha1_"]);
+            list($dia2, $mes2, $anio2) = explode("/", $_POST["fecha2_"]);
+            $fecha1 = $anio1 . "-" . $mes1 . "-" . $dia1;
+            $fecha2 = $anio2 . "-" . $mes2 . "-" . $dia2;
+            $cod_cuenta = $_POST["cod_cuenta"];
+            $sql = "
+SELECT
+mb.cod_movimiento_ban,
+mb.cod_tesor_bancodet,
+tm.descripcion as tipo_movimiento_desc,
+mb.numero_movimiento,
+mb.fecha_movimiento,
+mb.concepto,
+case when mb.tipo_movimiento =  3 or mb.tipo_movimiento =  4 then mb.monto  else 0 end debe,
+case when mb.tipo_movimiento  =  1 or mb.tipo_movimiento =  2 then mb.monto  else 0 end haber,
+mb.tipo_movimiento,
+mb.estado,
+mb.cod_conciliacion,
+'false' as conciliar
+ FROM `movimientos_bancarios` mb inner join tipo_movimientos_ban tm
+ on tm.cod_tipo_movimientos_ban = mb.tipo_movimiento
+ WHERE mb.fecha_movimiento between '" . $fecha1 . "' and '" . $fecha2 . "'
+ and mb.cod_tesor_bancodet = " . $cod_cuenta . "  and mb.cod_conciliacion is null
+order by mb.cod_movimiento_ban";
+            $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes),
+                "data" => $campos_comunes
+            ));
+
+            break;
+
+        case 'cxpIvaFactura':
+
+            $MONTOBASE = $_GET[montoBase];
+            $codIva = $_GET[codIva];
+
+            $ivas = $conn->ObtenerFilasBySqlSelect("select li.alicuota, fi.formula from lista_impuestos li join formulacion_impuestos fi on (li.cod_formula=fi.cod_formula) WHERE li.cod_impuesto=$codIva");
+            $PORCENTAJE = $ivas[0][alicuota];
+            eval($ivas[0][formula]);
+            echo $cad = $PORCENTAJE . '-' . $MONTO;
+            break;
+
+        case 'cxpRetIslrFactura':
+            $par1 = $conn->ObtenerFilasBySqlSelect("select unidad_tributaria from parametros_generales");
+            $id_item = $_GET[servicio];
+            $cod_entidad = $_GET[entidad];
+            $item_totalsiniva = $_GET[montoBase];
+            $islr = $conn->ObtenerFilasBySqlSelect("select si.cod_lista_impuesto, fi.formula, li.alicuota, li.pago_mayor_a, li.monto_sustraccion, li.descripcion, li.cod_impuesto from servicios_islr si join lista_impuestos li on (si.cod_lista_impuesto=li.cod_impuesto) join formulacion_impuestos fi on (fi.cod_formula=li.cod_formula) WHERE si.cod_item=$id_item and li.cod_entidad=$cod_entidad and li.pago_mayor_a<$item_totalsiniva");
+            if ($islr[0]) {
+                $UT = $par1[0]["unidad_tributaria"];
+                $FACTORSUST = $islr[0]["monto_sustraccion"];
+                $FACTORM = $islr[0]["pago_mayor_a"];
+                $PORCENTAJE = $islr[0]["alicuota"];
+                $MONTOBASE = $item_totalsiniva;
+                $formula = $islr[0]["formula"];
+                eval($formula);
+
+                echo number_format($MONTO, 2, ".", "");
+            }
+            else
+                echo $cad = 0;
+            break;
+
+        case 'retencionesFactura':
+
+            $codFacs = $_GET["facs"];
+
+            $retenciones = $conn->ObtenerFilasBySqlSelect("SELECT cpf.cod_impuesto, li.descripcion, sum(cpf.monto_iva) as base, porcentaje_iva_retenido, sum(cpf.monto_retenido) as montoRet, sum(cpf.monto_exento) as exento, li.cod_tipo_impuesto FROM cxp_factura cpf JOIN lista_impuestos li ON ( li.cod_impuesto = cpf.cod_impuesto ) WHERE id_factura in ($codFacs) group by cpf.cod_impuesto");
+            $reg = '';
+            $i = 0;
+            foreach ($retenciones as $key => $campos) {
+                if ($campos[montoRet] > 0) {
+                    $reg.="<tr><TD><input type='hidden' name='codImp$i' id='codImp$i' value='$campos[cod_impuesto]'><input type='hidden' name='exento$i' id='exento$i' value='$campos[exento]'><input type='hidden' name='tipoImp$i' id='tipoImp$i' value='$campos[cod_tipo_impuesto]'>$campos[descripcion]</TD><TD> <input type='text' style='border:0px; background-color:#ffffff;' size='15' name='base$i' id='base$i' value='$campos[base]'></TD> <TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='porcen$i' id='porcen$i' value='$campos[porcentaje_iva_retenido]'></TD><TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='montoRet$i' id='montoRet$i' value='$campos[montoRet]'></TD></tr>";
+                    $i++;
+                }
+            }
+
+            $retenciones2 = $conn->ObtenerFilasBySqlSelect("SELECT cpfd.cod_impuesto, li.descripcion, sum(cpfd.monto_base) as base, porcentaje_retenido, sum(cpfd.monto_retenido) as montoRet, li.cod_tipo_impuesto FROM cxp_factura_detalle cpfd JOIN lista_impuestos li ON ( li.cod_impuesto = cpfd.cod_impuesto ) WHERE id_factura_fk in ($codFacs) group by cpfd.cod_impuesto");
+            foreach ($retenciones2 as $key => $campos) {
+                $reg.="<tr><TD><input type='hidden' name='codImp$i' id='codImp$i' value='$campos[cod_impuesto]'><input type='hidden' name='exento$i' id='exento$i' value='$campos[exento]'><input type='hidden' name='tipoImp$i' id='tipoImp$i' value='$campos[cod_tipo_impuesto]'>$campos[descripcion]</TD><TD> <input type='text' style='border:0px; background-color:#ffffff;' size='15' name='base$i' id='base$i' value='$campos[base]'></TD> <TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='porcen$i' id='porcen$i' value='$campos[porcentaje_retenido]'></TD><TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='montoRet$i' id='montoRet$i' value='$campos[montoRet]'></TD></tr>";
+                $i++;
+            }
+            $reg.="*l*l*l*" . $i;
+            echo $reg;
+            break;
+
+// 	case 'retencionesFactura':
+//
+// 		$codFacs=$_GET["facs"];
+// 		$retenciones2=$conn->ObtenerFilasBySqlSelect("SELECT cpfd.cod_impuesto, li.descripcion, sum(cpfd.monto_base) as base, porcentaje_retenido, sum(cpfd.monto_retenido) as montoRet, li.cod_tipo_impuesto FROM cxp_factura_detalle cpfd JOIN lista_impuestos li ON ( li.cod_impuesto = cpfd.cod_impuesto ) WHERE id_factura_fk in ($codFacs) group by cpfd.cod_impuesto");
+// 		foreach($retenciones2 as $key => $campos)
+// 		{
+// 			$reg.="<tr><TD><input type='hidden' name='codImp$i' id='codImp$i' value='$campos[cod_impuesto]'><input type='hidden' name='exento$i' id='exento$i' value='$campos[exento]'><input type='hidden' name='tipoImp$i' id='tipoImp$i' value='$campos[cod_tipo_impuesto]'>$campos[descripcion]</TD><TD> <input type='text' style='border:0px; background-color:#ffffff;' size='15' name='base$i' id='base$i' value='$campos[base]'></TD> <TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='porcen$i' id='porcen$i' value='$campos[porcentaje_retenido]'></TD><TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='montoRet$i' id='montoRet$i' value='$campos[montoRet]'></TD></tr>";
+// 			$i++;
+// 		}
+// 		$reg.="*l*l*l*".$i;
+// 		echo $reg;
+// 	break;
+
+        case 'anticipos':
+
+            $edoCta = $_GET["edoCta"];
+            $retenciones2 = $conn->ObtenerFilasBySqlSelect("SELECT * FROM cxp_edocuenta_detalle WHERE cod_edocuenta=$edoCta AND tipo='d' and cod_edocuenta_detalle not in (select cxp_edocuenta_detalle_fk from cxp_factura_pago) and marca in ('P','X')");
+            $reg = '';
+            $i = 0;
+            foreach ($retenciones2 as $key => $campos) {
+                $reg.="<tr><TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='numero$i' id='numero$i' value='$campos[numero]'></TD><TD>$campos[descripcion]</TD><TD> <input type='text' style='border:0px; background-color:#ffffff;' size='15' name='monto$i' id='monto$i' value='$campos[monto]'></TD><TD><input name='optAnticipo{$i}' id='optAnticipo{$i}' type='checkbox' onchange='javascript:totalAnticipos();' value='{$i}'></TD></tr>";
+                $i++;
+            }
+            $reg.="*l*l*l*" . $i;
+            echo $reg;
+            break;
+
+        case 'cambiarClave';
+            $clave = $_GET["clave1"];
+            $clave2 = $_GET["claveOLD"];
+
+            $usuario = $login->getIdUsuario();
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM usuarios WHERE cod_usuario = '" . $login->getIdUsuario() . "' and
+		 clave='" . $_GET["claveOLD"] . "'");
+
+//echo "SELECT * FROM usuarios WHERE cod_usuario = '".$login->getIdUsuario()."' and
+// clave='".$_GET["claveOLD"]."'";
+//count($campos);
+            if (count($campos) == 0) {
+                echo "1";
+            } else {
+                /* echo "update usuarios set
+                  `clave` = '".$_GET["clave1"]."'
+                  WHERE cod_usuario = ".$login->getIdUsuario();
+                 */
+                $sql = "UPDATE usuarios SET `clave` = '" . $_GET["clave1"] . "' WHERE cod_usuario ='{$usuario}'";
+                $conn->Execute2($sql);
+//echo "-1";
+            }
+            break;
+        case 'anularFactura';
+            $idFac = $_GET["idFac"];
+            $sql = "UPDATE cxp_factura SET cod_estatus = 2 WHERE id_factura = {$idFac};";
+            $conn->Execute2($sql);
+            break;
+        case "eliminar_ordenCXP":
+            $instruccion = "UPDATE cxp_edocuenta SET marca='A', fecha_anulacion='{$_GET["fechaOrden"]}', observacion_anulado='{$_GET ["motivoAnulacionOrden"]}' WHERE cod_edocuenta = '{$_GET["cod"]}'";
+            $conn->Execute2($instruccion);
+            /*
+             * Modificado por: Charli Vivenes
+             * Objetivo: incluir la eliminacion de las entradas en el inventario cuando se cancela la compra.
+             * Desccripcion: se creo la tabla 'compra_kardex' para mantener la relacion entre el kardex y la compra
+             *
+             */
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_kardex FROM compra_kardex WHERE id_compra = {$_GET["cod"]};");
+            $campos2 = $conn->ObtenerFilasBySqlSelect("SELECT estado FROM kardex_almacen WHERE id_transaccion = {$campos[0]["id_kardex"]};");
+            $campos3 = $conn->ObtenerFilasBySqlSelect("SELECT * FROM kardex_almacen_detalle WHERE id_transaccion = {$campos[0]["id_kardex"]};");
+            $instruccion = "INSERT INTO kardex_almacen (tipo_movimiento_almacen, autorizado_por, observacion, fecha, usuario_creacion, fecha_creacion, estado, fecha_ejecucion)
+                VALUES (8, 'Nadie', 'Salida por Devolucion Compra', '{$_GET["fechaOrden"]}', '{$_SESSION["usuario"]}', CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP);";
+            $conn->ExecuteTrans($instruccion);
+            $id_kardex_almacen = $conn->getInsertID();
+            /*
+             * En este punto decidi registrar el detalle de la devolución.
+             * Por ello está comentada la condición que fue relegada al interior del foreach.
+             */
+#if ($campos2[0]["estado"] == "Entregado") {
+            foreach ($campos3 as $key => $kardex_almacen_detalle) {
+                $conn->ExecuteTrans("INSERT INTO kardex_almacen_detalle (id_transaccion_detalle, id_transaccion, id_almacen_entrada, id_almacen_salida, id_item, cantidad)
+                    VALUES (NULL, '{$id_kardex_almacen}', '0', '{$kardex_almacen_detalle["id_almacen_entrada"]}', '{$kardex_almacen_detalle["id_item"]}', '{$kardex_almacen_detalle["cantidad"]}');");
+                if ($campos2[0]["estado"] == "Entregado") {
+                    $conn->ExecuteTrans("UPDATE item_existencia_almacen SET cantidad = cantidad - '{$kardex_almacen_detalle["cantidad"]}'
+                    WHERE id_item  = '{$kardex_almacen_detalle["id_item"]}' AND cod_almacen = '{$kardex_almacen_detalle["id_almacen_entrada"]}';");
+                }
+            }
+#}
+            if ($campos2[0]["estado"] == "Pendiente") {
+                $conn->ExecuteTrans("UPDATE kardex_almacen SET estado = 'Cancelado' WHERE id_transaccion = {$campos[0]["id_kardex"]};");
+            }
+            break;
+        case 'movimiento':
+            $cliente = $_GET["cliente"];
+//$movimiento=$conn->ObtenerFilasBySqlSelect("SELECT * FROM movimientos_bancarios  WHERE id_cliente=$cliente AND monto<>monto_aplicado");
+            $movimiento = $conn->ObtenerFilasBySqlSelect("SELECT cod_movimiento_ban, numero_movimiento, concepto, (monto-(ifnull(monto_aplicado,0.00))) as monto, fecha_movimiento FROM movimientos_bancarios  WHERE id_cliente=$cliente and estatus IS NULL");
+            $reg = '';
+            $i = 0;
+            if ($movimiento) {
+                foreach ($movimiento as $key => $campos) {
+                    $reg.="<tr><TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='numerom$i' id='numerom$i' value='$campos[numero_movimiento]'><input type='hidden' name='codmov$i' id='codmov$i' value='$campos[cod_movimiento_ban]'></TD><TD>$campos[concepto]</TD> <TD><input type='text' style='border:0px; background-color:#ffffff;' size='15' name='fechamov$i' id='fechamov$i' value='" . fecha($campos[fecha_movimiento]) . "'></TD><TD> <input type='text' style='border:0px; background-color:#ffffff;' size='15' name='montosss$i' id='montosss$i' value='$campos[monto]'></TD><TD><input name='optMov{$i}' id='optMov{$i}' type='checkbox' onchange='javascript:totalPagos();' value='{$i}'></TD></tr>";
+                    $i++;
+                }
+            }
+            $reg.="*l*l*l*" . $i;
+            echo $reg;
+            break;
+				case "filtroItemByRCCB":
+            /**
+             * Procedimiento de busqueda de productos/servicios
+             *
+             * Realizado por:
+             * Luis E. Viera Fernandez
+             *
+             * Correo:
+             *      lviera@armadillotec.com
+             *      levieraf@gmail.com
+             *
+             */
+            $tipo_item = (isset($_POST["cmb_tipo_item"])) ? $_POST["cmb_tipo_item"] : 1;
+
+            $busqueda = (isset($_POST["BuscarBy"])) ? $_POST["BuscarBy"] : "";
+            $limit = (isset($_POST["limit"])) ? $_POST["limit"] : 10;
+            $start = (isset($_POST["start"])) ? $_POST["start"] : 0;
+
+            if ($busqueda) {
+                //filtro para productos
+                if ($tipo_item == 1) {
+                    $codigo = (string)((isset($_POST["codigoProducto"])) ? $_POST["codigoProducto"] : "");
+                    $andWHERE = "UPPER(i.referencia) = UPPER('".$codigo."') or UPPER(i.cod_item) like UPPER('%".$codigo."%') or UPPER(i.codigo_barras) like UPPER('%".$codigo."%')";
+                }
+
+                $sql = "SELECT i.* FROM item i WHERE i.cod_item_forma = " . $tipo_item . " and (" . $andWHERE . ") ";
+
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+  
+                $sql = "SELECT i.* FROM item i WHERE i.cod_item_forma = " . $tipo_item . " and " . $andWHERE . " limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+            } else {
+                $sql = "SELECT i.* FROM item i WHERE i.cod_item_forma = " . $tipo_item;
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+                $sql = "SELECT i.* FROM item i WHERE i.cod_item_forma = " . $tipo_item . " limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+            
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes1),
+                "data" => $campos_comunes
+            ));
+
+            break;
+            case "cargarRegion":
+                //cargar la region 
+                    $idEstado = $_POST["idEstado"];
+                    
+                     $campos = $conn->ObtenerFilasBySqlSelect("SELECT a.id_region,b.descripcion FROM estado_region a, region b where a.id_estado=".$idEstado." and a.id_region=b.id limit 1;");
+                     echo $campos[0]["descripcion"];
+            break;
+            case "cargarSubrubro":
+              // cargar el select dependiente de subrubro
+                 $tipoSql = $_POST["tipoSql"];
+                 switch ($tipoSql) {
+                    case '0':
+                       $id_rubro = $_POST["idCarga"];
+                        $campos = $conn->ObtenerFilasBySqlSelect("select * from grupo where id_rubro = ".$id_rubro);
+                        foreach ($campos as $filas){
+                        ?>
+                        <option value= "<?php echo $filas['cod_grupo']; ?>"><?php echo $filas['descripcion']; ?> </option>
+
+                        <?php }
+                    break;
+                    case '1':
+                        $id_rubro = $_POST["idCarga"];
+                        $id=$_POST["id"];
+                        $campo = $conn->ObtenerFilasBySqlSelect("select * from item where id_item = ".$id);
+                        $campos = $conn->ObtenerFilasBySqlSelect("select * from grupo where id_rubro = ".$id_rubro);
+                       
+                        foreach ($campos as $filas){
+                              if($campo[0]["cod_grupo"]==$filas["cod_grupo"]){
+                               ?>
+                                 <option value= "<?php echo $filas['cod_grupo']; ?>" selected ><?php echo $filas['descripcion'];  ?> </option>
+
+                            <?php } else{
+                            ?>
+                                <option value= "<?php echo $filas['cod_grupo']; ?>"><?php echo $filas['descripcion']; ?> </option>
+
+                            <?php }
+                        } 
+
+                    break;
+                  }
+            break;
+        case "filtroItem":
+        
+        		
+            /**
+             * Procedimiento de busqueda de productos/servicios
+             *
+             * Realizado por:
+             * Luis E. Viera Fernandez
+             *
+             * Correo:
+             *      lviera@armadillotec.com
+             *      levieraf@gmail.com
+             *
+             */
+            $tipo_item = (isset($_POST["cmb_tipo_item"])) ? $_POST["cmb_tipo_item"] : 1;
+				
+            $busqueda = (isset($_POST["BuscarBy"])) ? $_POST["BuscarBy"] : "";
+            $limit = (isset($_POST["limit"])) ? $_POST["limit"] : 10;
+            $start = (isset($_POST["start"])) ? $_POST["start"] : 0;
+
+            if ($busqueda) {
+                //filtro para productos
+                if ($tipo_item == 1) {
+                    $codigo = (isset($_POST["codigoProducto"])) ? $_POST["codigoProducto"] : "";
+                    $codigo_barras = (isset($_POST["codigoBarrasProducto"])) ? $_POST["codigoBarrasProducto"] : "";
+                    $descripcion = (!isset($_POST["descripcionProducto"])) ? "" : $_POST["descripcionProducto"];
+                    $referencia = (!isset($_POST["referencia"])) ? "" : $_POST["referencia"];
+
+                    $andWHERE = " and ";
+                    if ($codigo != "") {
+                        $andWHERE .= " ( cod_item = '" . $codigo . "' or id_item  = '".$codigo."') ";
+                        $entrada_codigo=true;
+                    }
+
+################################################################################
+                    if ($codigo_barras != "") {
+                        if ($codigo != "") {
+                            $andWHERE .= " and ";
+                        } else {
+                            $andWHERE = " and ";
+                        }
+
+                        $andWHERE .= " upper(codigo_barras) like upper('%" . $codigo_barras . "%')";
+                    }
+
+                    if ($referencia != "") {
+                        if ($codigo_barras != "" || $codigo != "") {
+                            $andWHERE .= " and ";
+                        } else {
+                            $andWHERE = " and ";
+                        }
+                        $andWHERE .= " upper(referencia) like upper('%" . $referencia . "%')";
+                    }
+
+################################################################################
+                    if ($descripcion != "") {
+                        if ($codigo_barras != "" || $referencia != "" || $codigo != "") {
+                            $andWHERE .= " and ";
+                        } else {
+                            $andWHERE = " and ";
+                        }
+                        $andWHERE .= " upper(descripcion1) like upper('%" . $descripcion . "%')";
+                    }
+                    if ($codigo == "" && $descripcion == "" && $codigo_barras == "" && $referencia == "") {
+                        $andWHERE = "";
+                    }
+                	//echo "HOLA".$andWHERE;
+                	//exit;
+                }
+
+                //filtro para productos
+                if ($tipo_item == 2) {
+                    $codigo = (isset($_POST["codigoProducto"])) ? $_POST["codigoProducto"] : "";
+                    $descripcion = (!isset($_POST["descripcionProducto"])) ? "" : $_POST["descripcionProducto"];
+
+                    $andWHERE = " and ";
+                    if ($codigo != "") {
+                        $andWHERE .= " upper(cod_item) = upper('" . $codigo . "')";
+                    }
+                    if ($descripcion != "") {
+                        if ($codigo != "") {
+                            $andWHERE .= " and ";
+                        } else {
+                            $andWHERE = " and ";
+                        }
+                        $andWHERE .= " upper(descripcion1) like upper('%" . $descripcion . "%')";
+                    }
+                    if ($codigo == "" && $descripcion == "") {
+                        $andWHERE = "";
+                    }
+                }
+					
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+					
+                $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item . " " . $andWHERE . " limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+            } else {
+                $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item;
+                $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
+                $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item . " limit $start,$limit";
+                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+            	
+            echo json_encode(array(
+                "success" => true,
+                "total" => count($campos_comunes1),
+                "data" => $campos_comunes
+            ));
+
+            break;
+        case "agregar_factura":
+            /**
+             * Procedimiento de registro de facturas sin generacion de inventario
+             *
+             * Realizado por:
+             * Charli J. Vivenes Rengel
+             *
+             * Correo:
+             *      cvivenes@asys.com.ve
+             *      cjvrinf@gmail.com
+             *
+             */
+#$compra = new Compra();
+            $correlativos = new Correlativos();
+
+#$compra->BeginTrans();
+            $nro_compra = $correlativos->getUltimoCorrelativo("cod_compra", 1, "si");
+
+            $sql = "INSERT INTO `compra` (
+              `id_compra`, `cod_compra`, `id_proveedor`, `cod_vendedor`,
+              `fechacompra`, `montoItemscompra`, `ivaTotalcompra`, `TotalTotalcompra`, `monto_excento`,
+              `cantidad_items`, `cod_estatus`, `fecha_creacion`, `usuario_creacion`,
+              `responsable`, `centrocosto`, `num_factura_compra`, `num_cont_factura`)
+              VALUES (
+              NULL , '" . $nro_compra . "', '" . $_GET["id_proveedor"] . "', '',
+              '" . $_GET["fecha_emision"] . "', '" . $_GET["subtotal_factura"] . "', '" . $_GET["iva_factura"] . "', '" . ($_GET["iva_factura"] + $_GET["subtotal_factura"]) . "', '" . $_GET["exento_factura"] . "',
+              '0', '1', CURRENT_TIMESTAMP , '" . $_GET["usuario"] . "',
+              '" . $_GET["responsable"] . "', '', '" . $_GET["num_factura"] . "', '" . $_GET["num_control"] . "');";
+
+#$compra->ExecuteTrans($sql);
+            $conn->ExecuteTrans($sql);
+
+            $sql_cxp = "INSERT INTO cxp_edocuenta (
+		`cod_edocuenta`, `id_proveedor`, `documento`,
+		`numero`, `monto`, `fecha_emision`,
+		`observacion`, `vencimiento_fecha`, `vencimiento_persona_contacto`,
+		`vencimiento_telefono`, `vencimiento_descripcion`,
+		`usuario_creacion`, `fecha_creacion`, `marca`)
+                VALUES (
+		NULL, '" . $_GET["id_proveedor"] . "', 'FACxCOM',
+		'" . $nro_compra . "', '" . ($_GET["iva_factura"] + $_GET["subtotal_factura"]) . "', '" . $_GET["fecha_emision"] . "',
+		'Compra " . $nro_compra . "', '" . $_GET["fecha_vence"] . "', '',
+		'', '' , '" . $_GET["usuario"] . "', '" . $_GET["fecha_emision"] . "', 'P');";
+
+#$compra->ExecuteTrans($sql_cxp);
+            $conn->ExecuteTrans($sql_cxp);
+            $id_cxp = $conn->getInsertID();
+
+            $SQL_cxp_DET = "INSERT INTO cxp_edocuenta_detalle (
+		`cod_edocuenta_detalle`, `cod_edocuenta`, `documento`,
+		`numero`, `descripcion`, `tipo`,
+		`monto`, `usuario_creacion`, `fecha_creacion`,
+		`fecha_emision_edodet`, `marca`)
+                VALUES (
+		NULL ,'" . $id_cxp . "','PAGOxCOM',
+                '" . $nro_compra . "R','compra " . $nro_compra . "','c',
+                '" . ($_GET["iva_factura"] + $_GET["subtotal_factura"]) . "','" . $_GET["usuario"] . "', CURRENT_TIMESTAMP,
+		'" . $_GET["fecha_emision"] . "','P');";
+# Se inserta el detalle de la cxp en este caso el asiento del DEBITO.
+#$compra->ExecuteTrans($SQL_cxp_DET);
+            $conn->ExecuteTrans($SQL_cxp_DET);
+            $nro_compra = $correlativos->getUltimoCorrelativo("cod_compra", 1, "no");
+            $conn->ExecuteTrans("UPDATE correlativos SET contador = '" . $nro_compra . "' WHERE campo LIKE 'cod_compra'");
+
+            $cod_impuesto = $alicuota = $monto_retenido = 0;
+            if ($_GET["retencion_iva"]) {
+                $cod_impuesto = $_GET["cod_impuesto"];
+                $alicuota = $_GET["alicuota"];
+                $monto_retenido = $_GET["iva_factura"] * $alicuota / 100;
+            }
+#$sql_tipo_impuesto;
+//responsable='+responsable+'&num_factura='++'&='+num_control+'&='+exento_factura+'&subtotal_factura='+subtotal_factura+'&='+base_factura+'&iva_factura='+iva_factura+'&='+fecha_emision+'&fecha_vence='+fecha_vence+'&id_proveedor='+id_proveedor+'&usuario='+usuario,
+            $sql_cxp_factura = "INSERT INTO cxp_factura (
+                    id_factura, cod_factura, cod_cont_factura, id_cxp_edocta, fecha_factura, fecha_recepcion,
+                    monto_base, monto_exento, anticipo, monto_total_con_iva, monto_total_sin_iva,
+                    cod_impuesto, porcentaje_iva_mayor, monto_iva, porcentaje_iva_retenido, monto_retenido,
+                    total_a_pagar, cod_estatus, fecha_pago, fecha_creacion, usuario_creacion,
+                    tipo, factura_afectada, libro_compras, cod_correlativo_iva, cod_correlativo_islr)
+                VALUES (
+                    NULL, '" . $_GET["num_factura"] . "', '" . $_GET["num_control"] . "', '" . $id_cxp . "', '" . $_GET["fecha_emision"] . "', '" . $_GET["fecha_emision"] . "',
+                    '" . $_GET["base_factura"] . "', '" . $_GET["exento_factura"] . "', '0', '" . ($_GET["iva_factura"] + $_GET["subtotal_factura"]) . "', '" . $_GET["subtotal_factura"] . "',
+                    '" . $cod_impuesto . "', 12, '" . $_GET["iva_factura"] . "', " . $alicuota . ", " . $monto_retenido . ",
+                    '" . ($_GET["subtotal_factura"] + $_GET["iva_factura"] - $monto_retenido) . "', '1', '', CURRENT_TIMESTAMP, '" . $_GET["usuario"] . "',
+                    'FAC', '" . $_GET["num_factura"] . "', '{$_GET["libro_compras"]}', '', '')";
+            $conn->ExecuteTrans($sql_cxp_factura);
+
+            $id_cxp_factura = $conn->getInsertID();
+            $sql_cxp_factura_det = "INSERT INTO cxp_factura_detalle (
+                    id_factura, id_factura_fk, monto_base, porcentaje_retenido, cod_impuesto, monto_retenido, id_item)
+                VALUES (
+                    NULL, '" . $id_cxp_factura . "', '" . $_GET["base_factura"] . "', '" . $_GET["alicuota"] . "', '', '')";
+            $conn->ExecuteTrans($sql_cxp_factura_det);
+            break;
+            
+            
+        case "cambioPrecio":
+            
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT *
+							from item
+							WHERE id_item between $_GET[itemini] and $_GET[itemfin]");
+            if (count($campos) == 0) {
+                exit;
+            }
+            echo '
+            		<table >
+                    <thead>
+                        <th style="border-bottom: 1px solid #949494;width:110px;">Cod</th>
+                        <th style="border-bottom: 1px solid #949494;width:200px;">Descripcion</th>
+                        <th style="border-bottom: 1px solid #949494;width:200px;">Precio1&nbsp;<input type="checkbox" name="precio1" id="precio1" value="1"></th>
+								<th style="border-bottom: 1px solid #949494;width:200px;">Precio2&nbsp;<input type="checkbox" name="precio2" id="precio2" value="1"></th>
+								<th style="border-bottom: 1px solid #949494;width:200px;">Precio3&nbsp;<input type="checkbox" name="precio3" id="precio3" value="1"></th>
+								<th style="border-bottom: 1px solid #949494;width:200px;">Precio4&nbsp;<input type="checkbox" name="precio4" id="precio4" value="1"></th>
+								<th style="border-bottom: 1px solid #949494;width:200px;">Precio5&nbsp;<input type="checkbox" name="precio5" id="precio5" value="1"></th>
+								<th style="border-bottom: 1px solid #949494;width:200px;">Precio6&nbsp;<input type="checkbox" name="precio6" id="precio6" value="1"></th>
+
+                    </thead>
+                    <tbody>';
+
+
+            $acuDebitos = 0;
+            $acuCreditos = 0;
+            foreach ($campos as $key => $item) {
+                echo '
+                        <tr>
+                            <td align="center" style="border-bottom: 1px solid #949494;width:110px;">' . $item["cod_item"] . '
+									<input type="hidden" id="id_item[]" name="id_item[]" value='.$item["id_item"].'>
+                            </td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;width:200px;">' . $item["descripcion1"] . '</td>
+                            <td style="text-align: left; border-bottom: 1px solid #949494;width:110px;"><input style="text-align: right;" size="7" type="text" id="coniva1" name="coniva1[]" value=' . $item["coniva1"] . '></td>
+									<td style="text-align: left; border-bottom: 1px solid #949494;width:110px;"><input style="text-align: right;" size="7" type="text" id="coniva2" name="coniva2[]" value=' . $item["coniva2"] . '></td>
+									<td style="text-align: left; border-bottom: 1px solid #949494;width:110px;"><input style="text-align: right;" size="7" type="text" id="coniva3" name="coniva3[]" value=' . $item["coniva3"] . '></td>
+									<td style="text-align: left; border-bottom: 1px solid #949494;width:110px;"><input style="text-align: right;" size="7" type="text" id="coniva4" name="coniva4[]" value=' . $item["coniva4"] . '></td>
+									<td style="text-align: left; border-bottom: 1px solid #949494;width:110px;"><input style="text-align: right;" size="7" type="text" id="coniva5" name="coniva5[]" value=' . $item["coniva5"] . '></td>
+									<td style="text-align: left; border-bottom: 1px solid #949494;width:110px;"><input style="text-align: right;" size="7" type="text" id="coniva6" name="coniva6[]" value=' . $item["coniva6"] . '></td>
+                            
+                        </tr>';
+            }
+            echo '</tbody></table>';
+            break;
+            case "ValidarSerial":
+                //ajax para validar los seriales
+            $serial=$_POST["serial"];
+            $num=$_POST["num"];
+            $idItem=$_POST["idItem"];
+            if($serial==""){
+                $campo[0]["serial"]="";
+            }else{
+               $campo = $conn->ObtenerFilasBySqlSelect("select * from item_serial where id_producto=".$idItem." and estado=1 and serial ='".$serial."'");
+            }
+           
+            if($campo[0]["serial"]==""){
+                echo "<div><img src='../../libs/imagenes/ico_est6.gif' width='16' height='16' /></div>";
+                echo "<input class='oculto' type='hidden' name=h".$num." id=h".$num." value=1 />";
+            }else{
+                echo "<div><img src='../../libs/imagenes/ico_est2.gif' width='16' height='16' /></div>";
+                echo "<input class='oculto' type='hidden' name=h".$num." id=h".$num." value=0 />";
+            }
+
+           
+
+
+            break;
+            
+            case "actualizar_precio_producto":
+            $pos=POS;
+            $prod=$_GET[prod];
+            $precio=$_GET[precio];
+            $trans=$_GET[trans];
+            $sql="UPDATE item SET precio1=".$precio.", coniva1=".$precio.", precio2=".$precio.", coniva2=".$precio.", precio3=".$precio.", coniva3=".$precio." WHERE codigo_barras='".$prod."'";
+            $conn->Execute2($sql);
+            $sql="UPDATE $pos.products SET PRICEBUY=".$precio.", PRICESELL=".$precio." WHERE CODE='".$prod."'";
+            $conn->Execute2($sql);
+            $sql_estatus="UPDATE sincronizacion_productos_detalle SET estatus=0, usuario_ejecucion='".$login->getUsuario()."', fecha_ejecucion=CURRENT_TIMESTAMP WHERE codigo_barra='".$prod."' and id_sincro=".$trans."";
+            $conn->Execute2($sql_estatus);
+                                
+
+            break;
+
+            case "actualizar_precio_producto2":
+            $comunes = new Comunes();
+            $pos=POS;
+            $prod=$_GET[prod];
+            $precio=$_GET[precio];
+            $trans=$_GET[trans];
+            //$comunes=$_GET[id_cone];
+            $sql="UPDATE item SET precio1=".$precio.", coniva1=".$precio.", precio2=".$precio.", coniva2=".$precio.", precio3=".$precio.", coniva3=".$precio." WHERE codigo_barras='".$prod."'";
+            
+            $comunes->Execute2($sql);
+            $sql="UPDATE $pos.products SET PRICEBUY=".$precio.", PRICESELL=".$precio." WHERE CODE='".$prod."'";
+            $comunes->Execute2($sql);
+            $sql_estatus="UPDATE sincronizacion_productos_detalle SET estatus=0, usuario_ejecucion='".$login->getUsuario()."', fecha_ejecucion=CURRENT_TIMESTAMP WHERE codigo_barra='".$prod."' and id_sincro=".$trans."";
+            $comunes->Execute2($sql_estatus);
+            break;
+
+            case "BuscarSerial":
+                $idItem=$_POST["idItem"];               
+                $campo = $conn->ObtenerFilasBySqlSelect("select * from item_serial where  estado=1 and id_producto=".$idItem);
+                echo "<option value='0'>Seleccione un serial</option>";                
+                foreach ($campo as $key ) {
+                  echo "<option value='".$key["serial"]."'>".$key["serial"]."</option>";
+                }
+
+            break;
+            
+            case "cantidadSeriales":
+                $id=$_GET[cod];
+	            $cant=$_GET[cant];	            
+	            $campos = $conn->ObtenerFilasBySqlSelect("SELECT *	from item WHERE id_item ='$id'");
+	            if($campos[0][seriales]==1)
+	            {
+	            	
+		            echo '<form id="seriales" name="seriales"><table>';
+		            echo '<tr>
+		                   <td colspan="2"><input type="hidden" name="item" id="item" value="'.$id.'"></td>
+		                   </tr>';
+                    echo "<div style='margin: 25px 0px 0px 40px;'><input type='text' id='iSerialGen' style='float:left' class='form-text'></div>";     
+                    echo "<div id='gSerial' style='background:#abcee4;px;padding:5px 5px;margin:3px 0px 10px 10px;float:left;color:white;cursor:pointer'>Generar</div>" ;      
+		            echo "<div style='clear:both'></div>";
+                    for($i=0;$i<$cant;$i++)
+		            {
+		                   echo '<tr>
+		                   <td>Serial '.($i+1).'</td>
+		                   <td><input type="text" name="serial'.$i.'" id="serial'.$i.'" class="form-text serialSec "></td>
+		                   </tr>';
+		                   
+		            }
+		        		echo '</table></form>';
+		        	}
+		        	else
+		        	{
+		        		echo "-1";
+		        	}
+            break;
+            
+            case "agregarSeriales":
+            
+            	$form=array();
+                    //echo $_GET["formulario"];
+                    $form=json_decode($_GET["formulario"],true);
+                    $ii=0;
+                    foreach ($form as $i => $input)
+                    {
+                        if($input[name]=="item")
+                            $item=$input[value];
+                                            
+                        $cad="serial".$ii;
+                
+                        if($input[name]==$cad) 
+                        {
+                            $ii++;
+                            //$tallas[]=$input[value];
+                            $ser=$input[value];
+                            
+                            $conn->ExecuteTrans("insert into item_serial_temp (id_producto, serial, estado, usuario_creacion,idsessionactual) values ('$item', '$ser', '1', '".$login->getUsuario()."', '".$login->getIdSessionActual()."')");
+                        }
+                    }      
+                 /*$id=$_GET[cod];
+                $cant=$_GET[cant];
+                
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT *  from item WHERE id_item ='$id'");
+                if($campos[0][seriales]==1)
+                {
+                    
+                    echo '<form id="seriales" name="seriales"><table>';
+                    for($i=0;$i<=$cant;$i++)
+                    {
+                           echo '<tr>
+                           <td>Serial '.$i.'</td>
+                           <td><input type="text" name="serial[]" id="serial[]" class="form-text"></td>
+                           </tr>';
+                           
+                    }
+                        echo '</table></form>';
+                    }
+                    else
+                    {
+                        echo "-1";
+                    }*/
+
+
+            break;
+            case"cargarAlmacen":
+                  $comunes = new Comunes();
+                  $id_localidad=$_POST["idLocalidad"];
+                  $campo = $comunes->ObtenerFilasBySqlSelect("select * from almacen where id_localidad=".$id_localidad);
+                  $filas=$comunes->getFilas();
+                  $mensaje=$comunes->Notificacion();
+                  $cabecera=array("Codigo","Descripción");
+                  // boton agregar almacen
+                  echo "<div style='margin-bottom: 10px;'>";
+                     echo "<table style='cursor: pointer; 'class='btn_bg' onclick=\"javascript:window.location='?opt_menu=3&amp;opt_seccion=55&amp;opt_subseccion=add&amp;idLocalidad=".$id_localidad."&amp;loc=1';\">";
+                         echo "<tr>";
+                            echo " <td><img src='../../../includes/imagenes/bt_left.gif' style='border-width: 0px; width: 4px; height: 21px;' /></td>
+                                   <td><img src='../../../includes/imagenes/add.gif' width='16' height='16' /></td>";
+                            echo " <td style='padding: 0px 4px;'>Agregar</td>
+                                   <td><img src='../../../includes/imagenes/bt_right.gif' style='border-width: 0px; width: 4px; height: 21px;' /></td>" ;      
+                        echo "</tr>";
+                     echo "</table>";
+                echo "</div>";
+                  echo "</div style='clear_both'>";
+                   //fin del boton agregar almacen                 
+                  echo " <table class='seleccionLista'>";
+                    echo "<tr class='tb-head'>";
+                        foreach ( $cabecera as $key => $value) {
+                           echo" <td><b>".$value."</b></td>";
+                        }
+                       echo"<td colspan='3' style='text-align:center;'><b>Opciones</b></td>" ;
+                    echo "</tr >";
+                    if ($filas==0) {
+                      echo " <tr><td colspan='3'>".$mensaje."</td></tr>";
+                    }else{
+                        foreach ($campo as $key => $value) {
+                        echo "<tr style='background:#cacacf;'>";
+                           echo "<td >".$value["cod_almacen"]."</td>";
+                           echo "<td >".$value["descripcion"]."</td>";
+                           echo "<td style='cursor: pointer; width: 30px; text-align:center'>
+                                <img class='editar' onclick=\"javascript: window.location.href='?opt_menu=3&amp;opt_seccion=55&amp;opt_subseccion=edit&amp;cod=".$value["cod_almacen"]."&amp;idLocalidad=".$id_localidad."&amp;loc=1'\" title='Editar' src='../../../includes/imagenes/edit.gif'/>
+                                 </td>";
+                           echo "<td style='cursor: pointer; width: 30px; text-align:center'>
+                                <img class='eliminar' onclick=\"javascript: window.location.href='?opt_menu=3&amp;opt_seccion=55&amp;opt_subseccion=delete&amp;cod=".$value["cod_almacen"]."&amp;idLocalidad=".$id_localidad."&amp;loc=1'\" title='Eliminar' src='../../../includes/imagenes/delete.gif'/> 
+                                </td>";   
+                            echo "<td style='cursor: pointer; width: 30px; text-align:center'>
+                                <img class='eliminar' onclick=\"javascript: window.location.href='?opt_menu=3&amp;opt_seccion=55&amp;opt_subseccion=ubicacion&amp;cod=".$value["cod_almacen"]."&amp;idLocalidad=".$id_localidad."&amp;loc=1'\" title='agregar ubicacion' src='../../../includes/imagenes/add.gif'/> 
+                            </td>";       
+                        echo "</tr>";
+                        }
+                    }
+                  echo " </table>";
+            break;
+            case "cargaUbicacion":
+                       $almacen=$_POST["idAlmacen"];
+                       $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."'");
+                        if (count($campos) == 0) {
+                            echo "[{band:'-1'}]";
+                        } else {
+                            echo json_encode($campos);
+                        }
+            break;
+             case "VerificarSerial":
+                     $item= $_GET["item"];
+                     $cant=$_GET["cant"];   
+                     $arr2=array();                 
+                       for ($i=0; $i < $cant; $i++) { 
+                        
+                            $serial=$_GET["serial".$i];                         
+                            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item_serial WHERE id_producto='".$item."' and serial='".$serial."'");
+                            $campos1 = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item_serial_temp WHERE id_producto='".$item."' and serial='".$serial."'");
+                         
+                            if(count($campos)!=0 || count($campos1)!=0){
+                               
+                                $arr2[]=array("idSerial"=>"serial".$i);
+                            }
+
+                       }      
+                       if(count($arr2)==0){
+                              $arr2[]=array("idSerial"=>"0");
+                       } 
+                       
+                               
+                        header('Content-type: application/json; charset=utf-8');
+                        // $arr = array(
+                        //     array("idSerial"=>"serial0"),
+                        //     array("idSerial"=>"serial1")
+                        // );
+                        // $arr=array();
+                        // $arr[]=array("idSerial"=>"serial0");
+                        // $arr[]=array("idSerial"=>"serial1");
+                        // print_r($arr);
+                        // print_r($arr2);
+                      // echo json_encode($arr);
+                        echo json_encode($arr2);
+                      
+                       
+                       // $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."'");
+                       //  if (count($campos) == 0) {
+                       //      echo "[{band:'-1'}]";
+                       //  } else {
+                       //      echo json_encode($campos);
+                       //  }
+            break;
+             case "cargaProductoCodigo":
+                       $codigoBarra=$_POST["codigoBarra"];
+                     $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM `item` WHERE `codigo_barras`='".$codigoBarra."'");
+                       if (count($campos) == 0) {
+                            echo "[{band:'-1'}]";
+                        } else {
+                            echo json_encode($campos);
+                        }
+            break;
+              case "estatusImpresora":
+                    
+                    $status=Tfhka::CheckFprinter1();                                                   
+                    echo json_encode($status);
+                       
+            break;
+            case "eliminarserial":
+               $id_producto=$_POST["idproduc_serial"];
+                // $sql="delete  item_serial_temp where id_producto='".$id_producto."' and usuario_creacion='".$login->getUsuario()."' and idsessionactual='".$login->getIdSessionActual()."'";
+                $conn->ExecuteTrans("delete from item_serial_temp where id_producto='".$id_producto."' and usuario_creacion='".$login->getUsuario()."' and idsessionactual='".$login->getIdSessionActual()."'");
+                // return  $sql;
+            break;
+             case "reporte_productoCentral":
+                    $punto = $_GET["punto"];
+                    $estado = $_GET["estados"];
+                    $desde = $_GET["desde"];
+                    $hasta = $_GET["hasta"];
+                    $BD_central=DB_REPORTE_CENTRAL;
+                    $sql=" SELECT v.CODE,v.REFERENCE,v.nombre_producto,SUM(v.UNITS) as UNITS,SUM(v.PRICESELL*v.UNITS) as TOTALSINIVA,SUM((v.PRICESELL*(t.rate)+v.PRICESELL)*v.UNITS) as TOTALCONIVA,v.PRICESELL,(v.PRICESELL*t.rate) + v.PRICESELL as PRECIOIVA,t.rate FROM $BD_central.ventas v
+                           INNER JOIN $BD_central.taxes t on v.taxid_tikestline=t.ID
+                           INNER JOIN $BD_central.puntos_venta pv on pv.codigo_siga_punto=v.codigo_siga
+                           WHERE  v.datenew_ticketlines BETWEEN  '$desde' and '$hasta'"; 
+                    
+                    if($punto!=0){
+                        $sql.=" and v.codigo_siga='$punto'";
+                    }      
+                    if($estado!=0){
+                        $sql.=" and pv.codigo_estado_punto='$estado'";
+                    }      
+
+                    $sql.=" GROUP BY v.CODE ORDER BY v.nombre_producto";
+                    
+                 
+                    $reporte = $conn->ObtenerFilasBySqlSelect($sql);
+                    if(count($reporte)>0){
+                    ?>  
+                       <div style="background-color:#5084A9;padding:10px;width:80px;color:white;cursor:pointer;  font-weight:bold;margin-bottom: 10px;margin-left: 200px;" id="excelImp">generar excel</div>
+            
+                    <?php
+                        ob_start();
+                    ?>
+                    <table  width="100%" border="1" align="center" cellpadding="1" cellspacing="0">
+                        <tr bgcolor="#5084A9">
+                            <td colspan="14" align="center"><b><font color="white">REPORTE DE VENTAS POR PRODUCTO DESDE: <?php echo $desde." HASTA: ".$hasta  ?></font></b></td>    
+                        </tr>
+                        <tr bgcolor="#5084A9">
+                            <td width="10%"><b><font color="white">CODIGO BARRA</font></b></td>
+                            <td width="10%" align="center"><b><font color="white">REFERENCIA</font></b></td>
+                            <td width="30%" align="center"><b><font color="white">DESCRIPCION</font></b></td>
+                            <td width="5%" align="center"><b><font color="white">UNID</font></b></td>
+                            <td width="10%" align="center"><b><font color="white">TOTAL SIN IVA</font></b></td>
+                            <td width="10%" align="center"><b><font color="white">TOTAL CON IVA</font></b></td>
+                            <td width="10%" align="center"><b><font color="white" >PRECIO UND SIN IVA</font></b></td>
+                            <td width="10%" align="center"><b><font color="white" >PRECIO UND CON IVA</font></b></td>
+                            <td width="5%" align="center"><b><font color="white" >IVA</font></b></td>                
+                        </tr>
+
+                    <?php 
+                        foreach ($reporte as $lista ) {
+                            $totalUni+=$lista["UNITS"];
+                            $totalSinIva+=$lista["TOTALSINIVA"];
+                            $totalConIva+=$lista["TOTALCONIVA"];
+                            
+                     ?>      
+                        <tr>
+                            <td width="10%"><?php echo $lista["CODE"] ?></td>
+                            <td width="10%" align="center"><?php echo $lista["REFERENCE"] ?></td>
+                            <td width="30%" align="center"><?php echo utf8_encode($lista["nombre_producto"])  ?></td>
+                            <td width="5%" align="center"><?php echo number_format($lista["UNITS"], 2, ',', '.'); ?></td>
+                            <td width="10%" align="center"><?php echo number_format($lista["TOTALSINIVA"], 2, ',', '.'); ?></td>
+                            <td width="10%" align="center"><?php echo number_format($lista["TOTALCONIVA"], 2, ',', '.'); ?></td>
+                            <td width="10%" align="center"><?php echo number_format($lista["PRICESELL"], 2, ',', '.'); ?></td>
+                            <td width="10%" align="center"><?php echo number_format($lista["PRECIOIVA"], 2, ',', '.'); ?></td>
+                            <td width="5%" align="center"><?php echo $lista["rate"] ?></td>                
+                        </tr>  
+
+                    <?php     
+                        }
+                    ?>  
+                     <tr>
+                            <td width="10%"></td>
+                            <td width="10%" align="center"></td>
+                            <td width="30%" align="center"><b>TOTALES</b></td>
+                            <td width="5%" align="center"><b><?php echo number_format($totalUni, 2, ',', '.'); ?></b></td>
+                            <td width="10%" align="center"><b><?php echo number_format($totalSinIva, 2, ',', '.');  ?></b></td>
+                            <td width="10%" align="center"><b><?php echo number_format($totalConIva, 2, ',', '.'); ?></b></td>
+                            <td width="10%" align="center"></td>
+                            <td width="10%" align="center"></td>
+                            <td width="5%" align="center"></td>                
+                    </tr>  
+                    </table>
+                    <?php
+                    $_SESSION['contenido'] = ob_get_contents();
+                    ob_end_clean();
+
+                    echo $_SESSION['contenido'];
+                    ?> 
+                        <script >
+                             $("#excelImp").click(function() {
+                                // $.ajax({
+                                //     type: 'GET',
+                                //     data: "opt=imprimirReporteExcel",
+                                //     url: '../../libs/php/ajax/ajax.php',
+                                //     beforeSend: function() {
+                                      
+                                //     },
+                                //     success: function(data) {   
+                                //         $("#contenido_reporte").empty();
+  
+                                //         $("#contenido_reporte").html(data);
+                                //     }
+                                // });//fin del ajax  
+                                window.location.href = "imprimirReporteProducto.php";  
+                            });
+                        </script>
+
+                    <?php
+                }else{
+                    echo "NO SE ENCONTRARON RESULTADOS!!!!";
+                }
+
+            break;
+
+            case "CambioPrecios1":
+                    $comunes = new Comunes();
+                    $mensaje=$comunes->Notificacion();
+                    $id_producto=$_POST["id_producto"];                    
+                   // $campo = $comunes->ObtenerFilasBySqlSelect("SELECT i.*, r.descripcion as region, t.descripcion as tipo FROM item_precio i , region r,tipo_precio_item t where i.id_producto =".$id_producto." and i.id_region=r.id and i.tipo_precio=t.id order by id_region,tipo_precio ;");
+                    $campo=$comunes->ObtenerFilasBySqlSelect("select * from item where id_item='".$id_producto."'");
+                    $pos=POS;
+                    $campopos=$comunes->ObtenerFilasBySqlSelect("SELECT * FROM $pos.products WHERE id='".$campo[0]['itempos']."'");
+                    
+                    $filas=$comunes->getFilas();
+                    $reg=0;
+                    $cont=0;
+                    // $cabecera=array("REGION","TIPO DE PRECIO","PRECIO");
+                    $cabecera=array("ID","PRODUCTO","CODIGO DE BARRAS","PRECIO PYME", "PRECIO POS");
+                    //echo "<tr><td>".$campopos[0]["ID"]."SELECT * FROM $pos.products WHERE id='".$campo[0]['itempos']."'</td></tr>";
+                        echo "<tr class='tb-head' >";
+                        foreach ($cabecera as $key => $value) {
+                           echo" <td width='20%'><b>".$value."</b></td>";
+                        }                      
+                        echo "</tr >";
+                         if ($filas==0) {
+                            echo " <tr><td colspan='1' width='10%' VALIGN='MIDDLE' ALIGN='CENTER'>".$mensaje."</td></tr>";
+                        }else{
+                            foreach ($campo as $key => $value) {
+                                if($reg!=$value["id_item"]){
+                                    if($cont!=3 && $cont!=0 ){
+                                        while ($cont<=3) {
+                                             echo "<td width='10%' VALIGN='MIDDLE' ALIGN='CENTER'>sin precio</td>";
+                                             $cont++;
+                                        }
+                                       
+                                    }
+                                    $cont=1;
+                                    echo "<tr style='background:#cacacf;'><td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>".$value["id_item"]."</td>";  
+                                    $reg=$value["id_item"]; 
+                                                                
+                                }
+                                    if($cont==1){
+                                        if(!empty($value["descripcion1"])){
+                                            echo "<td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>".$value["descripcion1"]."<input type=hidden readonly name='nombre_producto_c' id='nombre_producto_c' value='".$value["descripcion1"]."'/></td>";   
+                                        }else{
+                                            echo "<td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>sin precio</td>";   
+                                             $cont++;
+                                        }
+                                    }
+                                    if($cont>=1){
+                                        if($value["codigo_barras"]!=""){
+                                            echo "<td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>".$value["codigo_barras"]."<input type=hidden readonly name='codigo_barras_c' id='codigo_barras_c' value='".$value["codigo_barras"]."'/></td>";   
+                                        }else{
+                                            echo "<td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>sin precio</td>"; 
+                                             $cont++;  
+                                        }
+                                    }
+                                    if($cont>=1){
+                                        if($value["coniva1"]!=""){
+                                            echo "<td width='15%' VALIGN='MIDDLE' ALIGN='CENTER'>".$value["coniva1"]."</td>";   
+                                        }else{
+                                            echo "<td width='15%' VALIGN='MIDDLE' ALIGN='CENTER'>sin precio</td>";  
+                                            echo " </tr>";
+                                        }
+                                    }
+                                    $cont++;
+                                    if($cont>=1 && !empty($campopos[0]['PRICESELL'])){
+                                        if($campopos[0]['PRICESELL']!=""){
+                                            echo "<td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>".number_format($campopos[0]['PRICESELL'],2,".",",")."<input type=hidden readonly name='pricesell' id='pricesell' value='".number_format($campopos[0]['PRICESELL'],2,".",",")."'/></td>";   
+                                        }else{
+                                            echo "<td width='25%' VALIGN='MIDDLE' ALIGN='CENTER'>sin precio</td>";  
+                                            echo " </tr>";
+                                        }
+                                    
+                                       
+                                        
+                                        
+                                        }
+                                    $cont++;
+                                    
+                                 
+
+                            }    
+                          
+                        }
+                    echo "</table>" ;   
+                    
+
+            break;
+            case 'CambioPrecios2':
+                $comunes = new Comunes();  
+                $i=0;         
+                $producto= $_POST["producto"];
+                $region= $_POST["region"];
+                $tipoPrecio= $_POST["tipoPrecio"];  
+                $tipoPrecio=explode(",", $tipoPrecio);                      
+                echo "<div>";
+                echo "<form id='formulario'>";
+                foreach ($tipoPrecio as $value) {
+                    $campo = $comunes->ObtenerFilasBySqlSelect("SELECT * FROM item_precio , tipo_precio_item a where id_region=".$region." and id_producto=".$producto." and tipo_precio=".$tipoPrecio[$i]." and a.id=tipo_precio ;");
+                    if($value==1)
+                        $tipo="Red Comercial";
+                     if($value==2)
+                        $tipo="PAE";
+                     if($value==3)
+                        $tipo="Pdvalito";                        
+
+                   echo "<div style='margin-left: 116px'><div style='float:left;width:100px'>".$tipo." </div><input class='form-text precioV' id='".$value."' type='text' value='".$campo[0]["precio"]."' onkeypress='if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;'><div style='clear:both'></div></div>";
+                   echo "<input type='hidden' value='".$campo[0]["precio"]."' name='precioh".$value."' id='precioh".$value."' >" ;
+                   echo "<input type='hidden' name='".$value."' value='".$value."'>";
+                   $i++;
+                  
+                }
+                echo "</div>";   
+                echo "<input type='hidden' id='cantPrecio' value='".$i."'>";
+                echo "<input type='hidden' id='producto' value='".$producto."'>";
+                echo "<input type='hidden' id='region' value='".$region."'>"; 
+                echo "<div id='agregarP' style='width: 90px;margin: 20px 0px 0px 186px;cursor:pointer ;padding: 10px; background: #bdd1dc;cursor:pointer'>Agregar precios</div>";          
+               echo "</form>";
+               
+
+            break;
+            case 'CambioPrecios3':
+               $comunes = new Comunes();  
+                $cantidad=$_POST["cantidad"];
+                $producto=$_POST["producto"];
+                $region=$_POST["region"];
+                if(isset($_POST["1"])){
+                    $campo = $comunes->ObtenerFilasBySqlSelect("SELECT * FROM item_precio where id_region=".$region." and id_producto=".$producto." and tipo_precio=1");
+                    $filas=$comunes->getFilas();
+                    if( $filas!=0){
+                         echo   $sql = "UPDATE item_precio SET precio =".$_POST["precioh1"]."  WHERE id = {$campo[0]['id']};";
+                            $comunes->Execute2($sql);
+                    }else{
+                             $instruccion = "INSERT INTO item_precio (id_region, id_producto, tipo_precio, precio)
+                             VALUES ( '$region', '$producto', '1', ".$_POST["precioh1"].");";
+                            $comunes->ExecuteTrans($instruccion); 
+                    }
+                }
+                if(isset($_POST["2"])){
+                    $campo = $comunes->ObtenerFilasBySqlSelect("SELECT * FROM item_precio where id_region=".$region." and id_producto=".$producto." and tipo_precio=2");
+                    $filas=$comunes->getFilas();
+                    if( $filas!=0){
+                         echo   $sql = "UPDATE item_precio SET precio =".$_POST["precioh2"]."  WHERE id = {$campo[0]['id']};";
+                            $comunes->Execute2($sql);
+                    }else{
+                             $instruccion = "INSERT INTO item_precio (id_region, id_producto, tipo_precio, precio)
+                             VALUES ( '$region', '$producto', '2', ".$_POST["precioh2"].");";
+                            $comunes->ExecuteTrans($instruccion); 
+                    }
+                }
+                 if(isset($_POST["3"])){
+                    $campo = $comunes->ObtenerFilasBySqlSelect("SELECT * FROM item_precio where id_region=".$region." and id_producto=".$producto." and tipo_precio=3");
+                    $filas=$comunes->getFilas();
+                    if( $filas!=0){
+                         echo   $sql = "UPDATE item_precio SET precio =".$_POST["precioh3"]."  WHERE id = {$campo[0]['id']};";
+                            $comunes->Execute2($sql);
+                    }else{
+                             $instruccion = "INSERT INTO item_precio (id_region, id_producto, tipo_precio, precio)
+                             VALUES ( '$region', '$producto', '3', ".$_POST["precioh3"].");";
+                            $comunes->ExecuteTrans($instruccion); 
+                    }
+                }
+
+
+                  
+              
+            break;
+            
+            case 'cargarCantidadPOS_1':
+            $pos=POS;
+                
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item WHERE id_item = '".$_GET["v2"]."'");
+            $campopos=$conn->ObtenerFilasBySqlSelect("SELECT * FROM $pos.stockcurrent WHERE PRODUCT='" . $campos[0]['itempos']."'");
+           // echo "SELECT * FROM $pos.stockcurrent WHERE PRODUCT=" . $campos[0]['itempos'];
+            //echo $campopos[0]["PRODUCT"];
+            if (count($campopos) == 0) {
+                echo "[{id:'-1'}]";
+            } else { 
+                echo json_encode($campopos);
+            }
+            break;
+            
+            case 'ver_ubicacion':
+                           
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id = '".$_GET["ubicacion"]."'");
+          
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else { 
+                echo json_encode($campos);
+            }
+            break;
+            
+            
+            
+            
+         
+
+    }
+}
+?>

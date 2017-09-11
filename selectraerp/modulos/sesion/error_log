@@ -1,0 +1,525 @@
+[30-Nov-2010 16:40:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 16:40:17] PHP Warning:  require_once(/home/selectra/public_html/guatemala/general.config.inc.php) [<a href='function.require-once'>function.require-once</a>]: failed to open stream: No such file or directory in /home/selectra/public_html/pymes/selectraerp/libs/php/configuracion/config.php on line 5
+[30-Nov-2010 16:40:17] PHP Fatal error:  require_once() [<a href='function.require'>function.require</a>]: Failed opening required '/home/selectra/public_html/guatemala/general.config.inc.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/selectra/public_html/pymes/selectraerp/libs/php/configuracion/config.php on line 5
+[30-Nov-2010 16:42:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 16:42:37] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:03:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:03:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:03:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:03:48] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[30-Nov-2010 17:03:48] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[30-Nov-2010 17:03:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:03:54] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[30-Nov-2010 17:03:54] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[30-Nov-2010 17:03:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:03:59] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:02] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:04:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:44:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:44:50] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:44:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:44:56] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[30-Nov-2010 17:44:56] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[30-Nov-2010 17:45:40] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Nov-2010 17:45:46] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[01-Dec-2010 04:45:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[01-Dec-2010 04:45:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[01-Dec-2010 11:18:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[01-Dec-2010 11:18:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 08:15:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 08:15:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 12:21:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 12:21:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:27:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:27:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:27:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:27:24] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[02-Dec-2010 14:27:24] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[02-Dec-2010 14:27:36] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:27:36] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[02-Dec-2010 14:27:36] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[02-Dec-2010 14:27:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:27:56] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[02-Dec-2010 14:27:56] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[02-Dec-2010 14:36:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:36:54] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[02-Dec-2010 14:36:54] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[02-Dec-2010 14:37:19] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 14:37:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 15:42:38] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 15:42:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 15:42:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[02-Dec-2010 15:42:48] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[02-Dec-2010 15:42:48] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[02-Dec-2010 15:44:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[03-Dec-2010 23:05:31] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[03-Dec-2010 23:05:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-Dec-2010 11:18:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-Dec-2010 11:18:15] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-Dec-2010 11:18:35] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[06-Dec-2010 15:42:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[06-Dec-2010 15:42:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 07:30:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 07:30:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 08:38:40] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 08:39:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 08:39:19] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 08:39:19] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[07-Dec-2010 08:39:19] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[07-Dec-2010 08:39:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Dec-2010 08:43:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 06:49:47] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 06:50:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 06:55:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:01:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:01:27] PHP Warning:  require_once(/home/selectra/public_html/guatemala/general.config.inc.php) [<a href='function.require-once'>function.require-once</a>]: failed to open stream: No such file or directory in /home/selectra/public_html/pymes/selectraerp/libs/php/configuracion/config.php on line 5
+[09-Dec-2010 08:01:27] PHP Fatal error:  require_once() [<a href='function.require'>function.require</a>]: Failed opening required '/home/selectra/public_html/guatemala/general.config.inc.php' (include_path='.:/usr/lib/php:/usr/local/lib/php') in /home/selectra/public_html/pymes/selectraerp/libs/php/configuracion/config.php on line 5
+[09-Dec-2010 08:07:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:07:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:12:46] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:16:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:21:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:33:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:36:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 08:36:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:18] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[09-Dec-2010 11:06:18] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[09-Dec-2010 11:06:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:21] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[09-Dec-2010 11:06:21] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[09-Dec-2010 11:06:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 11:06:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 12:40:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 12:50:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 12:51:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 21:58:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 21:59:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 22:17:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 22:17:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 22:49:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-Dec-2010 22:50:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[10-Dec-2010 16:16:50] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[10-Dec-2010 16:17:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 08:57:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 08:58:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 13:03:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 13:03:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 18:10:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 18:10:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 18:33:19] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 18:33:25] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:22:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:22:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:22:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:22:48] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[11-Dec-2010 19:22:48] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[11-Dec-2010 19:22:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:23:11] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:24:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:24:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Dec-2010 19:26:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 08:44:51] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 08:45:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 10:59:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 10:59:11] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 11:19:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 11:19:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 11:38:29] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 11:38:40] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 11:47:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 11:47:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:08:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:08:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:12:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:13:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:44:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:45:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:46:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 12:46:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 14:01:59] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 14:02:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 14:10:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 14:10:32] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:51:50] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:53:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:54:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:54:43] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:54:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:54:53] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[13-Dec-2010 16:54:53] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[13-Dec-2010 16:55:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:03] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[13-Dec-2010 16:55:03] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[13-Dec-2010 16:55:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:11] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:31] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:31] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 16:55:43] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 17:29:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 17:29:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 17:30:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 17:31:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 18:41:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 18:41:36] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 19:56:43] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 19:56:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 20:01:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 20:01:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 20:13:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Dec-2010 22:19:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 10:06:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 10:07:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 14:26:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 14:26:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 15:38:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 15:38:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 15:59:47] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 15:59:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 16:54:35] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 16:54:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Dec-2010 16:54:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Dec-2010 13:17:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Dec-2010 13:18:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Dec-2010 13:18:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Dec-2010 13:18:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 16:23:29] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 16:24:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 16:25:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:32:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:33:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:33:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:34:51] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:34:51] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[16-Dec-2010 21:34:51] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[16-Dec-2010 21:35:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:35:31] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:35:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:35:33] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[16-Dec-2010 21:35:33] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[16-Dec-2010 21:35:37] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:35:43] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:36:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:36:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:37:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:37:13] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[16-Dec-2010 21:37:13] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[16-Dec-2010 21:39:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:39:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:57:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Dec-2010 21:58:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Dec-2010 14:52:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Dec-2010 14:52:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Dec-2010 15:48:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Dec-2010 15:48:15] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Dec-2010 18:13:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Dec-2010 18:13:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:37:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:37:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:37:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:37:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:37:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:38:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:38:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:55:32] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Dec-2010 12:55:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[29-Dec-2010 06:43:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[29-Dec-2010 06:43:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 15:14:58] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 15:15:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 15:21:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 15:21:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 18:03:42] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 18:03:58] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 18:10:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Jan-2011 18:10:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Jan-2011 15:37:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Jan-2011 15:38:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Jan-2011 11:59:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Jan-2011 11:59:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Jan-2011 12:06:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Jan-2011 12:07:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Jan-2011 16:30:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Jan-2011 16:30:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 09:40:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 09:40:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 10:01:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 10:01:45] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 12:08:37] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 12:08:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 12:10:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 12:10:50] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 14:44:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[12-Jan-2011 14:45:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:14:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:14:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:14:45] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:14:45] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[13-Jan-2011 21:14:45] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[13-Jan-2011 21:15:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:15:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:15:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Jan-2011 21:15:23] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[13-Jan-2011 21:15:23] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[14-Jan-2011 10:45:42] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Jan-2011 10:46:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Jan-2011 17:23:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Jan-2011 21:49:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[14-Jan-2011 21:49:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:01:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:02:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:02:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:02:09] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[15-Jan-2011 09:02:09] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[15-Jan-2011 09:02:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:02:34] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[15-Jan-2011 09:02:34] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[15-Jan-2011 09:02:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:02:55] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[15-Jan-2011 09:02:55] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[15-Jan-2011 09:02:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:19] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:03:40] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:04:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 09:04:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 11:01:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 11:01:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:37:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:38:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:39:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:39:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:42:36] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:42:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 16:43:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 17:06:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 17:06:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 17:37:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 17:37:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 19:05:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Jan-2011 19:05:32] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:49:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:49:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:49:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:49:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:50:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:50:11] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[17-Jan-2011 09:50:11] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[17-Jan-2011 09:50:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 09:50:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 12:53:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 12:53:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:28:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:28:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:28:45] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[17-Jan-2011 13:28:45] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[17-Jan-2011 13:28:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:41:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:41:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:00] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[17-Jan-2011 13:42:00] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[17-Jan-2011 13:42:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:08] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[17-Jan-2011 13:42:08] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[17-Jan-2011 13:42:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:12] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 13:42:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 15:31:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 15:58:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 15:58:46] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 15:58:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 15:58:57] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[17-Jan-2011 15:58:57] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[17-Jan-2011 20:06:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 20:06:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Jan-2011 20:06:54] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 09:50:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 09:52:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:18] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:24] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:24] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[18-Jan-2011 14:03:24] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[18-Jan-2011 14:03:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:33] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[18-Jan-2011 14:03:33] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[18-Jan-2011 14:03:35] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:37] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:03:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 14:04:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 15:24:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 15:25:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 15:43:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 23:40:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 23:40:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[18-Jan-2011 23:58:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[19-Jan-2011 08:48:40] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[19-Jan-2011 11:28:58] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[19-Jan-2011 11:32:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[19-Jan-2011 11:32:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[19-Jan-2011 16:26:58] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[19-Jan-2011 16:27:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Jan-2011 11:25:35] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Jan-2011 11:25:46] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Jan-2011 23:46:38] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[21-Jan-2011 23:46:46] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[22-Jan-2011 15:30:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[22-Jan-2011 15:30:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[24-Jan-2011 11:11:59] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[24-Jan-2011 11:12:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[24-Jan-2011 14:10:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[24-Jan-2011 14:10:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[26-Jan-2011 13:12:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[26-Jan-2011 13:13:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Jan-2011 11:02:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Jan-2011 11:02:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Jan-2011 11:05:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Jan-2011 11:05:50] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Jan-2011 11:30:36] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Jan-2011 11:30:43] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Jan-2011 08:55:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Jan-2011 08:55:17] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Jan-2011 12:43:58] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Jan-2011 12:44:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Jan-2011 12:44:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Jan-2011 12:44:08] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[28-Jan-2011 12:44:08] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[28-Jan-2011 12:44:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[29-Jan-2011 11:30:19] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[29-Jan-2011 11:30:25] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Jan-2011 19:50:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Jan-2011 19:51:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Jan-2011 19:55:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Jan-2011 19:56:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[31-Jan-2011 20:55:15] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[31-Jan-2011 20:56:45] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[01-Feb-2011 10:14:55] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[01-Feb-2011 10:15:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-Feb-2011 11:44:15] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-Feb-2011 11:44:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-Feb-2011 11:49:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Feb-2011 17:59:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Feb-2011 17:59:47] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Feb-2011 09:42:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Feb-2011 09:42:47] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Feb-2011 16:36:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[08-Feb-2011 16:36:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Feb-2011 16:37:37] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Feb-2011 16:38:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Feb-2011 16:38:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Feb-2011 16:43:59] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[11-Feb-2011 16:44:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 10:49:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 10:49:23] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 10:49:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 11:45:13] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 11:47:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 12:42:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 12:44:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 18:26:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[15-Feb-2011 18:26:19] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Feb-2011 10:51:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Feb-2011 10:51:59] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Feb-2011 14:13:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Feb-2011 14:14:04] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Feb-2011 17:43:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[16-Feb-2011 17:43:15] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 08:41:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 08:41:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 08:46:56] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 08:47:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 09:16:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 09:17:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 10:53:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 11:32:06] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 11:32:29] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:48:36] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:48:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:49:09] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:49:09] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[17-Feb-2011 17:49:09] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[17-Feb-2011 17:49:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:49:36] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:50:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 17:50:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 18:10:49] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[17-Feb-2011 18:11:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Feb-2011 17:52:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Feb-2011 17:53:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 19:13:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 19:13:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 20:45:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 20:45:46] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 20:50:44] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 20:50:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 21:04:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 21:04:33] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 21:04:37] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[28-Mar-2011 21:05:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[29-Mar-2011 20:02:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[29-Mar-2011 20:02:58] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Mar-2011 09:38:27] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Mar-2011 09:38:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Mar-2011 09:39:08] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Mar-2011 14:44:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[30-Mar-2011 14:45:01] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Apr-2011 12:44:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[04-Apr-2011 12:44:26] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:11:38] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:12:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:12:14] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:12:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:12:34] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:12:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:14:39] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:14:57] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[07-Apr-2011 09:14:57] PHP Warning:  Invalid argument supplied for foreach() in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/login.php on line 34
+[07-Apr-2011 09:14:57] PHP Fatal error:  Cannot use string offset as an array in /home/selectra/public_html/pymes/selectraerp/libs/php/clases/ConexionComun.php on line 135
+[13-Apr-2011 15:48:48] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Apr-2011 15:49:15] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[13-Apr-2011 15:50:53] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[25-Apr-2011 15:14:38] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[25-Apr-2011 15:14:52] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[25-Apr-2011 15:15:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Apr-2011 17:57:05] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Apr-2011 17:57:21] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Apr-2011 17:58:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Apr-2011 18:11:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[27-Apr-2011 18:11:50] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-May-2011 07:47:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-May-2011 07:47:42] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-May-2011 18:30:22] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[05-May-2011 18:30:28] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 14:38:07] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 14:38:30] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 14:39:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 14:47:41] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 14:47:51] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 15:01:16] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[09-May-2011 15:01:20] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[10-May-2011 09:54:10] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[10-May-2011 09:55:00] PHP Warning:  Module 'zip' already loaded in Unknown on line 0
+[10-May-2011 09:55:03] PHP Warning:  Module 'zip' already loaded in Unknown on line 0

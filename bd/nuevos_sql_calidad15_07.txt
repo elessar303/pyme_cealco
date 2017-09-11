@@ -1,0 +1,11 @@
+
+ALTER TABLE `calidad_almacen` ADD `tipo_acta` TINYINT NOT NULL COMMENT '1=entrada, 2=retiro calidad' ;
+
+INSERT INTO `selectrapyme_prueba_standard`.`modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES ('227', '225', 'Revision Almacen', 'calidad_retiro.php', 'calidad_retiro.tpl', '2', '../../libs/imagenes/113.png', '1');
+
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('add', 'calidad_almacen_retiro_add.tpl', ' add calidad_almacen_add.tpl calidad_almacen_add.php 226 Agregar Nuevas Entradas De Productos', '227', 'Retirar productos de almacen que esten dañados');
+
+
+INSERT INTO `modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES
+(228, 225, 'Acta De Visitas', 'calidad_visita.php', 'calidad_visita.tpl', 1, '../../libs/imagenes/88.png', 1); 

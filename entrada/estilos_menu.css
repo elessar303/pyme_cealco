@@ -1,0 +1,207 @@
+/*@import url("../includes/css/reset.css");*/
+
+body{
+    background-image:url(../selectraerp/imagenes/fondo_pyme.png);
+    background-repeat: no-repeat;
+    background-position:top;
+    height:100%;
+    background-color:#d5ebf8;/*D4ECF7*/
+    overflow:hidden;
+}
+#cont {
+    position:absolute;
+    width:100%;
+    height:100%;
+    margin:0px;
+    background-repeat:repeat-x;
+}
+
+#cont::after {
+  content: "";
+  background: url(../selectraerp/imagenes/fondo_pyme.png);
+  opacity: 0.1;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  z-index: -1;   
+}
+#logo {
+    position:absolute;
+    /*background-image:url(botones/selectra.jpg);*/
+    background-repeat:no-repeat;
+    top:50%;
+    left:50%;
+    margin-top: -100px;
+    margin-left: -150px;
+    width:300px;
+    height:200px;
+}
+#logo2{
+    position:absolute;
+    /*background-image:url(botones/asys.png);
+    background-repeat:no-repeat;*/
+    width:100%;
+    height:100%;
+    background-position:bottom;
+}
+#imalogo{
+    position:absolute;
+    border:0;
+    top:98%;
+    left:50%;
+    margin-top: -50px;
+    margin-left: -50px;
+}
+
+#contenedor_botones {
+    position:absolute;
+    background:transparent url(botones/overlay.png) repeat top left;
+    top:50%;
+    left:50%;
+    margin-top: -193px;
+    margin-left: -330px;
+    width: 660px;
+    height:440px;
+    -moz-border-radius: 35px;
+    border-radius: 35px;
+    z-index:100;
+    /*display:none;*/
+}
+#logo:hover #contenedor_botones{
+    display:block;
+}
+#administrativo a {
+    margin:10px;
+    float:left;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONADM1.png);
+    display:block
+}
+#contabilidad a {
+    float:left;
+    margin:10px;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONCON1.png);
+    display:block
+}
+#rrhh a {
+    float:left;
+    margin:10px;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONRRHH1.png);
+    display:block
+}
+#bienes a {
+    float:left;
+    margin:10px;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONBIE1.png);
+    display:block
+}
+#hacienda a {
+    float:left;
+    margin:10px;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONHAC1.png);
+    display:block
+}
+#reportes a {
+    float:left;
+    margin:10px;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONREP.png);
+    display:block
+}
+#manuales a {
+    float:left;
+    margin:10px;
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONMAN1.png);
+    display:block
+}
+#administrativo a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONADM2.png);
+
+}
+#contabilidad a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONCON2.png);
+}
+#rrhh a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONRRHH2.png);
+}
+#bienes a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONBIE2.png);
+}
+#hacienda a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONHAC2.png);
+}
+#reportes a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONREP2.png);
+}
+#manuales a:hover {
+    width: 200px;
+    height: 200px;
+    background-image:url(botones/BOTONMAN2.png);
+}
+#administrativo a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+
+}
+#contabilidad a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+
+}
+#rrhh a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+}
+#bienes a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+
+}
+#hacienda a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+
+}
+#reportes a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+
+}
+#manuales a:focus {
+    background-image:url(botones/load.gif);
+    background-position:center;
+    background-repeat:no-repeat;
+
+}

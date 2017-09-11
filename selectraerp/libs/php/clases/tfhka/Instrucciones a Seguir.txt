@@ -1,0 +1,39 @@
+PASOS HA SEGUIR PARA LA INTEGRACION DE LAS IMPRESORAS FISCALES CON PHP
+
+1-. Pegar  la carpeta IntTFHKA en el disco duro C: ( C:\IntTFHKA  ).BUSCAR LA CARPETA INTTFHKA, dentro de este mismo paquete
+2-. Configurar en el archivo php.ini los siguientes parametros de esta manera:
+
+		safe_mode = Off
+
+
+                safe_mode_exec_dir = On
+
+3-. Activar en  el Servicio Apache la permisibilidad de aceeso en escritorio
+    remoto de la siguiente manera en tu Windows:
+
+    -> Inicio
+    -> Ejecutar
+
+              Escribir el comando:  services.msc    y  Abrir
+
+    -> Buscar el servicio Apache en la lista de los servicios locales y hacer click
+       derecho y entrar en las Propiedades.
+    -> Buscar la pestaña Inicio de seccion y hacer y activar la casilla:
+
+            Permitir que el servicio interactue con el escritorio remoto.
+
+    -> Aplicar y Aceptar
+    -> Reiniciar el servicio Apache para que los cambio tengan efecto.
+
+4-. Pegar el achivo estandar TfhkaPHP.php dentro de los directorios de la aplicacion de la carpeta www 
+    de tu Servidor Apache .
+
+5-. Todas los archivos de la aplicacion que se construya que interactue con la impresora
+    fiscal deben incluir la clase estandar TfhkaPHP.php para aceder a sus funciones básicas.
+    
+     Ejemplo: Pegar el archivo TfhkaPHP.php y el DemoTfhkaPHP.php en la carpeta www del Servidor
+	      Apache y ejecutar el Demo con la siguiente URL:
+
+                http://localhost/http://localhost/DemoTfhkaPHP.php
+	
+	

@@ -1,0 +1,4 @@
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_lista_conciliacion` AS select `conciliacion_bancaria`.`cod_conciliacion` AS `cod_conciliacion`,`conciliacion_bancaria`.`fecha_inicial` AS `fecha_inicial`,`conciliacion_bancaria`.`fecha_final` AS `fecha_final`,`conciliacion_bancaria`.`saldo_inicial` AS `saldo_inicial`,`conciliacion_bancaria`.`saldo_final` AS `saldo_final`,`conciliacion_bancaria`.`saldo_libros` AS `saldo_libros`,`vw_tesor_bancodet`.`descripcion` AS `descripcion`,`vw_tesor_bancodet`.`tipo_cuenta` AS `tipo_cuenta`,`vw_tesor_bancodet`.`nro_cuenta` AS `nro_cuenta`,`banco`.`descripcion` AS `banco` from ((`conciliacion_bancaria` join `vw_tesor_bancodet` on((`vw_tesor_bancodet`.`cod_tesor_bandodet` = `conciliacion_bancaria`.`cod_tesor_bancodet`))) join `banco` on((`vw_tesor_bancodet`.`cod_banco` = `banco`.`cod_banco`)));
+
+--
+-- VIEW  `vw_lista_conciliacion`

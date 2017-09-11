@@ -1,0 +1,16 @@
+<?php
+include("../../libs/php/clases/almacen.php");
+$almacen = new Almacen();
+$tipo="E";
+$cadena="001";
+$sucursal="002";
+$dia=date(d);
+$mes=date(m);
+$ano=date(y);
+$hora=date(h);
+$min=date(i);
+ echo $nomb=$tipo.$cadena.$sucursal.$dia.$mes.$ano.$hora.$min;
+exit;
+$pf=fopen("/PDVAL001/carga","r+");
+
+?>

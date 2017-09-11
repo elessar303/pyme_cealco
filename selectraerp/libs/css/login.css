@@ -1,0 +1,76 @@
+/* 
+    Document   : login
+    Created on : 13/10/2009, 09:00:03 PM
+    Author     : luisenrique
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* 
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+
+
+#form_login{
+    margin-top: 55px;
+    border: 1px solid #cccccc;
+    background: url('../../libs/imagenes/Login.png') no-repeat;
+    height: 215px;
+    text-align:left;
+    width:450px;
+}
+
+#form_login #campos{
+width:auto;
+ float: left;
+ padding-top:40px;
+ padding-left:20px;
+ 
+}
+
+label { width:60px; text-align: right;  float: left;margin: 0 6px 0 0;padding: 2px 0 0 0;}
+br { margin-bottom: 10px;}
+
+#form_login #botones{
+width:auto;
+ float: right;
+ padding-right: 20px;
+ padding-top:96px;
+ 
+
+}
+
+#form_login  #botones .button input{
+
+-moz-border-radius: 5px; padding: 5px; color: black; font-weight: bold;-webkit-border-radius: 5px; font-size: 13px;  width: 70px;
+
+border: 1px solid #666666;
+    font-family: Arial,Helvetica,sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom:6px;
+    width: 65px;
+    font-variant: normal;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+#form_login  #botones .button input:hover		{
+
+					  -moz-border-radius: 5px; padding: 5px; color: black; font-weight: bold;
+					  -webkit-border-radius: 5px; font-size: 13px;  width: 70px;
+
+border: 1px solid #666666;
+    font-family: Arial,Helvetica,sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom:6px;
+    width: 65px;
+    font-variant: normal;
+    font-size: 13px;
+    text-decoration: none;
+     background: white; color: black;
+}
+
+

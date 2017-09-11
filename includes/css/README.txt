@@ -1,0 +1,2 @@
+En esta carpeta se incluiran (poco a poco) con la finalidad de reducir la redundancia de archivos .css y codigo css incluido
+en platillas (.tpl) y archivos .html además de algunos casos en archivos .php.

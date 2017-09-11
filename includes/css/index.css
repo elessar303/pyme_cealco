@@ -1,0 +1,114 @@
+/*input{
+    width:200px;
+}*/
+
+/*input.inc{
+    background: #FDA08F ;
+    border-color: #E91D18;
+}
+input.corr{
+    background:#C6FFC6;
+    border-color: #33CC00;
+}*/
+.procesando{
+    width:401px;
+    height: 400px;
+    background:white;
+    position:absolute;
+    border:0.1px;
+    border-style:solid;
+    border-color:green;
+    border-radius:10px;
+    margin: auto 0 auto 0;
+}
+/*span.error{
+    font-weight:normal;
+    text-align:left;
+    color: #C00;
+    width:140px;
+    padding-left:25px;
+    background-attachment: scroll;
+    background-image: none;
+    background-repeat: no-repeat;
+    background-position: left;
+}*/
+.columna1{
+    background:white;
+    opacity:0.7;
+    border-radius:10px;
+    margin-left:20px;
+    padding-left:10px;
+}
+
+.titulo1{
+    font-size:10px;
+    font-family:arial;
+    font-weight:bold;
+    text-align:center;
+}
+
+#nuevaEmpresa td{
+    color:black;
+    font-size:10px;
+    font-family:arial;
+    text-transform:uppercase;
+}
+
+#nuevaEmpresa{
+    background-color:#ecEdeF;
+    position:absolute;
+    top:10px;
+    left:10px;
+    width:320px;
+    height:220px;
+    padding:10px;
+    font-size:10px;
+    font-family:arial;
+    border:0.1px;
+    border-style:solid;
+    border-color:green;
+    border-radius:10px;
+}
+
+hr{
+    color:white;
+}
+
+.contenedor{
+    background-color: #EBEBEB;
+    background-image:url('../imagenes/login_bg.jpg');
+    height:390px;
+    width:400px;
+    background-repeat: repeat-x;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px #2a4c8a;
+    /*border-radius:10px;
+    -moz-box-shadow:1px 1px 10px #2a4c8a;
+    -webkit-border-radius:10px;
+    -webkit-box-shadow:2px 2px 10px #2a4c8a;*/
+    margin:140px auto 0 auto;
+    padding:15px;
+    overflow: hidden;
+}
+
+.seleccionEmpresa{
+    width:390px;
+    height:150px;
+    border-radius:10px;
+    background-image:url(../imagenes/login_bg.jpg);
+}
+
+td,tr,img{
+    background:none;
+}
+
+body{
+    font-family: Verdana, Geneva, sans-serif;
+    font-size: 12px;
+    background-image: url(../imagenes/bg.jpg);
+    background-repeat: no-repeat;
+    background-position:center;
+    height:100%;
+    background-color:#d5ebf8;/*D4ECF7*/
+    overflow:hidden;
+}

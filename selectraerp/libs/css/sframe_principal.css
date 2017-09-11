@@ -1,0 +1,23 @@
+@import "screen.css";
+
+body { margin:0; background:#FFF; padding:0; }
+* html body { overflow:auto; }
+#Cabecera { position:absolute; left:0; top:0; }
+#Lateral, #Contenido { position:absolute; left:0; top:0; overflow:auto; }
+html>body #Cabecera, html>body #Lateral { position:fixed; }
+#Cabecera, #Contenido { width:100%; }
+#Lateral, #Contenido { height:100%; }
+#Contenido {background-color:#f6f6f6; z-index:1; border-top:60px solid #FFF; border-left:200px solid #FFF; }
+html>body #Contenido { height:auto; width:auto; border:0; top:60px; left:200px; }
+@media ScReEn { head:first-child+body #Contenido { position:fixed; bottom:0; right:0; } }
+#Lateral { background: url('../../libs/imagenes/menu.jpg') repeat-y; z-index:2; width:200px; padding-top:60px; }
+html>body #Lateral { height:auto; top:60px; bottom:0; padding-top:0; }
+#Cabecera { background:#507e95; z-index:3; height:60px; }
+
+.Relleno { margin-left:0.5em;margin-right:0.5em;color:#888; text-align:left; font-size:0.65em;
+font-size: 12px;margin-top:0.2em;
+color: black;
+}
+#Asunto p.Codigo { padding:0.5em 0 0.5em 1em; }
+
+

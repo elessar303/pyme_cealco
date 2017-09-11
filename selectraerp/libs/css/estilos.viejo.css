@@ -1,0 +1,333 @@
+
+/* Definiciones de Fuentes */
+
+.stilo_login{
+    color: #FFFFFF;
+
+}
+
+.sobreobjeto{
+    background-color:#d7d7d7;
+}
+
+.mouseOVER {
+    background-color:#ededed;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #eeecff;
+    font-family: Arial,Helvetica,sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+body, td, th, input{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+/* Definiciones de Links */
+a:link, a:visited, a:active {
+    color: #000000;
+    text-decoration: none;
+}
+a:hover {
+    color: #000000;
+    text-decoration: none;
+}
+/* Estilos del menu superior */
+
+.sup-ico-c2{
+    background-image : url('../../libs/imagenes/azul/sub_c2.png');
+
+}
+
+.sup-ico-help{
+    background-image : url('../../libs/imagenes/azul/sup_help.png');
+    background-position : center center;
+
+}
+.sup-ico-about{
+    background-image : url('../../libs/imagenes/azul/stock_about.png');
+    background-position : center center;
+
+
+}
+.sup-ico-exit{
+    background-image : url('../../libs/imagenes/azul/sup_exit.png');
+    background-position : center center;
+
+    cursor : pointer
+}
+
+.sup-help{
+
+    background-color: #223372;
+
+}
+.sup-help-text{
+
+    color: #ffffff;
+    font-size : 9pt; 
+    font-weight : bold;
+}
+
+/* Definiciones de Menu */
+
+.menu
+{
+    font-size: 15px;
+    font-family:TheSansCorrespondence;
+}
+
+a.menu:link, a.menu:visited, a.menu:active, a.menu:hover{
+    color: #333333;
+    padding: 2px;
+    font-size: 15px;
+    font-family:TheSansCorrespondence;
+}
+
+
+
+.fondo_banner{
+
+    background-image : url('../../libs/imagenes/barra1.png');
+    background-position : center; 
+    background-repeat : repeat-x; 
+}
+.menu-bg{
+    background-color:#5084A9;
+    color: #F9F9F9;
+    /*background-image:url(../../libs/imagenes/bg_menu.png);*/
+    background-repeat:repeat-y;
+}
+.menu-fila{
+    background-color:#5084A9;
+    color: #F9F9F9;
+    cursor: pointer;
+    /*background-image:url(../../libs/imagenes/bg_menu.png);*/
+    background-repeat:repeat-y;
+}
+.menu-bg-hover{
+    background-color: #E5E6E3;
+    background-image:url(../../libs/imagenes/azul/bg_menu_over.png);
+    background-repeat:repeat-y;
+}
+.menu-separador{
+
+    background-image:url(../../libs/imagenes/azul/sep_menu.png);
+
+}
+
+.menu-br{
+    background-color: #98A1B0;
+}
+/* Definiciones de Botones */
+.btn-t {
+    text-decoration: none;
+    padding-right: 2px;
+    padding-left: 2px;
+    color: #000000;
+}
+.fondo_index{
+    background-color: #0C37A5;
+
+}
+.btn_principal {
+    border-bottom-style : outset; 
+    border-left-style : outset; 
+    border-right-style : outset; 
+    border-top-style : outset;
+    background-color : #E1E1E1; 
+    color : #0C37A5; 
+    font-family : Verdana, Sans-Serif, Helvetica; 
+    font-size : 9pt; 
+    font-weight : bold;
+    width:150px;
+    height:40px;
+    cursor: pointer;
+}
+
+.creditos{
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
+.fondo {
+    background-color:#EEECFF;
+}
+a.btn-t:link, a.btn-t:active, a.btn-t:hover,a.btn-t:visited {
+    color: #000000;
+}
+.btn_bg {
+    background-image: url(../../libs/imagenes/azul/bt_middle.gif);
+    background-repeat: repeat-x;
+    font-weight:normal;
+    color: #000000;
+}
+.box {
+    float:left;
+    margin:5px;
+}
+.boton {
+    background-image: url(../../libs/imagenes/boton_off.png);
+    background-repeat: repeat-x;
+    font-weight:normal;
+}
+.boton-over {
+    background-image: url(../../libs/imagenes/boton_on.png);
+    background-repeat: repeat-x;
+    font-weight:normal;
+}
+.boton-text{
+    font-size: 13px;
+    font-family:TheSansCorrespondence;
+}
+
+/*padding: 0px 4px; white-space: nowrap; width: 100%; text-align: center; background-image: url(/skins/WinXPReloadedCompact/images/button_middle.gif);*/
+
+/* Definiciones de Tablas */
+table {
+    border-collapse:collapse;
+}
+
+table.seleccionLista, table.navegacion, table.tb-head{
+    width:100%;
+    border:0px;
+}
+
+table.seleccionLista td{
+    border: 1px solid #ffffff;
+    border-spacing: 20px;
+}
+
+.tb-tit {
+    background-image: url(../../libs/imagenes/azul/tb_tit.jpg);
+    font-weight: bold;
+    color: #000066;
+    padding-left: 5px;
+    height:26px;
+}
+.tb-head {
+    background-color: #5084A9;
+    color: #EEEEEE;
+}
+.tb-head-hover{
+    background-color: #E9EBEF;
+}
+.tb-footer {
+    background-color: #CCD7E1;
+}
+.tb-body {
+    background-color: #EEF2F5;
+    background-image:url(../../libs/imagenes/tb_body.jpg);
+    background-repeat:repeat-x;
+}
+.tb-fila{
+    background-color: #D3D3D3;
+}
+.tb-sep {
+    background-image:url(../../libs/imagenes/tb_sep.png);
+    background-repeat:repeat-x;
+    font-weight: bold;
+    text-align:center;
+}
+.row-even {
+    background-color: #FFFFFF;
+}
+.row-odd {
+    background-color: #EEF2F5;
+}
+.row-hover {
+    background-color: #DDEEFF;
+}
+.row-select {
+    background-color: #DDEEFF;
+}
+.row-br {
+    border:1px solid #27627B;
+}
+.fondo_login{
+    background-color: #E3F1FF;
+}
+.pie_login{
+    background-image:url(../../libs/imagenes/fondopielogin.png);
+    background-repeat:repeat-x;
+    /*background-color: #003cb7;*/
+}
+.cabecera_login{
+    background-image:url(../../libs/imagenes/fondocabeceralogin.png);
+    background-repeat:repeat-x;
+}
+.alert {
+    background-color: #FFFFCC;
+}
+.icon{
+    vertical-align:middle;
+    margin-right:5px;
+    border:0px;
+}
+
+.icon2{
+    vertical-align:middle;
+    margin-right:0px;
+    border:0px;
+}
+
+/* Definiciones de Controles de formulario */
+input, select, textarea {
+    border: 1px solid silver;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:12px;
+}
+input.error, select.error, textarea.error {
+    border: 1px solid red;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:12px;
+}
+input:focus, select:focus, textarea:focus {
+    border: 1px solid #99CCFF;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:12px;
+}
+
+.form-btn{
+    border: 1px solid #C1C8D2;
+    background-image:url(../../libs/imagenes/bt_middle.gif)
+}
+
+.form-btn2{
+    border: 0px none ;
+    font-size: 11px;
+    text-align: left;  
+
+}
+
+.no-br {
+    border: none;
+}
+
+.saltopagina {
+    page-break-after: always;
+}
+
+.tb-tit2 {
+    background-color: #ddebfb;
+    font-weight: bold;
+    color: #2c6bae;
+    padding-left: 5px;
+    height:26px;
+}
+.normal {
+    border: 1px solid #000;
+}
+.normal th, .normal td {
+    border: 1px solid #000;
+}
+/* Definiciones de Validacion */
+/* Definiciones de Wigets */
+/* Definiciones de Tabs */

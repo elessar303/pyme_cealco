@@ -1,0 +1,31 @@
+FACTURA    00000001        
+Cliente:   Víctor M.Díaz R....................                                      
+Direccion1 DIRECCION DEL CLIENTE..............                   
+Direccion2 UBICACION D ELA DIRECCION..........                                     
+TELEFONO   0412-3041035 - 0426-6983025                                                
+RIF/CI:    J-3211241345    
+Descripcion                             Codigo                    Cant      Precio    IVA
+honorarios profesionales............... JNFNDNDJNDNDGNGNDLDKF    1,000        1,00  12,00
+SEGUNDA DESCRIPCION DEL ARTICULO 1
+honorarios profesionales............... JNFNDNDJNDNDGNGNDLDKF    1,000        2,00  12,00
+honorarios profesionales............... JNFNDNDJNDNDGNGNDLDKF    3,000        1,00  12,00
+SEGUNDA DESCRIPCION DEL ARTICULO 3
+honorarios profesionales............... JNFNDNDJNDNDGNGNDLDKF    1,000        1,00  12,00
+SERIALES DEL ARTICULO 1
+Descuento:              10,00 %
+TOTAL NETO:           5690,00
+TOTAL CANCELADO:      5690,00
+Efectiv                 90,00
+Cheques                  1,00    
+Tarjeta                  2,00    
+CREDITO                  3,00    
+USUARIOS          JUAN COLMENARES  - CAJA 1                                               
+COMENTARIO1       COMPAQC700 *                                                                  
+COMENTARIO2       CUALQUIER COMENTARIO                    
+COMENTARIO3       GRACIAS POR SU COMPRA                   
+DATOS PARA LAS  "D E V O L U C I O N E S"  (ETIQUETA)
+FACTDEVOL         0000002635      SOLO NECESITO AQUI LA REF/INTERNA QUE AFCTA LA DEVOLUCION()                
+FECHADEVOL        10/03/2010      NO ES NECESARIO                
+HORADEVOL         10:30:00        NO ES NECESARIO              
+SERIALIMP         KNA8011111      NO ES NECESARIO                
+COO-BEMATECH      000123          SOLO SI ES BEMATECH

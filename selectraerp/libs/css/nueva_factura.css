@@ -1,0 +1,140 @@
+/*
+    Document   : nueva_factura.css
+    Created on : 03/12/2009, 10:18:48 PM
+    Author     : lviera
+    Description: Purpose of the stylesheet follows.
+
+    Modified on: 30/08/2012
+    Author     : Charli Vivenes
+    Description: Modificación y creación de nuevos estilos
+
+    Modified on: 09/08/2013
+    Author     : Charli Vivenes
+    Description: Creacion de nuevos estilos
+*/
+
+.tab{
+    text-align:left;
+    background-color:#d0d0d0;
+    padding-left:10px;
+    padding-right:10px;
+    font-size:11px;
+    font-family: arial;
+    color:#a0a0a0;
+    cursor: pointer;
+    width:auto;
+    border-left: 1px solid #8d8f91;
+    border-right: 1px solid #8d8f91;border-top: 1px solid #8d8f91;
+}
+.sobreboton{
+    background-color:#bec0c1;
+}
+.click{
+    background: url('../../libs/imagenes/azul/tb_tit.jpg') repeat-x;
+    color:black;
+    border-left: 1px solid #8d8f91;
+    border-right: 1px solid #8d8f91;
+    border-top: 1px solid #8d8f91;
+}
+#contenedorTAB, #contenedorTAB21 {
+    background-color: #e3ebf1;
+    /*-moz-border-radius: 5px;
+    -webkit-border-radius: 5px;*/
+    border-radius: 5px;
+    padding: 2px;
+    border: 1px solid #adafb0;
+}
+.tabfactura{
+    background-color: #e3ebf1;
+    /*-moz-border-radius: 5px;
+      -webkit-border-radius: 5px;*/
+    border-radius: 5px;
+    padding: 2px;
+    border: 1px solid #adafb0;
+    padding: 0px;
+}
+#tabs {
+    margin-top:15px;
+}
+#tabs_pasos {
+    margin-top:2px;
+}
+#tabs_pasos #tab1_pasos,#tab2_pasos  {
+    cursor:pointer;
+}
+.click_paso_ON{
+    background-color:#35358c;
+    color:#ffffff;
+    border: 2px solid #070742;
+    border-radius: 7px;
+    float:left;
+    padding:5px;
+    margin-top:0.3%;
+    font-size: 13px;
+}
+.click_paso_OFF{
+    background-color:#eaeaea;
+    color:#bababa;
+    border: 1px solid #f8f8f8;
+    border-radius: 7px;
+    /*-webkit-border-radius: 7px;Añadido para que tuviera el mismo efecto en Google Chrome*/
+    padding:5px;float:left;
+    margin-left: 0.3%;
+    margin-top:0.3%;
+    font-size: 13px;
+}
+.contenedor_factura{
+    background-color:#ffffff;
+    border:1px solid #ededed;
+    border-radius: 7px;
+    /*-moz-border-radius:7px;
+    -webkit-border-radius:7px;*/
+    padding:5px;
+    margin-top:0.3%;
+    font-size:13px;
+    margin:5px 0 5px 0;
+}
+.subcontenedor_factura{
+    background-color:#ffffff; border:1px solid #d0d0d0;
+    border-radius:7px;
+    /*-moz-border-radius:7px;
+    -webkit-border-radius:7px;*/
+    padding:5px;
+    margin-top:0.3%;
+    font-size:13px;
+    float:right;
+    margin:0 10px 10px 0;
+    cursor:pointer;
+    height:80%;
+    text-align:center;
+}
+.subcontenedor_factura:hover{
+    background-color: #ededed;
+}
+/** imagenes relacionadas a filtro de busqueda */
+.cancelar{
+    background-image:  url('../../../includes/imagenes/cancel.gif')  !important;
+}
+.seleccionar{
+    background-image:  url('../../../includes/imagenes/ico_propiedades.gif')  !important;
+}
+.iconTitulo{
+    background-image:  url('../../../includes/imagenes/grid.png')  !important;
+
+}
+.iconBuscar{
+    background-image:  url('../../../includes/imagenes/search.gif')  !important;
+}
+.iconLimpiar{
+    background-image:  url('../../../includes/imagenes/Clear.gif')  !important;
+}
+.iconInformacion{
+    background-image:  url('../../../includes/imagenes/ico_view.gif')  !important;
+    background-repeat: no-repeat;
+}
+.resumen{
+    margin-right: 20px; float: left; font-style: italic; font-size: 15px;
+}
+.etiqueta{border-top-style: dotted; border-bottom-style: dotted; border-width: 1px; border-color: #8d8f91; vertical-align:middle; width:150px; text-align: right; padding-right: 15px; white-space: nowrap;}
+.elemento{border-top-style: dotted; border-bottom-style: dotted; border-width: 1px; border-color: #8d8f91; vertical-align:top; padding-top:4px; padding-bottom:4px;}
+/** imagenes relacionadas a filtro de busqueda */

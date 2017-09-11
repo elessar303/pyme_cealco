@@ -1,0 +1,23 @@
+FACTURA:    00000002
+CLIENTE:    CHARLI VIVENES.....................
+DIRECCION1: AV. NVA. TOLEDO....................
+DIRECCION2:
+TELEFONO:   04263888510
+RIF/CI:     V-17672978
+DESCRIPCION                             CODIGO                    CANT      PRECIO    IVA
+ BOMB.ESP.FLE45/HLX/6500 .............. P00434                    1,00       23,00   2,76
+BOMBILLOS
+DESCUENTO:               0,00 %
+TOTAL NETO:             23,00
+TOTAL CANCELADO:        25,76
+EFECTIVO:               25,76
+CHEQUES:                 0,00
+TARJETA:                 0,00
+CREDITO:                 0,00
+COMENTARIO1:      NO SE ACEPTAN DEVOLUCIONES DESPUES DE 24 HORAS 
+DATOS PARA LAS  "D E V O L U C I O N E S"
+FACTDEVOL:        0000000000
+FECHADEVOL:       00/00/0000
+HORADEVOL:        00:00:00
+SERIALIMP:        EOCC0007610
+COO-BEMATECH:     000123

@@ -1,0 +1,12 @@
+html { background:#9AC; margin:0; padding:0; border:0; font-family:sans-serif; }
+body { background:#FFF; margin:1%; padding:1%; border:0; }
+h1 { margin:0 0 0.75em; background:#9AC; width:100%; padding:0.25em 0; color:#FFF; text-align:center; font-size:1em; }
+h2 { margin:0; padding:1em; font-size:0.75em; color:#069; }
+code { font:1.25em 'Courier new',Courier,monospace; }
+#Asunto { background:#BCD; font-size:0.75em; padding:1em; text-align:justify; }
+div #Asunto { margin:1.5em; }
+#Asunto p { margin:0.25em; }
+#Asunto img { float:none; margin:0.5em 0 0; border:0; }
+p#Origen { margin-top:0.75em; color:#888; font-size:0.9em; }
+
+#Asunto p.Codigo { margin:0.5em 0.25em; border-top:1px solid #CDE; border-bottom:1px solid #CDE; padding-left:1em; text-align:left; color:#009; }

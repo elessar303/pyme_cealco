@@ -1,0 +1,3 @@
+<?php 
+header ("Location: http://localhost/sisalud/selectraerp/requisicioness/unidades_list2.php"); 
+?>

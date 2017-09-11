@@ -1,0 +1,107 @@
+<?php
+require('fpdf.php');
+
+require_once '../selectra/lib/config.php';
+require_once '../selectra/lib/pdfcommon.php';
+require_once '../selectra/lib/common.php';
+//include ("../selectra/header.php");
+$cantidad_registros=25;
+$Conn=conexion_conf();
+
+
+
+	$var_sql="select encabezado1,encabezado2,encabezado3,encabezado4,imagen_izq,imagen_der from parametros";
+	$rs = query($var_sql,$Conn);
+	$row_rs = fetch_array($rs);
+	$var_encabezado1=$row_rs['encabezado1'];
+	$var_encabezado2=$row_rs['encabezado2'];
+	$var_encabezado3=$row_rs['encabezado3'];
+	$var_encabezado4=$row_rs['encabezado4'];
+	$var_imagen_izq=$row_rs['imagen_izq'];
+	$var_imagen_der=$row_rs['imagen_der'];	
+	$var_sql="select codigo,nomemp,departamento,presidente,periodo,cargo,nivel,desislr,ctaisrl,desiva,ctaiva,por_isv,compra,servicio,rif,nit,direccion,telefono,por_im,por_bomberos,lugar,sobregirop,autorizacionodp,claveodp,contrato,gas_dir from parametros";
+	$rsu = query($var_sql,$Conn);
+	$row_rsu = fetch_array($rsu);
+	$var_nomemp=$row_rsu['nomemp'];
+
+	cerrar_conexion($Conn);
+
+
+
+$conexion=conexion();
+$cod_centro = (empty($_REQUEST['cod_centro'])) ? '' : $_REQUEST['cod_centro'];
+$id = (empty($_REQUEST['id'])) ? '' : $_REQUEST['id'];
+$var_rows = (empty($_REQUEST['rows'])) ? '' : $_REQUEST['rows'];
+
+$consulta_req="SELECT * FROM requisiciones_det  WHERE cod_requisicion = '$id'  ORDER BY cod_requisicion_det";
+$rs = query($consulta_req,$conexion);
+$num_paginas=obtener_num_paginas($consulta_req,$cantidad_registros);
+$pagina=obtener_pagina_actual($pagina, $num_paginas);
+
+
+
+
+class PDF extends FPDF
+{
+//Cabecera de página
+function Header()
+{
+     $Conn=conexion_conf();
+	$var_sql="select encabezado1,encabezado2,encabezado3,encabezado4,imagen_izq,imagen_der from parametros";
+	$rs = query($var_sql,$Conn);
+	$row_rs = fetch_array($rs);
+	$var_encabezado1=$row_rs['encabezado1'];
+	$var_encabezado2=$row_rs['encabezado2'];
+	$var_encabezado3=$row_rs['encabezado3'];
+	$var_encabezado4=$row_rs['encabezado4'];
+	$var_imagen_izq=$row_rs['imagen_izq'];
+	$var_imagen_der=$row_rs['imagen_der'];	
+	$var_sql="select codigo,nomemp,departamento,presidente,periodo,cargo,nivel,desislr,ctaisrl,desiva,ctaiva,por_isv,compra,servicio,rif,nit,direccion,telefono,por_im,por_bomberos,lugar,sobregirop,autorizacionodp,claveodp,contrato,gas_dir from parametros";
+	$rsu = query($var_sql,$Conn);
+	$row_rsu = fetch_array($rsu);
+	$var_nomemp=$row_rsu['nomemp'];
+
+	cerrar_conexion($Conn);
+
+     $this->SetFont('Arial','B',12);
+     
+     $this->Image("../selectra/imagenes/".$var_imagen_izq,10,8,33);
+     $this->Cell(50);
+     $this->Cell(50,8,$var_encabezado1,'LR',0,0,'C');
+     //$this->Image($var_imagen_der,10,8,33);
+     $this->Ln(5);
+     $this->Cell(50);
+     $this->Cell(100,8,$var_encabezado2,'LR',0,0,'C');
+     $this->Ln(5);
+     $this->Cell(50);
+     $this->Cell(100,8,$var_encabezado3,'LR',0,0,'C');
+     $this->Ln(5);
+     $this->Cell(50);
+     $this->Cell(150,8,$var_encabezado4,'LR',0,0,'C');
+
+
+
+}
+
+//Pie de página
+function Footer()
+{
+    //Posición: a 1,5 cm del final
+    $this->SetY(-15);
+    //Arial italic 8
+    $this->SetFont('Arial','I',8);
+    //Número de página
+    $this->Cell(0,10,'Page '.$this->PageNo().'/{nb}',0,0,'C');
+}
+}
+
+
+//Creación del objeto de la clase heredada
+$pdf=new PDF();
+$pdf->AliasNbPages();
+$pdf->AddPage();
+$pdf->SetFont('Times','',12);
+for($i=1;$i<=40;$i++)
+    $pdf->Cell(0,10,'Imprimiendo línea número '.$i,0,1);
+$pdf->Output();
+?>

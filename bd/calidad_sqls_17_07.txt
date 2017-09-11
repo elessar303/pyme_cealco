@@ -1,0 +1,53 @@
+
+ALTER TABLE `calidad_almacen` ADD `tipo_acta` TINYINT NOT NULL COMMENT '1=entrada, 2=retiro calidad' ;
+
+INSERT INTO `selectrapyme_prueba_standard`.`modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES ('227', '225', 'Revision Almacen', 'calidad_retiro.php', 'calidad_retiro.tpl', '2', '../../libs/imagenes/113.png', '1');
+
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('add', 'calidad_almacen_retiro_add.tpl', ' add calidad_almacen_add.tpl calidad_almacen_add.php 226 Agregar Nuevas Entradas De Productos', '227', 'Retirar productos de almacen que esten dañados');
+
+
+INSERT INTO `modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES
+(228, 225, 'Acta De Visitas', 'calidad_visita.php', 'calidad_visita.tpl', 1, '../../libs/imagenes/88.png', 1);
+
+CREATE TABLE IF NOT EXISTS `tipo_uso` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tipo` varchar(150) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
+
+--
+-- Volcado de datos para la tabla `tipo_uso`
+--
+
+INSERT INTO `tipo_uso` (`id`, `tipo`) VALUES
+(1, 'Consumo Humano'),
+(2, 'Consumo ABA'); 
+
+
+
+INSERT INTO `selectrapyme_prueba_standard`.`modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES (NULL, '1', 'Tipo Uso', 'tipo_uso.php', 'tipo_uso.tpl', '1', '../../libs/imagenes/11.png', '1');
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('add', 'tipo_uso_agregar.tpl', 'tipo_uso_agregar.php', '229', 'Agregar Tipo Uso');
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('edit', 'tipo_uso_editar.tpl', 'tipo_uso_editar.php', '229', 'Modificar Tipo Uso');
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('delete', 'tipo_uso_borrar.tpl', 'tipo_uso_borrar.php', '229', 'Borrar Tipo Uso')
+
+
+
+INSERT INTO `selectrapyme_prueba_standard`.`modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES (NULL, '1', 'Tipo Visita', 'tipo_visita.php', 'tipo_visita.tpl', '1', '../../libs/imagenes/11.png', '1');
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('add', 'tipo_visita_agregar.tpl', 'tipo_visita_agregar.php', '230', 'Agregar Tipo Visita');
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('edit', 'tipo_visita_editar.tpl', 'tipo_visita_editar.php', '230', 'Modificar Tipo visita');
+
+INSERT INTO `selectrapyme_prueba_standard`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('delete', 'tipo_visita_borrar.tpl', 'tipo_visita_borrar.php', '230', 'Borrar Tipo Visita')
+
+
+
+
+
+
+
+

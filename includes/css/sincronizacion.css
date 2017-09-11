@@ -1,0 +1,30 @@
+.contRespuesta{
+    position: absolute;
+    width: 400px;
+    height: 200px;
+    top:50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -200px;
+    background-color: #dfe8f6;
+    border: 1px solid #99bbe8;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+
+                }
+.wait{
+    background: url("../../imagenes/ajax-loader.gif") no-repeat ;
+     z-index: 10;
+    width: 54px;
+    height: 55px; 
+    margin-left: 25px;
+    margin-bottom: 10px;
+                       
+}
+.contCarga{
+    position: absolute;
+    top: 45px;
+    left:140px;
+    font-size: 20px;        
+
+}

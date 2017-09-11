@@ -1,0 +1,143 @@
+/*
+    Document   : comunes
+    Created on : 14/10/2009, 11:50:48 PM
+    Author     : lviera
+    Description:
+        Purpose of the stylesheet follows.
+*/
+/*
+   TODO customize this sample style
+   Syntax recommendation http://www.w3.org/TR/REC-CSS2/
+*/
+.seleccion {
+    /*background: #989898;*/
+    background: activecaption;
+}
+.grid table.lista {
+    margin: 1px auto 20px auto;
+    border-collapse: collapse;
+}
+.grid table.lista thead tr th{
+    border-left: 1px solid #b8d9eb;
+    border: 1px solid #b8d9eb;
+    font-weight: normal;
+    font-family:'Verdana';
+}
+.grid table.lista tbody tr td, table tfoot tr td, table thead tr th{
+    padding: 6px;
+    vertical-align: top;
+}
+
+.grid table.lista tfoot tr td{
+
+    text-align: center;
+}
+
+.grid table.lista tbody tr td{
+    text-align: center;
+    border-left: 1px solid #b8d9eb;
+    background-color:white;
+    border-bottom: 1px solid #ddd;
+}
+
+.grid table.lista thead th, table.formulario thead th{
+    background-color:#f7fdfd;
+    color: #369;
+    border-bottom: 1px solid #CCC;
+}
+
+.grid table.lista tfoot td, table.formulario tfoot td{
+    color: #369;
+}
+
+.grid table.formulario tfoot td{
+    border-top: 1px solid #CCC;
+}
+
+.grid2 table.lista2 {
+    margin: 1px 0 20px 0;
+    border-collapse: collapse;
+}
+
+.grid2 table.lista2 thead tr th{
+    border-left: 0;
+    border: 1px solid #b8d9eb;
+    font-weight: normal;
+    font-family:'Verdana';
+}
+
+.grid2 table.lista2 tbody tr td, table tfoot tr td, table thead tr th{
+
+    padding: 6px;
+    vertical-align: top;
+}
+
+.grid2 table.lista2 tfoot tr td{
+
+    text-align: left;
+}
+
+.grid2 table.lista2 tbody tr td{
+    text-align: left;
+    border-left: 0;
+    border-right: 1px solid #b8d9eb;
+    background-color:white;
+    border-bottom: 1px solid #ddd;
+}
+
+.grid2 table.lista2 thead th, table.formulario thead th{
+    background-color:#f7fdfd;
+    color: #369;
+    border-bottom: 1px solid #CCC;
+}
+
+.grid2 table.lista2 tfoot td, table.formulario tfoot td{
+    color: #369;
+}
+
+.grid2 table.formulario tfoot td{
+    border-top: 1px solid #CCC;
+}
+
+.stilo_login{
+    color: #FFFFFF
+
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #eeecff;
+    font-family: Arial,Helvetica,sans-serif;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+#ContenedorPrincipal #cabecera{
+    background: url(../../libs/imagenes/sup_22.png);
+    /*width: 100px;*/
+    height : 60px;
+}
+
+#ContenedorPrincipal #cabecera .stilo_logo {
+    background: url(../../libs/imagenes/selectra.png) no-repeat;
+    height:     58px;
+    position:   absolute;
+    width:      242px;
+}
+
+#ContenedorPrincipal #cabecera .stilo_login {
+    background:url(../../libs/imagenes/sup_c22.jpeg) no-repeat;
+    margin-top:       38px;
+    text-align:       left;
+    padding-left:     20px;
+    padding-top:      3px;
+    padding-bottom:   3px;
+    float:            right;
+    width:            75em;
+    color:            white;
+    background-color: #517d96;
+}
