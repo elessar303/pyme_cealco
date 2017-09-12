@@ -1,4 +1,0 @@
-#pyme
-ALTER TABLE `usuarios` ADD `visible_vendedor` BOOLEAN NOT NULL DEFAULT TRUE AFTER `vendedor`;
-
-

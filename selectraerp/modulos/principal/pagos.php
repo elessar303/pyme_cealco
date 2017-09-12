@@ -20,48 +20,64 @@ $loc_aper = strpos($ruta_server, $findme);
 $ipserver=DB_HOST;
 $impresora_serial=impresora_serial;
 
-/*
-if ($loc_aper!=0) {
-echo '<script language="javascript" type="text/JavaScript">';
-echo 'alert("No se puede realizar la venta, iniciar sesion local en la PC con la Impresora Fiscal");';
-echo 'window.close();'; 
-echo '</script>';
-exit();
-}*/
-
 $id_usuario=$login->getIdUsuario();
 $pos = POS;
 $despacho=$_GET['despacho'];
+
 $bancos=$almacen->ObtenerFilasBySqlSelect("SELECT * from banco");
-$sql="SELECT *,kardex_almacen.estado as estatus  from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and id_transaccion=".$despacho."";
+
+$sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0 and clientes.id_cliente=".$despacho."";
+
 $datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
 
 $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
 
-if (empty($money)) {
+if (empty($money)) 
+{
 
     $sql="INSERT INTO closedcash_pyme(serial_caja, money, fecha_inicio, fecha_fin) VALUES ('".impresora_serial."', '".$_POST['serial'].date('Y-m-d_H:i:s')."',  now(), null)";
     $insert_money=$almacen->Execute2($sql);
 }
+
 $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
 
-if(isset($_POST['guardar1'])){
-$sql="SELECT coalesce(sum(monto_pagado),0) as monto FROM pedidos_pagos
-where nro_pedido=".$despacho."";
-$rs4=$almacen->ObtenerFilasBySqlSelect($sql);
+if(isset($_POST['guardar1']))
+{
+    //pedidos pendiente del cliente
+    $sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0  and clientes.id_cliente=".$despacho."";
 
-$sql="SELECT *,kardex_almacen.estado as estatus  from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and id_transaccion=".$despacho."";
-$datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
-$sql="SELECT * from despacho_new WHERE cod_factura=".$datos_cliente[0]['nro_factura']."";
-$datos_factura=$almacen->ObtenerFilasBySqlSelect($sql);
-$sql="SELECT sum(`_item_cantidad`*`_item_totalconiva`) as total1, totaltotalfactura as total FROM despacho_new_detalle,despacho_new
-WHERE cod_factura=".$datos_cliente[0]['nro_factura']."
-AND despacho_new_detalle.id_factura=despacho_new.id_factura";
-$total_factura=$almacen->ObtenerFilasBySqlSelect($sql);
-$datos_factura[0]['totalizar_total_general']=$total_factura[0]['total'];
-$monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
+    $datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
+    $facturas="";
+    
+    foreach ($datos_cliente as $key => $value) 
+    {
+        $facturas.="'".$value['nro_factura']."', ";
+    }
+    $facturas=substr($facturas, 0, -2);
+    $sql="SELECT coalesce((a.total_monto),0) as monto, a.id FROM pedido_facturas_consolidadas_maestra as a, pedidos_pagos as b, despacho_new as c
+    where a.id=b.id_pagos_consolidados and a.id=c.id_pagos_consolidados and cod_factura in (".$facturas.") group by a.id";
 
-    if($_POST['monto2']>$monto){
+    $rs4=$almacen->ObtenerFilasBySqlSelect($sql);
+    $rs=0;
+    foreach ($rs4 as $key => $value) 
+    {
+        $rs+=$value['monto'];
+    }
+    $rs4[0]['monto']=$rs;
+    
+    $sql="SELECT * from despacho_new WHERE cod_factura in (".$facturas.")";
+    $datos_factura=$almacen->ObtenerFilasBySqlSelect($sql);
+    $sql="
+    select sum(a.total1) as total1, sum(a.total) as total from (
+    SELECT (`_item_cantidad`*`_item_totalconiva`) as total1, (totaltotalfactura) as total FROM despacho_new_detalle,despacho_new
+    WHERE cod_factura in (".$facturas.")
+    AND despacho_new_detalle.id_factura=despacho_new.id_factura group by despacho_new_detalle.id_factura) as a ";
+    $total_factura=$almacen->ObtenerFilasBySqlSelect($sql);
+    $datos_factura[0]['totalizar_total_general']=$total_factura[0]['total'];
+    $monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
+    
+    if($_POST['monto2']>$monto)
+    {
         $_POST['monto2']=$monto;
     }
     //comprobando las retenciones
@@ -125,133 +141,177 @@ $monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
         }
     }
 
-    //fin retenciones
-$sql="INSERT INTO `pedidos_pagos`(`nro_pedido`, `forma_pago`, `nro_tarjeta`, `tipo_tarjeta`, `id_banco`, `monto_pagado`, `nro_retencion`, `nro_1x1000`, `usuario`) VALUES (".$_GET['despacho'].",'".$_POST['forma_pago']."','".$_POST['nro_tarjeta']."','".$_POST['tipo_tarjeta']."','".$_POST['id_banco']."',".$_POST['monto2'].",".$_POST['nro_irpf'].",".$_POST['nro_1x1000'].", ".$id_usuario.")";
-$insert_pago=$almacen->Execute2($sql);
-}
-
-if(isset($_POST['imprimir'])){
-$nro_pedido=$_GET['despacho'];
-$cedula='18677970';
-$id_fiscal="RIF";
-include ("../../libs/php/clases/tfhka/TfhkaPHP.php");
-$itObj = new Tfhka();
-$sql="SELECT * FROM kardex_almacen a, despacho_new b,  despacho_new_detalle c where a.nro_factura=b.cod_factura and a.id_transaccion=".$nro_pedido." and b.id_factura=c.id_factura"; 
-$regs_pedido=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT clientes.nombre, clientes.rif, clientes.direccion , clientes.telefonos  FROM kardex_almacen, clientes where id_transaccion=".$nro_pedido." and kardex_almacen.id_cliente=clientes.id_cliente limit 1";
-$array_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT b.totalizar_pdescuento_global FROM kardex_almacen a, despacho_new b,  despacho_new_detalle c where a.nro_factura=b.cod_factura and a.id_transaccion=".$nro_pedido." and b.id_factura=c.id_factura";
-$array_descuento=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_efectivo FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Efectivo'";
-
-$array_pago_efectivo=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_efectivo2 FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Nota Credito'";
-$array_pago_efectivo2=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_tarjeta FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Tarjeta'";
-$array_pago_tarjeta=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_ticket FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Ticket'";
-$array_pago_ticket=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_retencioniva FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='RetencionIva'";
-$array_pago_retencioniva=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_retencioniva1x1000 FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Retencion1x1000'";
-$array_pago_retencioniva1x1000=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_credito FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Credito'";
-$array_pago_credito=$almacen->ObtenerFilasBySqlSelect($sql);
-
-$sql="SELECT sum(monto_pagado) as total_deposito, nro_tarjeta, id_banco FROM pedidos_pagos where nro_pedido=".$nro_pedido." and forma_pago='Deposito'";
-$array_pago_deposito=$almacen->ObtenerFilasBySqlSelect($sql);
-
-
-
-$efectivo=$array_pago_efectivo[0]['total_efectivo'];
-$tarjeta=$array_pago_tarjeta[0]['total_tarjeta'];
-$efectivo2=$array_pago_efectivo2[0]['total_efectivo2'];
-$ticket=$array_pago_ticket[0]['total_ticket'];
-$retencioniva1=$array_pago_retencioniva[0]['total_retencioniva'];
-$retencioniva11x1000=$array_pago_retencioniva1x1000[0]['total_retencioniva1x1000'];
-$credito3=$array_pago_credito[0]['total_credito'];
-$deposito=$array_pago_deposito[0]['total_deposito'];
-$nro_deposito=$array_pago_deposito[0]['nro_tarjeta'];
-$banco_deposito=$array_pago_deposito[0]['id_banco'];
-
-$efectivo_factura=$array_pago_efectivo[0]['total_efectivo'];
-$tarjeta_factura=$array_pago_tarjeta[0]['total_tarjeta'];
-$efectivo2_factura=$array_pago_efectivo2[0]['total_efectivo2'];
-$ticket_factura=$array_pago_ticket[0]['total_ticket'];
-$retencioniva1_factura=$array_pago_retencioniva[0]['total_retencioniva'];
-$retencioniva11x1000_factura=$array_pago_retencioniva1x1000[0]['total_retencioniva1x1000'];
-$credito3_factura=$array_pago_credito[0]['total_credito'];
-$deposito_factura=$array_pago_deposito[0]['total_deposito'];
-
-
-$cheque=0;
-$otro=0;
-if ($nro_deposito=='') {
-    $nro_deposito=0;
-}
-if ($banco_deposito=='') {
-    $banco_deposito=0;
-}
-if ($deposito=='') {
-    $deposito=0;
-    $deposito_factura=0;
-
-}
-$total=$efectivo+$tarjeta+$efectivo2+$ticket+$retencioniva1+$retencioniva11x1000+$credito3+$deposito;
-
-$archivo = "C:\IntTFHKA\ArchivoFactura.txt";
-$fp = fopen($archivo, "w");
-
-$string = "";
-$write = fputs($fp, $string);
-
-//Cabecera de la Factura
-$nombreyapellido=$array_cliente[0]['nombre'];
-$direccion=$array_cliente[0]['direccion'];
-$telefono=$array_cliente[0]['telefonos'];
-$nombre = strlen(trim($nombreyapellido)) <= 40 ? trim($nombreyapellido) : substr(trim($nombreyapellido), 0, 40);
-$direccion = strlen(trim($direccion)) <= 40 ? trim($direccion) : substr(trim($direccion), 0, 40);
-$telefono = strlen(trim($telefono)) <= 40 ? trim($telefono) : substr(trim($telefono), 0, 40);
-$string = "iS*{$nombre}\n";
-#$string .= "i00" . "" . "\n";
-$string .= "iR*{$array_cliente[0]['rif']}\n";
-$string .= $direccion != "" ? "i01DIRECCION: {$direccion}\n" : "";
-$string .= $telefono != "" ? "i02TELEFONO: {$telefono}\n" : "";
-$string .= $nro_pedido != "" ? "i03PEDIDO: {$nro_pedido}\n" : "";
-$write = fputs($fp, utf8_encode($string));
-
-//Productos en la factura
-foreach ($regs_pedido as $value) {
-    if($value['_item_piva']==0){
-        $iva=" ";
-    }elseif ($value['_item_piva']==12) {
-        $iva="!";
-    }elseif ($value['_item_piva']==8) {
-        $iva='"';
+    
+    //quiere decir que existe un pago maestro
+    if($rs>0)
+    {
+        $sql="INSERT INTO pedido_facturas_consolidadas (id_maestro, total_monto, id_cliente) values (".$rs4[0]['id'].", ".$_POST['monto2'].", ".$_GET['despacho'].")";
+        $insert_pago=$almacen->Execute2($sql);
+        $sql="update pedido_facturas_consolidadas_maestra set total_monto=(total_monto+".$_POST['monto2'].") where id=".$rs4[0]['id'];
+        $insert_pago=$almacen->Execute2($sql);
+        $id_facturaTrans = $rs4[0]['id'];
     }
+    else
+    {
+        //se inserta en maestra primero
+        $sql="INSERT INTO pedido_facturas_consolidadas_maestra (total_monto) values (".$_POST['monto2'].")";
+        $insert_pago=$almacen->Execute2($sql);
+        $id_facturaTrans = $almacen->getInsertID();
+        $sql="INSERT INTO pedido_facturas_consolidadas (id_maestro, total_monto, id_cliente) values (".$id_facturaTrans.", ".$_POST['monto2'].", ".$_GET['despacho'].")";
+        $insert_pago=$almacen->Execute2($sql);
+        
+    }
+    
+    $sql="update despacho_new set id_pagos_consolidados=".$id_facturaTrans." where cod_factura in (".$facturas.")";
+    $update=$almacen->Execute2($sql);
+    //fin retenciones
+    $sql="INSERT INTO `pedidos_pagos`(`nro_pedido`, `forma_pago`, `nro_tarjeta`, `tipo_tarjeta`, `id_banco`, `monto_pagado`, `nro_retencion`, `nro_1x1000`, `usuario`, `id_pagos_consolidados` ) VALUES (".$_GET['despacho'].",'".$_POST['forma_pago']."','".$_POST['nro_tarjeta']."','".$_POST['tipo_tarjeta']."','".$_POST['id_banco']."',".$_POST['monto2'].",".$_POST['nro_irpf'].",".$_POST['nro_1x1000'].", ".$id_usuario.", ".$id_facturaTrans.")";
+    $insert_pago=$almacen->Execute2($sql);
+}
 
-    //echo $value["_item_preciosiniva"]; 
-    $p = explode(".", $value["_item_preciosiniva"]);
-    $precio = (string) $p[0] . $p[1];
-    $precio = str_pad($precio, 10, "0", STR_PAD_LEFT);
+if(isset($_POST['imprimir']))
+{
+    $nro_pedido=$_GET['despacho'];
+    $cedula='18677970';
+    $id_fiscal="RIF";
+    include ("../../libs/php/clases/tfhka/TfhkaPHP.php");
+    $itObj = new Tfhka();
 
-    $cantidad = explode(".", $value["_item_cantidad"]);
-    $cantidad = str_pad((string) $cantidad[0], 5, "0", STR_PAD_LEFT) . str_pad((string) $cantidad[1], 3, "0", STR_PAD_RIGHT);
-    $cantidad = str_pad($cantidad, 8 - strlen($cantidad), "0", STR_PAD_LEFT);
+    $sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0  and clientes.id_cliente=".$despacho."";
 
-    $descripcion = trim($value["_item_descripcion"]);
+    $datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
+    $facturas="";
+    
+    foreach ($datos_cliente as $key => $value) 
+    {
+        $facturas.="'".$value['nro_factura']."', ";
+    }
+    $facturas=substr($facturas, 0, -2);
 
-    $string = $iva . $precio . $cantidad . $descripcion . "\n";
+    $sql="SELECT * FROM kardex_almacen a, despacho_new b,  despacho_new_detalle c where a.nro_factura=b.cod_factura and b.id_factura=c.id_factura and b.cod_factura in (".$facturas.")";
+    
+    //pedidos 
+    $regs_pedido=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT clientes.nombre, clientes.rif, clientes.direccion , clientes.telefonos  FROM  clientes where id_cliente=".$nro_pedido;
+    //cliente
+    $array_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(b.totalizar_pdescuento_global) as totalizar_pdescuento_global FROM kardex_almacen a, despacho_new b,  despacho_new_detalle c where a.nro_factura=b.cod_factura  and b.id_factura=c.id_factura b.cod_factura in (".$facturas.")";
+    //descuento
+    $array_descuento=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    
+    $sql="SELECT sum(monto_pagado) as total_efectivo FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Efectivo'";
+    //total pago
+    $array_pago_efectivo=$almacen->ObtenerFilasBySqlSelect($sql);
+    
+    $sql="SELECT sum(monto_pagado) as total_efectivo2 FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Nota Credito'";
+    
+    $array_pago_efectivo2=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(monto_pagado) as total_tarjeta FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Tarjeta'";
+    $array_pago_tarjeta=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(monto_pagado) as total_ticket FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Ticket'";
+    $array_pago_ticket=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(monto_pagado) as total_retencioniva FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='RetencionIva'";
+    $array_pago_retencioniva=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(monto_pagado) as total_retencioniva1x1000 FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Retencion1x1000'";
+
+    $array_pago_retencioniva1x1000=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(monto_pagado) as total_credito FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Credito'";
+    $array_pago_credito=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT sum(monto_pagado) as total_deposito, nro_tarjeta, id_banco FROM pedidos_pagos where id_pagos_consolidados=".$regs_pedido[0]['id_pagos_consolidados']." and forma_pago='Deposito'";
+    $array_pago_deposito=$almacen->ObtenerFilasBySqlSelect($sql);
+
+
+
+    $efectivo=$array_pago_efectivo[0]['total_efectivo'];
+    $tarjeta=$array_pago_tarjeta[0]['total_tarjeta'];
+    $efectivo2=$array_pago_efectivo2[0]['total_efectivo2'];
+    $ticket=$array_pago_ticket[0]['total_ticket'];
+    $retencioniva1=$array_pago_retencioniva[0]['total_retencioniva'];
+    $retencioniva11x1000=$array_pago_retencioniva1x1000[0]['total_retencioniva1x1000'];
+    $credito3=$array_pago_credito[0]['total_credito'];
+    $deposito=$array_pago_deposito[0]['total_deposito'];
+    $nro_deposito=$array_pago_deposito[0]['nro_tarjeta'];
+    $banco_deposito=$array_pago_deposito[0]['id_banco'];
+
+    $efectivo_factura=$array_pago_efectivo[0]['total_efectivo'];
+    $tarjeta_factura=$array_pago_tarjeta[0]['total_tarjeta'];
+    $efectivo2_factura=$array_pago_efectivo2[0]['total_efectivo2'];
+    $ticket_factura=$array_pago_ticket[0]['total_ticket'];
+    $retencioniva1_factura=$array_pago_retencioniva[0]['total_retencioniva'];
+    $retencioniva11x1000_factura=$array_pago_retencioniva1x1000[0]['total_retencioniva1x1000'];
+    $credito3_factura=$array_pago_credito[0]['total_credito'];
+    $deposito_factura=$array_pago_deposito[0]['total_deposito'];
+
+
+    $cheque=0;
+    $otro=0;
+    if ($nro_deposito=='') {
+        $nro_deposito=0;
+    }
+    if ($banco_deposito=='') {
+        $banco_deposito=0;
+    }
+    if ($deposito=='') {
+        $deposito=0;
+        $deposito_factura=0;
+
+    }
+    $total=$efectivo+$tarjeta+$efectivo2+$ticket+$retencioniva1+$retencioniva11x1000+$credito3+$deposito;
+
+    $archivo = "C:\IntTFHKA\ArchivoFactura.txt";
+    $fp = fopen($archivo, "w");
+
+    $string = "";
+    $write = fputs($fp, $string);
+
+    //Cabecera de la Factura
+    $nombreyapellido=$array_cliente[0]['nombre'];
+    $direccion=$array_cliente[0]['direccion'];
+    $telefono=$array_cliente[0]['telefonos'];
+    $nombre = strlen(trim($nombreyapellido)) <= 40 ? trim($nombreyapellido) : substr(trim($nombreyapellido), 0, 40);
+    $direccion = strlen(trim($direccion)) <= 40 ? trim($direccion) : substr(trim($direccion), 0, 40);
+    $telefono = strlen(trim($telefono)) <= 40 ? trim($telefono) : substr(trim($telefono), 0, 40);
+    $string = "iS*{$nombre}\n";
+    #$string .= "i00" . "" . "\n";
+    $string .= "iR*{$array_cliente[0]['rif']}\n";
+    $string .= $direccion != "" ? "i01DIRECCION: {$direccion}\n" : "";
+    $string .= $telefono != "" ? "i02TELEFONO: {$telefono}\n" : "";
+    $string .= $nro_pedido != "" ? "i03PEDIDO: {$nro_pedido}\n" : "";
     $write = fputs($fp, utf8_encode($string));
+
+    //Productos en la factura
+    foreach ($regs_pedido as $value) 
+    {
+        if($value['_item_piva']==0){
+            $iva=" ";
+        }elseif ($value['_item_piva']==12) {
+            $iva="!";
+        }elseif ($value['_item_piva']==8) {
+            $iva='"';
+        }
+
+        //echo $value["_item_preciosiniva"]; 
+        $p = explode(".", $value["_item_preciosiniva"]);
+        $precio = (string) $p[0] . $p[1];
+        $precio = str_pad($precio, 10, "0", STR_PAD_LEFT);
+
+        $cantidad = explode(".", $value["_item_cantidad"]);
+        $cantidad = str_pad((string) $cantidad[0], 5, "0", STR_PAD_LEFT) . str_pad((string) $cantidad[1], 3, "0", STR_PAD_RIGHT);
+        $cantidad = str_pad($cantidad, 8 - strlen($cantidad), "0", STR_PAD_LEFT);
+
+        $descripcion = trim($value["_item_descripcion"]);
+
+        $string = $iva . $precio . $cantidad . $descripcion . "\n";
+        $write = fputs($fp, utf8_encode($string));
     }
     
 
@@ -367,37 +427,52 @@ $descuento = str_pad($descuento, 4, "0", STR_PAD_LEFT);
     */
 
     //$itObj->UploadStatusCmd('S1');
-    $status=$itObj->CheckFprinter1();
+    //$status=$itObj->CheckFprinter1();
     //echo $status; exit();
+    $status=1;
+    if($status==0)
+    {
+        echo "<script type='text/javascript'>alert('!Impresora Desconectada o Apagada, Favor encender y Resetear!');</script>";
+        echo "<script>window.close();</script>";
+    }
+    elseif($status==1)
+    {
 
-    if($status==0){
-    
+        //$itObj->UploadStatusCmd('S1');
+        //include_once("../../libs/php/clases/tfhka/implementacion_tfhka.php");
+        //$contenido_s1 = getStatusInformativo();
+        //$nro_factura_fiscal = substr($contenido_s1, 21, 8);
+        //$lineas_escritas = $itObj->SendFileCmd($archivo);
 
-    echo "<script type='text/javascript'>alert('!Impresora Desconectada o Apagada, Favor encender y Resetear!');</script>";
-    echo "<script>window.close();</script>";
-    }elseif($status==1){
+        $sql="UPDATE kardex_almacen SET estado='Facturado', facturado=1  where nro_factura in (".$facturas.")";
+        $array_pago_ticket=$almacen->Execute2($sql);
+        $id_usuario=$login->getIdUsuario();
 
-    $itObj->UploadStatusCmd('S1');
-    include_once("../../libs/php/clases/tfhka/implementacion_tfhka.php");
-    $contenido_s1 = getStatusInformativo();
-    $nro_factura_fiscal = substr($contenido_s1, 21, 8);
-    $lineas_escritas = $itObj->SendFileCmd($archivo);
+        $sql="INSERT INTO `factura`(`cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `money`, `cesta_clap`, `facturacion`) 
+        SELECT b.id, '".$nro_factura_fiscal."', a.nroz, '".$impresora_serial."', a.id_cliente, ".$id_usuario.", b.fecha_creacion, sum(a.subtotal), sum(descuentosItemFactura), sum(montoItemsFactura), sum(ivaTotalFactura), sum(TotalTotalFactura), sum(cantidad_items), sum(totalizar_sub_total), sum(totalizar_descuento_parcial), sum(totalizar_total_operacion), sum(totalizar_pdescuento_global), sum(totalizar_descuento_global), sum(totalizar_base_imponible), sum(totalizar_monto_iva), sum(totalizar_total_general), sum(totalizar_total_retencion), `formapago`, `cod_estatus`,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, `usuario_creacion`, '".$money[0]['money']."', `cesta_clap`, `facturacion`  FROM `despacho_new` as a inner join pedido_facturas_consolidadas_maestra as b on a.id_pagos_consolidados=b.id WHERE b.id='".$regs_pedido[0]['id_pagos_consolidados']."';
+        ";
+        
+        $insertar_factura=$almacen->Execute2($sql);
+        $id_facturaTrans = $almacen->getInsertID();
+        $sql=
+        "
+            SELECT ".$id_facturaTrans.", `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, ".$id_usuario.", c.fecha_creacion FROM `despacho_new_detalle` c, `despacho_new` b,  pedido_facturas_consolidadas_maestra as d
+            WHERE b.id_factura=c.id_factura
+            AND b.id_pagos_consolidados=d.id and
+            d.id='".$regs_pedido[0]['id_pagos_consolidados']."'
+        ";
 
-    $sql="UPDATE kardex_almacen SET estado='Facturado', facturado=1  where id_transaccion=".$_GET['despacho']."";
-    $array_pago_ticket=$almacen->Execute2($sql);
-    $id_usuario=$login->getIdUsuario();
+        $detalles=$almacen->ObtenerFilasBySqlSelect($sql);
+        foreach ($detalles as $key => $value) 
+        {
+            $sql=
+            "
+                INSERT INTO `factura_detalle`(`id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion`) 
+                values ( ".$id_facturaTrans.", ".$value['id_item'].", ".$value['_item_almacen'].", '".$value['_item_descripcion']."', ".$value['_item_cantidad'].", ".$value['_item_preciosiniva'].", ".$value['_item_descuento'].", ".$value['_item_montodescuento'].", ".$value['_item_piva'].", ".$value['_item_totalsiniva'].", ".$value['_item_totalconiva'].", ".$id_usuario.", '".$value['fecha_creacion']."')";
+            $insertar_factura_detalle=$almacen->Execute2($sql);    
+        }
 
-    $sql="INSERT INTO `factura`(`cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `money`, `cesta_clap`, `facturacion`) 
-    SELECT `cod_factura`, '".$nro_factura_fiscal."', `nroz`, '".$impresora_serial."', `id_cliente`, ".$id_usuario.", `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`,CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, `usuario_creacion`, '".$money[0]['money']."', `cesta_clap`, `facturacion`  FROM `despacho_new` WHERE cod_factura='".$regs_pedido[0]['cod_factura']."';
-    ";
-    $insertar_factura=$almacen->Execute2($sql);
-    $id_facturaTrans = $almacen->getInsertID();
-    $sql="
-    INSERT INTO `factura_detalle`(`id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion`) SELECT ".$id_facturaTrans.", `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, ".$id_usuario.", c.fecha_creacion FROM `despacho_new_detalle` c, `despacho_new` b 
-        WHERE b.id_factura=c.id_factura 
-        AND b.cod_factura='".$regs_pedido[0]['cod_factura']."'";
-        $insertar_factura_detalle=$almacen->Execute2($sql);
-        //echo $sql; exit();
+        
 
 if($efectivo_factura==''){
 $efectivo_factura=0;
@@ -425,7 +500,12 @@ if($credito3_factura=='')
     VALUES (".$id_facturaTrans.",".$total.",".$efectivo_factura.",".$tarjeta_factura.",".$ticket_factura.", CURRENT_TIMESTAMP, ".$id_usuario.", ".$retencioniva1_factura.", ".$retencioniva11x1000_factura.", ".$credito3_factura.", ".$deposito_factura.", ".$nro_deposito.", ".$banco_deposito.")";
     $array_pago_ticket=$almacen->Execute2($sql);
     //$rs5=$conn->DB_Consulta($sql);  
-    echo "<script type='text/javascript'>alert('!Factura Impresa!');</script>";
+    echo "
+    <script type='text/javascript'>
+    alert('!Factura Impresa!');
+    window.open('../../reportes/rpt_factura.php?codigo=".$regs_pedido[0]['id_pagos_consolidados']."');
+    </script>";
+
     }
     $itObj->UploadStatusCmd('S1');
    // echo "<script>window.close();</script>";
@@ -439,22 +519,9 @@ if($credito3_factura=='')
     //fin obtener factura
 
 }
-$sql="SELECT coalesce(sum(monto_pagado),0) as monto FROM pedidos_pagos
-where nro_pedido=".$despacho."";
-$rs4=$almacen->ObtenerFilasBySqlSelect($sql);
 
-$sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and id_transaccion=".$despacho."";
-$datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
-$sql="SELECT * from despacho_new WHERE cod_factura=".$datos_cliente[0]['nro_factura']."";
-$datos_factura=$almacen->ObtenerFilasBySqlSelect($sql);
 
-$sql="SELECT totalizar_total_general as total FROM despacho_new_detalle,despacho_new
-WHERE cod_factura=".$datos_cliente[0]['nro_factura']."
-AND despacho_new_detalle.id_factura=despacho_new.id_factura";
-$total_factura=$almacen->ObtenerFilasBySqlSelect($sql);
-$datos_factura[0]['totalizar_total_general']=$total_factura[0]['total'];
 
-$monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
 ?>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -563,45 +630,116 @@ $monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
     </head>
 
     <body style="color: #000000;font-family: Verdana, Arial, Helvetica, sans-serif;font-size: 12px;background-color: #FFF;margin: 2px;">
-<form name="recibo" id="recibo" method="post">
-<table width="100%" border="0" cellpadding="1" cellspacing="1" align="center" valign="top" class="fondo_tabla01_2">
-    <tr>
-        <td width="16%" align="right" >Nro. Pedido:&nbsp;</td>
-        <td width="84%" align="left" >
-            <input name="nro_pedido2" id="nro_pedido2" type="text" size="10" title="Nro. Pedido" value="<?php echo $despacho; ?>" readonly="readonly"/>
-        </td>                                
-    </tr>   
-    <tr>
-        <td width="16%" align="right" >Beneficiario:&nbsp;</td>
-        <td width="84%" align="left" >
-        <input name="cedula2" id="cedula2" type="text" size="10" title="Cédula" value="<?php echo $datos_cliente[0]['rif']; ?>" readonly="readonly"/>
-            <input name="nombre2" id="nombre2" type="text" size="50" title="Nombre" value="<?php echo $datos_cliente[0]['nombre']; ?>" readonly="readonly"/>
-        </td>                                 
-    </tr>   
-    <tr>
-        <td width="16%" align="right" >Monto Pedido:&nbsp;</td>
-        <td width="84%" align="left" >
-        <input name="monto3" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($datos_factura[0]['totalizar_total_general'],2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
-        </td>
-    </tr>   
-    <?php if($monto>0){ ?>
-    <tr>
-        <td width="16%" align="right" >Pendiente:&nbsp;</td>
-        <td width="84%" align="left" >
-        <input name="monto3" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($monto,2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
-        </td>
-    </tr>
-    <?php } ?>
-    <?php if($monto<0){ ?>
-    <tr>
-        <td width="16%" align="right" >Vuelto:&nbsp;</td>
-        <td width="84%" align="left" >
-        <input name="monto3" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($monto,2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
-        </td>
-    </tr>
-    <?php } ?>     
-</table>
-<br>
+        <form name="recibo" id="recibo" method="post">
+        <table width="100%" border="0" cellpadding="1" cellspacing="1" align="center" valign="top" class="fondo_tabla01_2">
+                    <tr>
+                        <th>
+                            Pedidos a Facturar
+                        </th>
+                    </tr>
+            </table>
+            <?php
+            //se coloca aqui los datos del cliente, los movimientos que no han sido facturado
+            $sql="SELECT id_transaccion, nro_factura from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0  and clientes.id_cliente=".$despacho."";
+            $id_transaccion=$almacen->ObtenerFilasBySqlSelect($sql);
+            $facturas="";
+            foreach ($id_transaccion as $key => $value) 
+            {
+                $facturas.="'".$value['nro_factura']."', ";
+            }
+            $facturas=substr($facturas, 0, -2);
+            $sql="SELECT coalesce((a.total_monto),0) as monto FROM pedido_facturas_consolidadas_maestra as a, pedidos_pagos as b, despacho_new as c
+            where a.id=b.id_pagos_consolidados and a.id=c.id_pagos_consolidados and cod_factura in (".$facturas.") group by a.id";
+
+            $rs2=$almacen->ObtenerFilasBySqlSelect($sql);
+            $rs=0;
+            foreach ($rs2 as $key => $value) 
+            {
+                $rs+=$value['monto'];
+            }
+            $monto=0;
+            foreach ($id_transaccion as $key => $value)
+            {
+                $sql="SELECT coalesce(sum(monto_pagado),0) as monto FROM pedidos_pagos
+                where nro_pedido=".$value['id_trasaccion']."";
+                $rs4=$almacen->ObtenerFilasBySqlSelect($sql);
+
+                $sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0 and id_transaccion=".$value['id_transaccion']."";
+                $datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
+
+                $sql="SELECT * from despacho_new WHERE cod_factura=".$datos_cliente[0]['nro_factura']."";
+                $datos_factura=$almacen->ObtenerFilasBySqlSelect($sql);
+                
+                $sql="SELECT totalizar_total_general as total FROM despacho_new_detalle,despacho_new
+                WHERE cod_factura=".$datos_cliente[0]['nro_factura']."
+                AND despacho_new_detalle.id_factura=despacho_new.id_factura";
+                $total_factura=$almacen->ObtenerFilasBySqlSelect($sql);
+                $datos_factura[0]['totalizar_total_general']=$total_factura[0]['total'];
+
+                $monto+=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
+                
+                ?>
+                <table width="100%" border="0" cellpadding="1" cellspacing="1" align="center" valign="top" class="fondo_tabla01_2">
+                    <tr>
+                        <td width="16%" align="right" >Nro. Pedido:&nbsp;</td>
+                        <td width="84%" align="left" >
+                            <input name="nro_pedido2[]" id="nro_pedido2" type="text" size="10" title="Nro. Pedido" value="<?php echo $datos_cliente[0]['id_transaccion']; ?>" readonly="readonly"/>
+                        </td>                                
+                    </tr>   
+                    <!-- <tr>
+                        <td width="16%" align="right" >Beneficiario:&nbsp;</td>
+                        <td width="84%" align="left" >
+                        <input name="cedula2" id="cedula2" type="text" size="10" title="Cédula" value="<?php echo $datos_cliente[0]['rif']; ?>" readonly="readonly"/>
+                            <input name="nombre2" id="nombre2" type="text" size="50" title="Nombre" value="<?php echo $datos_cliente[0]['nombre']; ?>" readonly="readonly"/>
+                        </td>                                 
+                    </tr>-->   
+                    <tr>
+                        <td width="16%" align="right" >Monto Pedido:&nbsp;</td>
+                        <td width="84%" align="left" >
+                        <input name="monto3[]" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($datos_factura[0]['totalizar_total_general'],2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
+                        </td>
+                    </tr>   
+                   
+                    <?php if($monto<0){ ?>
+                    <tr>
+                        <td width="16%" align="right" >Vuelto:&nbsp;</td>
+                        <td width="84%" align="left" >
+                        <input name="monto3[]" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($monto,2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
+                        </td>
+                    </tr>
+                    <?php   } ?>
+                    
+            </table>
+            <br>
+            <?php } ?>
+            <?php 
+            $epsilon=0.001;
+            if(abs($monto - $rs) < $epsilon)
+            $monto=0;
+            else
+            $monto=($monto - $rs);
+            if($monto>0){ ?>
+            <table width="100%" border="0" cellpadding="1" cellspacing="1" align="center" valign="top" class="fondo_tabla01_2">
+                    <tr>
+                        <td width="16%" align="right" ><b>Total :</b>&nbsp;</td>
+                        <td width="84%" align="left" >
+                            <input name="monto3[]" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($monto+$rs,2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="16%" align="right" ><b>Total pagado:</b>&nbsp;</td>
+                        <td width="84%" align="left" >
+                            <input name="monto3[]" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($rs,2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="16%" align="right" ><b>Total a pagar:</b>&nbsp;</td>
+                        <td width="84%" align="left" >
+                            <input name="monto3[]" id="monto3" type="text" size="10" title="Monto" value="<?php echo number_format($monto,2,",","."); ?>" readonly="readonly"/>&nbsp;Bs.
+                        </td>
+                    </tr>
+            </table>
+            <?php } ?>  
 
 
 <table width="100%" border="0" cellpadding="1" cellspacing="1" align="center" valign="top" class="fondo_tabla01_2">
@@ -678,8 +816,9 @@ $monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
                                                 <select name="id_banco" id="id_banco" title="Banco" style="width:195px" >
                                                    <option value="x999">Seleccione...</option>
                                                    <?php
-                                                   foreach ($bancos as $value) {
-                                                    echo "<option value=".$value['cod_banco'].">".$value['descripcion']."</option>";
+                                                   foreach ($bancos as $value) 
+                                                   {
+                                                        echo "<option value=".$value['cod_banco'].">".$value['descripcion']."</option>";
                                                     }
                                                    ?>
                                                 </select>   
@@ -697,8 +836,9 @@ $monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
                                                 <select name="id_banco" id="id_banco" title="Banco" style="width:195px" >
                                                    <option value="x999">Seleccione...</option>
                                                    <?php
-                                                   foreach ($bancos as $value) {
-                                                    echo "<option value=".$value['cod_banco'].">".$value['descripcion']."</option>";
+                                                   foreach ($bancos as $value) 
+                                                   {
+                                                        echo "<option value=".$value['cod_banco'].">".$value['descripcion']."</option>";
                                                     }
                                                    ?>
                                                 </select>   
@@ -712,7 +852,10 @@ $monto=$datos_factura[0]['totalizar_total_general']-$rs4[0]['monto'];
                                         </tr>  
 
 
-                                        <?php }else{ ?>
+                                        <?php 
+                                        }
+                                        else
+                                        { ?>
                                         <tr>
                                         <?php if ($datos_cliente[0]['facturado']==0){?>
 

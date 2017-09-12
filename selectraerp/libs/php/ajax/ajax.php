@@ -22,6 +22,102 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "EstadoCuenta" : 
+
+            if ($_GET["id_tipo_movimiento_almacen"] == '8')
+            {
+                $operacion = "Salida";
+                $sql="SELECT *,kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, kad.precio
+                FROM kardex_almacen_detalle AS kad
+                join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+                Inner Join clientes as cli on k.id_cliente=cli.id_cliente
+                LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
+                LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id
+                LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+                LEFT JOIN marca m ON m.id = ite.id_marca
+                LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                WHERE 
+                cli.id_cliente='".$_GET['id_cliente']."' 
+                and 
+                k.estado='".$_GET['estatus']."'
+                order by kad.id_transaccion desc
+                ";
+                //echo $sql; exit();
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                //kad.id_transaccion =" . $_GET["id_transaccion"]
+            }
+
+            if (count($campos) == 0) {
+                exit;
+            }
+
+            echo '
+                    <tr class="detalle_items">
+                        <input type="hidden" name="desplegado" value="true"/>
+                        <td colspan="8">
+                            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+                            <table >
+                                <thead>
+                                    <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
+                                    <th style="width:150px; font-weight: bold;">Almac&eacute;n ' . $operacion . '</th>
+                                    <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n' . $operacion . '</th>
+                                    <th style="width:300px; font-weight: bold;">Item</th>
+                                    <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+                                    <th style="width:110px; font-weight: bold; text-align: center;">Precio</th>
+                                    <th style="width:110px; font-weight: bold; text-align: center;">Total</th>
+                                </thead>
+                            <tbody>
+                ';
+            foreach ($campos as $key => $item) 
+            {
+
+                echo 
+                '
+                    <tr>
+                        <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                        <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
+                        <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
+                        <td style="text-align: right; padding-right:10px;">' . number_format($item['precio'], '2', ',', '.') . '</td>
+                        <td style="text-align: right; padding-right:10px;">' . number_format(($item['cantidad_item']*$item['precio']), '2', ',', '.') . '</td>
+                    </tr>
+                ';
+            }
+
+            if ($campos[0]["estado"] == "Pendiente") 
+            {
+                echo 
+                '
+                    <tr>
+                        <td colspan="6" style="text-align: left; border-bottom: 1px solid #949494;width:110px;">
+                            <br/>
+                            <!--form>
+                                <label for="fecha">Fecha</label><input type="text" name="fecha">
+                                <label for="control">Nro. Control</label><input type="text" name="control">
+                                <label for="factura">Nro. Factura</label><input type="text" name="factura"-->
+                                <table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=3&opt_seccion=109&opt_subseccion=add&cod=' . $_GET["id_transaccion"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <!--<td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                        <td class="btn_bg"><img src="../../libs/imagenes/factu.png" width="16" height="16" /></td>
+                                         <td class="btn_bg" nowrap style="padding: 0px 1px;">Realizar Entrada</td> -->
+                                        <!-- <td style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>-->
+                                    </tr>
+                                </table>
+                            <!--/form-->
+                        </td>
+                    </tr>';
+            }
+            echo
+            '
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            ';
+        break;
+
         case "MontoAcumulado": 
             //efectivo
             if($_POST['tipo']==0)

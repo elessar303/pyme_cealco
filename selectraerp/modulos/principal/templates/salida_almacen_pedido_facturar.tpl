@@ -4,7 +4,7 @@
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         {include file="snippets/header_form.tpl"}
-        <script type="text/javascript" src="../../libs/js/entrada_almacen.js"></script>
+        <script type="text/javascript" src="../../libs/js/entrada_almacen_servicios.js"></script>
         <script language="JavaScript" type="text/javascript" src="../../libs/js/funciones.js"></script>
     </head>
     <body>
@@ -41,17 +41,16 @@
                                     {if $campos.facturado eq 0}<img src="../../../includes/imagenes/ico_cancel.gif"/>{else}<img src="../../../includes/imagenes/ico_ok.gif"/>
                                     {/if}
                                     </td>
-                                    <td style="text-align: center;">
-                                    {if $campos.cod_movimiento eq ''}<img src="../../../includes/imagenes/ico_cancel.gif"/>{else}<img src="../../../includes/imagenes/ico_ok.gif"/>
-                                    {/if}
-                                    </td>
+                                    
                                     <td style="width:50px; text-align: center;">
                                         <img class="boton_detalle" src="../../../includes/imagenes/drop-add.gif"/>
                                         <input type="hidden" name="id_transaccion" value="{$campos.id_transaccion}"/>
+                                        <input type="hidden" name="estatus" value="{$campos.estatus}"/>
+                                        <input type="hidden" name="id_cliente" value="{$campos.id_cliente}"/>
                                         <input type="hidden" name="id_tipo_movimiento_almacen" value="{$campos.id_tipo_movimiento_almacen}"/>
                                     </td>
                                      <td style="cursor:pointer; width:30px; text-align:center" colspan="2">
-                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('pagos.php?despacho={$campos.id_transaccion}','window','menubar=1,resizable=1,fullscreen=yes');" title="Nueva Factura Rapida" src="../../../includes/imagenes/factu.png"/>
+                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('pagos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Nueva Factura Rapida" src="../../../includes/imagenes/factu.png"/>
                                 </td>
                                 </tr>
                             {/foreach}

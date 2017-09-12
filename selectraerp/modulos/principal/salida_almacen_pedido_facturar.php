@@ -25,8 +25,8 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
             $instruccion = $comunes->buscar_cualquiera_join($tabla, $des, $busqueda, $join);
             break;
     }
-    $instruccion = $instruccion . " and operacion='-' and k.estado='Despachado'
-    or k.estado='Facturado' and k.id_cliente<>0 order by fecha desc";
+    $instruccion = $instruccion . " and operacion='-' and (k.estado='Despachado'
+    or k.estado='Facturado' or k.estado='Pendiente') and k.id_cliente<>0  group by  k.estado, cli.id_cliente  order by fecha desc";
     //exit(0);
 } else {
     $instruccion = "SELECT *, k.estado as estatus FROM $tabla AS k 
@@ -35,19 +35,20 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     INNER JOIN clientes AS cli
     ON k.id_cliente=cli.id_cliente 
     WHERE operacion = '-' 
-    and k.estado='Pendiente'
+    and (k.estado='Pendiente'
     or k.estado='Facturado'
-    or k.estado='Despachado'
+    or k.estado='Despachado')
     and k.id_cliente<>0
-    order by id_transaccion desc";
+    group by   k.estado, cli.id_cliente
+    order by id_transaccion desc ";
 }
-
+//print_r($instruccion); exit();
 $num_paginas = $comunes->obtener_num_paginas($instruccion);
 $pagina = $comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos = $comunes->paginacion($pagina, $instruccion);
 
 $smarty->assign("registros", $campos);
-$smarty->assign("cabecera", array("Transacci&oacute;n", "Cliente", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n", "Facturado", "Despachado"));
+$smarty->assign("cabecera", array("Transacci&oacute;n", "Cliente", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n", "Facturado"));
 $smarty->assign("limitePaginacion", $comunes->LimitePaginaciones);
 $smarty->assign("num_paginas", $num_paginas);
 $smarty->assign("pagina", $pagina);
