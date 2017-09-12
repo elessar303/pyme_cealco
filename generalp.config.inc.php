@@ -20,7 +20,7 @@ if (isset($_SESSION['Empresa_Nomina']))
  define('DB_SELECTRA_NOM',$_SESSION['EmpresaNomina'], true);
 if (isset($_SESSION['EmpresaFacturacion']))
 define('DB_SELECTRA_FAC',$_SESSION['EmpresaFacturacion'], true);
-$_SESSION['ROOT_PROYECTO']= $_SERVER['DOCUMENT_ROOT']."/pyme"; // debe especificarse el nivel donde está instalada la aplicacion con respecto al root del sitio
+$_SESSION['ROOT_PROYECTO']= $_SERVER['DOCUMENT_ROOT']."/pyme_cealco"; // debe especificarse el nivel donde está instalada la aplicacion con respecto al root del sitio
 /* * CONSTANTES UTILIZADAS POR LA INTERFAZ DE REGISTRO DE EVENTOS (LOG) */
 define('REG_INFO',0, true);
 define('REG_LOGIN_OK',1, true);

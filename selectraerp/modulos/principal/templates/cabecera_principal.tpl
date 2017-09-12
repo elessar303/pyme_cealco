@@ -7,6 +7,7 @@
 <div style="background-image:url('../../../includes/imagenes/top_bg.png'); background-repeat:repeat-x;">
     <table style="width:100%; background-image:url('../../../includes/imagenes/logo_bg.png'); background-repeat:no-repeat;" >
         <tr>
+
             <td style="cursor:pointer; width:200px; height:60px;">
                 <img width="200" height="50" src="../../../includes/imagenes/siscolp.png" onclick="javascript: window.location.href='?opt_menu=54';"/>
             </td>
@@ -18,9 +19,11 @@
                                 <tr>
                                     <td style="width:90%"></td>
                                     <td style="width:10%">
+                                        <!--
                                         <div style="text-align:right">
                                             <img src="../../../includes/imagenes/logo.png" width="160" height="38"/>
                                         </div>
+                                        -->
                                     </td>
                                 </tr>
                             </table>

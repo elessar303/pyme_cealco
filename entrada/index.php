@@ -25,7 +25,7 @@ session_unset();
                     </div>
                 </div>
             </div>
-            <div align="center"><a href="http://www.pdval.gob.ve/" target="_blank"><img src="../selectraerp/imagenes/banner_pyme.png" width="100%" height="100" title="http://www.pdval.gob.ve/"></img></a></div>
+            <!-- <div align="center"><a href="http://www.pdval.gob.ve/" target="_blank"><img src="../selectraerp/imagenes/banner_pyme.png" width="100%" height="100" title="http://www.pdval.gob.ve/"></img></a></div> -->
         </div>
     </body>
 </html>

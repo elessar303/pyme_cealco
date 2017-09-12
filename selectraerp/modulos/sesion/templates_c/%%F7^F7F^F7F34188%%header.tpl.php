@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-11 13:24:06
+<?php /* Smarty version 2.6.21, created on 2017-09-12 21:10:18
          compiled from header.tpl */ ?>
 <title>.::Pantalla de Acceso - Sistema de Inventario y Facturacion::.</title>
 <link rel="stylesheet" type="text/css" href="../../libs/css/login.css" media="screen" />
