@@ -201,16 +201,16 @@ if (isset($_POST["input_cantidad_items"])) {
             $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
 
             $campos = $almacen->ObtenerFilasBySqlSelect("SELECT * FROM item_existencia_almacen WHERE
-                    id_item  = '{$_POST["_id_item"][$i]}' AND id_ubicacion = '{$_POST["_ubicacion"][$i]}' AND lote='{$_POST["_lote"][$i]}';");
+                    id_item  = '{$_POST["_id_item"][$i]}' AND id_ubicacion = '{$_POST["_ubicacion"][$i]}' AND lote='{$_POST["_lote"][$i]}' AND id_proveedor='{$_POST["id_proveedor"]}';");
 
             if (count($campos) > 0) {
                 $cantidadExistente = $campos[0]["cantidad"];
                 $almacen->ExecuteTrans("UPDATE item_existencia_almacen 
                     SET cantidad = '" . ($cantidadExistente + $_POST["_cantidad"][$i]) . "'
-                    WHERE id_item  = '{$_POST["_id_item"][$i]}' AND id_ubicacion = '{$_POST["_ubicacion"][$i]}' and lote='{$_POST["_lote"][$i]}';");
+                    WHERE id_item  = '{$_POST["_id_item"][$i]}' AND id_ubicacion = '{$_POST["_ubicacion"][$i]}' and lote='{$_POST["_lote"][$i]}' and id_proveedor='{$_POST["id_proveedor"]}';");
             } else {
-                $instruccion = "INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, `lote`)
-                    VALUES ('{$_POST["_id_almacen"][$i]}', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}' , '{$_POST["_ubicacion"][$i]}','{$_POST["_lote"][$i]}');";
+                $instruccion = "INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, `lote`, `id_proveedor`)
+                    VALUES ('{$_POST["_id_almacen"][$i]}', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}' , '{$_POST["_ubicacion"][$i]}','{$_POST["_lote"][$i]}', '{$_POST["id_proveedor"]}');";
                 $almacen->ExecuteTrans($instruccion);
             }
 

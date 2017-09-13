@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-05 09:19:39
+<?php /* Smarty version 2.6.21, created on 2017-09-13 19:21:34
          compiled from productosexistencia.tpl */ ?>
 <!DOCTYPE html>
 <html>

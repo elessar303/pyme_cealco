@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-08-18 01:05:48
+<?php /* Smarty version 2.6.21, created on 2017-09-13 15:35:39
          compiled from snippets/regresar_boton.tpl */ ?>
 <!DOCTYPE html>
 <html>

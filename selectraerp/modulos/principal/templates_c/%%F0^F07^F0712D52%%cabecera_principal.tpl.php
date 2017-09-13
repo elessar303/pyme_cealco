@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-12 21:18:21
+<?php /* Smarty version 2.6.21, created on 2017-09-13 19:50:23
          compiled from cabecera_principal.tpl */ ?>
 <script language="JavaScript" src="../../libs/js/md5_crypt.js"></script>
 <script language="JavaScript" src="../../libs/js/cambiar_clave.js"></script>

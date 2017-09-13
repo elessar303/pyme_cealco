@@ -10,6 +10,17 @@ $comun = new Comunes();
 $smarty->assign("nombre_usuario", $login->getNombreApellidoUSuario());
 
 
+$arraySelectOption = "";
+$arraySelectoutPut = "";
+$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT * FROM proveedores order by descripcion");
+foreach ($campos_comunes as $key => $item) {
+    $arraySelectOption[] = $item["id_proveedor"];
+    $nombre_proveedor=$item["descripcion"]."-".$item["rif"];
+    $arraySelectoutPut[] = utf8_encode($nombre_proveedor);
+}
+$smarty->assign("option_values_proveedor", $arraySelectOption);
+$smarty->assign("option_output_proveedor", $arraySelectoutPut);
+
 if (isset($_POST["input_cantidad_items"]))
 { // si el usuario hizo post
 
@@ -46,7 +57,8 @@ if (isset($_POST["input_cantidad_items"]))
     `observacion` ,
     `fecha` ,
     `usuario_creacion`,
-    `fecha_creacion`
+    `fecha_creacion`,
+    `id_proveedor`
     )
     VALUES (
     NULL ,
@@ -55,7 +67,8 @@ if (isset($_POST["input_cantidad_items"]))
     '" . $_POST["observaciones"] . "',
     '" . $_POST["input_fechacompra"] . "',
     '" . $login->getUsuario() . "',
-    CURRENT_TIMESTAMP
+    CURRENT_TIMESTAMP,
+    '" . $_POST["id_proveedor"] . "'
     );";
 
     $almacen->ExecuteTrans($kardex_almacen_instruccion);
@@ -104,13 +117,13 @@ if (isset($_POST["input_cantidad_items"]))
                                 where
                         id_item  = '" . $_POST["_id_item"][$i] . "' and
                          id_ubicacion  = '" . $_POST["_ubicacion"][$i] . "' and
-                        cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "'");
+                        cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "' and id_proveedor='{$_POST["id_proveedor"]}'");
         #echo "select * from item_existencia_almacen where id_item  = '".$_POST["_id_item"][$i]."' and cod_almacen = '".$_POST["_id_almacen"][$i]."'<br>";
         if (count($campos) > 0) {
             $cantidadExistente = $campos[0]["cantidad"];
             #echo "update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "' where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "'<br>";
             $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "'
-                        where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i]."' and lote='" . $_POST["_nlote"][$i] . "'");
+                        where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i]."' and lote='" . $_POST["_nlote"][$i] . "' and id_proveedor='{$_POST["id_proveedor"]}'");
         } else {
             
         }
@@ -121,14 +134,14 @@ if (isset($_POST["input_cantidad_items"]))
                         select * from item_existencia_almacen
                                 where
                         id_item  = '" . $_POST["_id_item"][$i] . "' and
-                        cod_almacen = '" . $_POST["almacen_entrada"]. "' and id_ubicacion = '" . $_POST["ubicacion_entrada"]. "' and lote='" . $_POST["_nlote"][$i] . "'");
+                        cod_almacen = '" . $_POST["almacen_entrada"]. "' and id_ubicacion = '" . $_POST["ubicacion_entrada"]. "' and lote='" . $_POST["_nlote"][$i] . "' and id_proveedor='{$_POST["id_proveedor"]}'");
 
         #echo "select * from item_existencia_almacen where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["almacen_entrada"][$i] . "'<br>";
         if (count($campos) > 0) {
             $cantidadExistente = $campos[0]["cantidad"];
             #echo "update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "' where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["almacen_entrada"] . "'<br>";
             $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente + $_POST["_cantidad"][$i]) . "'
-                where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["almacen_entrada"] . "' and id_ubicacion = '" . $_POST["ubicacion_entrada"]. "' and lote='" . $_POST["_nlote"][$i] . "'");
+                where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["almacen_entrada"] . "' and id_ubicacion = '" . $_POST["ubicacion_entrada"]. "' and lote='" . $_POST["_nlote"][$i] . "' and id_proveedor='{$_POST["id_proveedor"]}'");
         } else {
             $instruccion = "
                     INSERT INTO item_existencia_almacen(
@@ -136,14 +149,16 @@ if (isset($_POST["input_cantidad_items"]))
                     `id_item` ,
                     `cantidad`,
                     `id_ubicacion`,
-                    `lote`
+                    `lote`,
+                    `id_proveedor`
                     )
                     VALUES (
                         '" . $_POST["almacen_entrada"] . "',
                         '" . $_POST["_id_item"][$i] . "',
                         '" . $_POST["_cantidad"][$i] . "',
                         '" .$_POST["ubicacion_entrada"]. "',
-                        '" . $_POST["_nlote"][$i] . "'
+                        '" . $_POST["_nlote"][$i] . "',
+                        '" . $_POST["id_proveedor"] . "'
                     );";
             $almacen->ExecuteTrans($instruccion);
         }

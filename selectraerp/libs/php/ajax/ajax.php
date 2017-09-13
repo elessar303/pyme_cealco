@@ -4681,7 +4681,7 @@ where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateen
 
             if($ubicacion_pro[0]['descripcion']!='PISO DE VENTA'){
 
-            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."' and lote='". $_GET["lote"]."'");
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."' and lote='". $_GET["lote"]."' and id_proveedor='". $_GET["id_proveedor"]."'");
             
            }elseif($ubicacion_pro[0]['descripcion']=='PISO DE VENTA'){
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_item_pisoventa WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'");

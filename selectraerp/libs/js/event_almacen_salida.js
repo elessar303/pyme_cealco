@@ -43,12 +43,13 @@ Ext.onReady(function(){
         ubicacion = $("#ubicacion").val(); 
         nombre_ubi = $("#ubicacion option:selected").html();
         item=$("#items").val();
-        lote = $("#nlote").val(); 
+        lote = $("#nlote").val();
+        id_proveedor=$("#id_proveedor").val();
         if(item!='' && codAlmacen!='0' && ubicacion!="" && nombre_ubi!='PISO DE VENTA'){
             $.ajax({
                 type: "GET",
                 url:  "../../libs/php/ajax/ajax.php",
-                data: "opt=verificarExistenciaItemByAlmacen&v1="+codAlmacen+"&v2="+item+"&ubicacion="+ubicacion+"&lote="+lote,
+                data: "opt=verificarExistenciaItemByAlmacen&v1="+codAlmacen+"&v2="+item+"&ubicacion="+ubicacion+"&lote="+lote+"&id_proveedor="+id_proveedor,
                 beforeSend: function(){
                 // $("#descripcion_item").html(MensajeEspera("<b>Veficando Cod. item..<b>"));
                 },

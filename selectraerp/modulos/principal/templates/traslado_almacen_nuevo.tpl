@@ -92,6 +92,19 @@ function solonumeros(evt){
                 </td>
             </tr>
             <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Proveedor (*):</b></span>
+                        </td>
+                        <td>
+                            <!--input type="text" maxlength="100" name="autorizado_por" id="autorizado_por" value="{$detalles_pendiente[0].autorizado_por}"/-->
+                            <select name="id_proveedor" id="id_proveedor" class="form-text" style="width:205px">
+                            <option value="">...</option>
+                            {html_options values=$option_values_proveedor output=$option_output_proveedor}
+                            </select>
+                        </td>
+                    </tr>
+            <tr>
                 <td>
                     <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/8.png"-->
                     <span style="font-family:'Verdana';"><b>Observaciones</b></span>

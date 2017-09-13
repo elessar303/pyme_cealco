@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-12 21:10:29
+<?php /* Smarty version 2.6.21, created on 2017-09-13 15:17:30
          compiled from sincronizacion.tpl */ ?>
 <!DOCTYPE html>
 <html>

@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-05 14:06:56
+<?php /* Smarty version 2.6.21, created on 2017-09-13 18:22:17
          compiled from salida_almacen_pedido_facturar.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format', 'salida_almacen_pedido_facturar.tpl', 36, false),)), $this); ?>
@@ -12,7 +12,7 @@ $this->_smarty_include(array('smarty_include_tpl_file' => "snippets/header_form.
 $this->_tpl_vars = $_smarty_tpl_vars;
 unset($_smarty_tpl_vars);
  ?>
-        <script type="text/javascript" src="../../libs/js/entrada_almacen.js"></script>
+        <script type="text/javascript" src="../../libs/js/entrada_almacen_servicios.js"></script>
         <script language="JavaScript" type="text/javascript" src="../../libs/js/funciones.js"></script>
     </head>
     <body>
@@ -74,19 +74,20 @@ unset($_smarty_tpl_vars);
                                     <?php if ($this->_tpl_vars['campos']['facturado'] == 0): ?><img src="../../../includes/imagenes/ico_cancel.gif"/><?php else: ?><img src="../../../includes/imagenes/ico_ok.gif"/>
                                     <?php endif; ?>
                                     </td>
-                                    <td style="text-align: center;">
-                                    <?php if ($this->_tpl_vars['campos']['cod_movimiento'] == ''): ?><img src="../../../includes/imagenes/ico_cancel.gif"/><?php else: ?><img src="../../../includes/imagenes/ico_ok.gif"/>
-                                    <?php endif; ?>
-                                    </td>
+                                    
                                     <td style="width:50px; text-align: center;">
                                         <img class="boton_detalle" src="../../../includes/imagenes/drop-add.gif"/>
                                         <input type="hidden" name="id_transaccion" value="<?php echo $this->_tpl_vars['campos']['id_transaccion']; ?>
+"/>
+                                        <input type="hidden" name="estatus" value="<?php echo $this->_tpl_vars['campos']['estatus']; ?>
+"/>
+                                        <input type="hidden" name="id_cliente" value="<?php echo $this->_tpl_vars['campos']['id_cliente']; ?>
 "/>
                                         <input type="hidden" name="id_tipo_movimiento_almacen" value="<?php echo $this->_tpl_vars['campos']['id_tipo_movimiento_almacen']; ?>
 "/>
                                     </td>
                                      <td style="cursor:pointer; width:30px; text-align:center" colspan="2">
-                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('pagos.php?despacho=<?php echo $this->_tpl_vars['campos']['id_transaccion']; ?>
+                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('pagos.php?despacho=<?php echo $this->_tpl_vars['campos']['id_cliente']; ?>
 ','window','menubar=1,resizable=1,fullscreen=yes');" title="Nueva Factura Rapida" src="../../../includes/imagenes/factu.png"/>
                                 </td>
                                 </tr>

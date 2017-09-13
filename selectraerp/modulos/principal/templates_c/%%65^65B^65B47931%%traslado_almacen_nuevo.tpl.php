@@ -1,7 +1,7 @@
-<?php /* Smarty version 2.6.21, created on 2017-08-18 01:04:47
+<?php /* Smarty version 2.6.21, created on 2017-09-13 19:50:23
          compiled from traslado_almacen_nuevo.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('function', 'html_options', 'traslado_almacen_nuevo.tpl', 110, false),array('modifier', 'date_format', 'traslado_almacen_nuevo.tpl', 130, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('function', 'html_options', 'traslado_almacen_nuevo.tpl', 103, false),array('modifier', 'date_format', 'traslado_almacen_nuevo.tpl', 143, false),)), $this); ?>
 <script type="text/javascript" src="../../libs/js/event_almacen_salida.js"></script>
 <script type="text/javascript" src="../../libs/js/eventos_formAlmacen.js"></script>
 <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
@@ -105,6 +105,21 @@ function solonumeros(evt){
 " class="form-text" readonly>
                 </td>
             </tr>
+            <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Proveedor (*):</b></span>
+                        </td>
+                        <td>
+                            <!--input type="text" maxlength="100" name="autorizado_por" id="autorizado_por" value="<?php echo $this->_tpl_vars['detalles_pendiente'][0]['autorizado_por']; ?>
+"/-->
+                            <select name="id_proveedor" id="id_proveedor" class="form-text" style="width:205px">
+                            <option value="">...</option>
+                            <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_proveedor'],'output' => $this->_tpl_vars['option_output_proveedor']), $this);?>
+
+                            </select>
+                        </td>
+                    </tr>
             <tr>
                 <td>
                     <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/8.png"-->

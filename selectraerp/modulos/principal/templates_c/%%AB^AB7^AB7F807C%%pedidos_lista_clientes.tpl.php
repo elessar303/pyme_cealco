@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-05 14:06:14
+<?php /* Smarty version 2.6.21, created on 2017-09-13 18:13:40
          compiled from pedidos_lista_clientes.tpl */ ?>
 <!DOCTYPE html>
 <!--Creado por: Charli Vivenes, email: cjvrinf@gmail.com-->

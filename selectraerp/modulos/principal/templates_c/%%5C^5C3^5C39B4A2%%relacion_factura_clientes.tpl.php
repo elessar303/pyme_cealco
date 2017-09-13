@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-07-31 23:39:18
+<?php /* Smarty version 2.6.21, created on 2017-09-13 15:35:39
          compiled from relacion_factura_clientes.tpl */ ?>
 <!DOCTYPE html>
 <html>

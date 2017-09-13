@@ -11,8 +11,9 @@ class PDF extends FPDFSelectra {
         $this->Cell(0, 7, "RUBRO: " . strtoupper($dpto), 0, 0, 'L');
         $this->Ln();
         $this->Cell(15, 7, utf8_decode('N'), 'LTB', 0, 'C');
+        $this->Cell(35, 7, utf8_decode('Proveedor'), 'LTB', 0, 'C');
         $this->Cell(25, 7, utf8_decode('Codigo Barra'), 'LTB', 0, 'C');
-        $this->Cell(100, 7, utf8_decode('Descripcion'), 'LTB', 0, 'C');
+        $this->Cell(70, 7, utf8_decode('Descripcion'), 'LTB', 0, 'C');
         $this->Cell(15, 7, 'Exist.', 'LTB', 0, 'C');
         $this->Cell(10, 7, 'Lote', 'LTB', 0, 'C');
         $this->Cell(20, 7, "Precio S/Iva", 'LTBR', 0, 'C');
@@ -51,9 +52,13 @@ class PDF extends FPDFSelectra {
 
         //$rs = query("SELECT * FROM item i, item_existencia_almacen a WHERE i.id_item = a.id_item AND cod_item_forma = 1 AND a.cantidad>0;",$conexion);
         // $rs = query("SELECT * FROM item i, item_existencia_almacen a WHERE i.id_item = a.id_item AND cod_item_forma = 1 AND a.cantidad>0 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' ORDER BY descripcion1;", $conexion);
-       $rs = query("select v.*,i.precio1,  i.codigo_barras, i.iva FROM vw_existenciabyalmacen v, item i where i.id_item=v.id_item AND v.cantidad>0 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' AND ubicacion!='PISO DE VENTA' 
-            GROUP BY i.codigo_barras, ubicacion, lote
-            ORDER BY descripcion,ubicacion, v.cod_almacen
+       $rs = query("select v.*,i.precio1,  i.codigo_barras, i.iva, pro.descripcion as nombre_proveedor FROM vw_existenciabyalmacen v, item i, proveedores pro
+        where i.id_item=v.id_item 
+        AND v.id_proveedor=pro.id_proveedor
+        AND v.cantidad>0 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' 
+        AND ubicacion!='PISO DE VENTA' 
+        GROUP BY i.codigo_barras, ubicacion, lote
+        ORDER BY descripcion,ubicacion, v.cod_almacen, nombre_proveedor, lote
         ", $conexion); 
 
         $totalwhile = num_rows($rs);
@@ -100,15 +105,16 @@ class PDF extends FPDFSelectra {
             $var_precio_total = number_format($precio_total, 2, ',', '.');
             $iva=number_format($row_rs['iva'], 0, ',', '.');
             $subtotal_dpto += $precio_sub;
+            $nombre_proveedor=utf8_decode($row_rs['nombre_proveedor']);
             $contador++;
 
             $this->SetFont("Arial", "I", 9);
             // llamado para hacer multilinea sin que haga salto de linea
-            $this->SetWidths(array(15,25, 100,15, 10, 20, 15, 20,25,25));
-            $this->SetAligns(array('C','C', 'L', 'R', 'R', 'R','R', 'R','R','R'));
-            $this->Setceldas(array(0,0, 0, 0, 0, 0));
+            $this->SetWidths(array(15,25, 35,70,15, 10, 20, 15, 20,25,25));
+            $this->SetAligns(array('C','C', 'C','L', 'R', 'R', 'R','R', 'R','R','R'));
+            $this->Setceldas(array(0,0, 0, 0, 0, 0, 0));
             $this->Setancho(array(5,5, 5, 5, 5, 5, 5, 5,5,5));
-            $this->Row(array($contador,$var_codigo, $var_descrip, $var_exi, $lote,$var_preciosiva, $iva."%", $var_preciociva, $var_precio_sub,$var_precio_total));
+            $this->Row(array($contador,$nombre_proveedor,$var_codigo,$var_descrip, $var_exi, $lote,$var_preciosiva, $iva."%", $var_preciociva, $var_precio_sub,$var_precio_total));
 
             if ($cont == $cantidad_registros) {
                 // $this->Ln(80);
