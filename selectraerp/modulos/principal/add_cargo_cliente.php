@@ -32,7 +32,7 @@ $login = new Login();
 if (isset($_GET["cod"]) /* && isset($_GET["cod2"]) */) 
 {
 	
-    $sql = "SELECT kd.id_item, kd.cantidad, kd.id_almacen_entrada, kd.id_ubi_entrada, i.descripcion1, i.codigo_barras FROM calidad_almacen_detalle AS kd, item AS i WHERE i.id_item = kd.id_item AND kd.id_transaccion = {$_GET["cod"]};";
+    /*$sql = "SELECT kd.id_item, kd.cantidad, kd.id_almacen_entrada, kd.id_ubi_entrada, i.descripcion1, i.codigo_barras FROM calidad_almacen_detalle AS kd, item AS i WHERE i.id_item = kd.id_item AND kd.id_transaccion = {$_GET["cod"]};";
     $productos_pendientes_entrada = $almacen->ObtenerFilasBySqlSelect($sql);
     $detalles_pendiente = $almacen->ObtenerFilasBySqlSelect("SELECT autorizado_por, observacion, id_documento FROM calidad_almacen WHERE id_transaccion = {$_GET["cod"]};");
     $detalles_compra_pendiente = $almacen->ObtenerFilasBySqlSelect("SELECT num_factura_compra, num_cont_factura FROM compra WHERE id_compra = {$detalles_pendiente[0]["id_documento"]};");
@@ -40,7 +40,7 @@ if (isset($_GET["cod"]) /* && isset($_GET["cod2"]) */)
     $smarty->assign("productos_pendientes_entrada", $productos_pendientes_entrada);
     $smarty->assign("datos_factura", $detalles_compra_pendiente);
     $smarty->assign("cod", $_GET["cod"]);
-    #$smarty->assign("cod2", $_GET["cod2"]);
+    #$smarty->assign("cod2", $_GET["cod2"]);*/
     $pendiente = !$pendiente;
 }
 
@@ -61,10 +61,10 @@ $smarty->assign("option_output_proveedor", $arraySelectoutPut);
 //rubro a cliente
 $arraySelectOption="";
 $arraySelectoutPut="";
-$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT id_cliente, concat(cod_cliente, ' - ', nombre ) as nombre FROM clientes where cod_cliente=".$_GET['cod']);
+$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT id_cliente, concat(cod_cliente, ' - ', nombre ) as nombre FROM clientes where id_cliente='".$_GET['cod']."'");
     $id_cliente = $campos_comunes[0]["id_cliente"];
     $nombre_proveedor=utf8_encode($campos_comunes[0]["nombre"]);
-
+    
     $smarty->assign("id_cliente", $id_cliente);
     $smarty->assign("nombre_cliente", $nombre_proveedor);
 //fin rubro
@@ -250,9 +250,12 @@ if (isset($_POST["input_cantidad_items"]))
             $_POST['_item_totalsiniva'][$i]=$producto[0]['precio1'];
             $_POST['_item_totalconiva'][$i]=((($producto[0]['precio1']*$producto[0]['iva'])/100) + $producto[0]['precio1']);
             $_POST['_item_almacen'][$i]=1;
-            $_POST['_fechainicio'][$i]=date_format(date_create($_POST['_fechainicio'][$i]), 'Y-m-d');
-            $_POST['_fechafin'][$i]=date_format(date_create($_POST['_fechafin'][$i]), 'Y-m-d');
-            $sql="insert into cliente_cargos (id_cliente, id_servicio_material, costo, fecha_inicio, fecha_fin, id_usuario, fecha_creacion, observacion) values ({$_POST['id_cliente']}, {$id_transaccion}, {$totaliva}, {$_POST['_fechainicio'][$i]}, {$_POST['_fechafin'][$i]}, {$login->getIdUsuario()}, now(), '')";
+            //$_POST['_fechainicio'][$i]=date_format(date_create($_POST['_fechainicio'][$i]), 'Y-m-d');
+            $_POST['_fechainicio'][$i]=date_create($_POST['_fechainicio'][$i]);
+            $_POST['_fechainicio'][$i]=date_format($_POST['_fechainicio'][$i], 'Y-m-d');
+            $_POST['_fechafin'][$i]=date_create($_POST['_fechafin'][$i]);
+            $_POST['_fechafin'][$i]=date_format($_POST['_fechafin'][$i], 'Y-m-d');
+            $sql="insert into cliente_cargos (id_cliente, id_servicio_material, costo, fecha_inicio, fecha_fin, id_usuario, fecha_creacion, observacion) values ({$_POST['id_cliente']}, {$id_transaccion}, {$totaliva}, '{$_POST['_fechainicio'][$i]}', '{$_POST['_fechafin'][$i]}', {$login->getIdUsuario()}, now(), '')";
             $factura->ExecuteTrans($sql);    
             $detalle_item_instruccion = "
             INSERT INTO despacho_new_detalle (
@@ -300,14 +303,14 @@ if (isset($_POST["input_cantidad_items"]))
             $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
 
             $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
-            
+            $almacenlocal=$almacen->ObtenerFilasBySqlSelect("select a.cod_almacen as almacen, b.id as ubicacion from almacen as a inner join ubicacion as b on a.cod_almacen=b.id_almacen  limit 1");
             $kardex_almacen_detalle_instruccion = "
             INSERT INTO kardex_almacen_detalle (
                 `id_transaccion` , `id_almacen_entrada` ,
-                `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`, precio)
+                `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`, precio, elaboracion)
             VALUES (
-                '', '', '8',
-                '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_cantidad"][$i]}', 8, $precioconiva);";
+                $id_transaccion, '', ".$almacenlocal[0]['almacen'].",
+                '{$_POST["_item_codigo"][$i]}', '1', ".$almacenlocal[0]['ubicacion'].", $precioconiva, now());";
             
             $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
 

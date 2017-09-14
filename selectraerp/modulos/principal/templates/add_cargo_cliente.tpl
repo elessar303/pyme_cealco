@@ -237,7 +237,7 @@
                                         <span style="font-family:'Verdana';font-weight:bold;"><b>Cliente (*)</b></span>
                                     </td>
                                     <td>
-                                        <input type="nombre_cliente" name="nombre_cliente" value="{$nombre_cliente}"  size="30" maxlength="70" class="form-text" readonly="readonly" />
+                                        <input type="text" name="nombre_cliente"   size="30" maxlength="70" class="form-text" readonly="readonly" value={$nombre_cliente} />
                                         <input type="hidden" name="id_cliente" id="id_cliente" value={$id_cliente} />
                                     </td>
                                 </tr>
@@ -262,7 +262,7 @@
                                 </td>
                                 <td><img src="../../../includes/imagenes/add.gif" width="16" height="16" />
                                 </td>
-                                <td style="padding: 0px 6px;">Agregar Otro Producto
+                                <td style="padding: 0px 6px;">Agregar Otro Servicio
                                 </td>
                                 <td><img src="../../../includes/imagenes/bt_right.gif" style="border-width: 0px; width: 4px; height: 21px;" />
                                 </td>

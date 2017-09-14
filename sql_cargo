@@ -1,0 +1,1 @@
+ALTER TABLE `cliente_cargos` ADD `estatus` BOOLEAN NOT NULL DEFAULT FALSE COMMENT '0= no facturado, 1= facturado' AFTER `observacion` ;
