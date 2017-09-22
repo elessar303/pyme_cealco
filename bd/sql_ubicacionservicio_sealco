@@ -1,0 +1,18 @@
+UPDATE  `pyme_prueba_standar_ceal`.`modulos` SET  `visible` =  '1' WHERE  `modulos`.`cod_modulo` =55;
+CREATE TABLE IF NOT EXISTS `ubicacion_servicio` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_ubicacion` int(11) NOT NULL,
+  `id_servicio` int(11) NOT NULL,
+  `estatus` tinyint(1) NOT NULL DEFAULT '1',
+  `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `usuario_creacion` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+INSERT INTO `pyme_prueba_standar_ceal`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('propiedadesUbicacion', 'propiedadesUbicacion.tpl', 'propiedadesUbicacion.php', '55', 'Servicios Ubicacion');
+
+INSERT INTO `pyme_prueba_standar_ceal`.`subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('addpropiedadesUbicacion', 'addpropiedadesUbicacion.tpl', 'addpropiedadesUbicacion.php', '55', 'Agregar Servicios Ubicacion');
+
+
+
+

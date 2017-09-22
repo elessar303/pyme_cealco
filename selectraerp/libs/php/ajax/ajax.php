@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 session_start();
 ini_set("display_errors", 1);
 
@@ -22,6 +22,17 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "eliminarServicioUbicacion":
+            $delete="delete from ubicacion_servicio where id=".$_GET['v1'];
+            if($conn->Execute2($delete))
+            {
+                echo "1";
+            }
+            else
+            {
+                echo "-1";
+            }
+        break;
         case "EstadoCuenta" : 
 
             if ($_GET["id_tipo_movimiento_almacen"] == '8')
@@ -5914,6 +5925,7 @@ order by mb.cod_movimiento_ban";
         case "filtroItem":
         
         		
+             $comunes = new Comunes();
             /**
              * Procedimiento de busqueda de productos/servicios
              *
@@ -6011,7 +6023,7 @@ order by mb.cod_movimiento_ban";
                 $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item;
                 $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
                 $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item . " limit $start,$limit";
-                $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
+                $campos_comunes = $comunes->ObtenerFilasBySqlSelect($sql);
             }
             	
             echo json_encode(array(

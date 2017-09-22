@@ -21,7 +21,7 @@ Modificado por: daniel fernandez
                         {foreach from=$cabecera key=i item=campos}
                             <td><b>{$campos}</b></td>
                         {/foreach}
-                            <td colspan="2" style="text-align:center;"><b>Opciones</b></td>
+                            <td colspan="3" style="text-align:center;"><b>Opciones</b></td>
                         </tr>
                     {if $cantidadFilas == 0}
                         <tr><td colspan="3">{$mensaje}</td></tr>
@@ -38,6 +38,9 @@ Modificado por: daniel fernandez
                             <td>{$campos.descripcion}</td>                           
                             <td style="cursor: pointer; width: 30px; text-align:center">
                                 <img class="editar" {if $smarty.get.loc } onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=editUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}&amp;idLocalidad={$smarty.get.idLocalidad}&amp;loc=1'" {else}onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=editUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}'" {/if} title="Editar" src="../../../includes/imagenes/edit.gif"/>
+                            </td>
+                            <td style="cursor: pointer; width: 30px; text-align:center">
+                                <img class="Personalizar" {if $smarty.get.loc } onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=propiedadesUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}&amp;id={$campos.id}&amp;idLocalidad={$smarty.get.idLocalidad}&amp;loc=1'"{else} onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=propiedadesUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}'" {/if} title="Personalizar" src="../../../includes/imagenes/ico_propiedades.gif"/> 
                             </td>
                             <td style="cursor: pointer; width: 30px; text-align:center">
                                 <img class="eliminar" {if $smarty.get.loc } onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=deleteUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}&amp;id={$campos.id}&amp;idLocalidad={$smarty.get.idLocalidad}&amp;loc=1'"{else} onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=deleteUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}'" {/if} title="Eliminar" src="../../../includes/imagenes/delete.gif"/> 
