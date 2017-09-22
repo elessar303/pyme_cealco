@@ -53,14 +53,14 @@
                                 <input type="text" name="descripcion_ubicacion" value="{$datos_ubicacion[0].descripcion}" size="60" id="descripcion_ubicacion" class="form-text" />
                             </td>
                         </tr>                      
-                         <tr>
+                         <!--<tr>
                             <td colspan="3" class="label">
                                 Puede vender
                             </td>
                             <td style="padding-top:2px; padding-bottom: 2px;">
                                 <input {if $datos_ubicacion[0].puede_vender eq "1" } checked {/if}  type="checkbox" name="puede_vender" value=1 id="puede_vender" class="form-text" />
                             </td>
-                        </tr>
+                        </tr>-->
                 </table>
                 <table style="width:100%">
                     <tbody>
