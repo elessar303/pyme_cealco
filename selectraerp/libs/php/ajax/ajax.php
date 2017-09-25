@@ -22,6 +22,18 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "eliminarServicioMovimiento":
+            $delete="delete from movimiento_almacen_servicio where id=".$_GET['v1'];
+            if($conn->Execute2($delete))
+            {
+                echo "1";
+            }
+            else
+            {
+                echo "-1";
+            }
+        break;
+        
         case "eliminarServicioUbicacion":
             $delete="delete from ubicacion_servicio where id=".$_GET['v1'];
             if($conn->Execute2($delete))
