@@ -87,7 +87,7 @@ var eventos_form = {
       
     },
     Limpiar: function() {
-        $("#cantidadunitaria, #items,#items_descripcion,#codigoBarra,#almacen,#ubicacion,#descripcionitem, #codigofabricante,#cantidadunitaria,#costounitario, #totalitem_tmp,#cantidaddeberia,#observacion,#cantidad_existente,#fecha_vence,#fVencimiento,#fechaelaboracion,#nlote,#fecha_vencimiento").val("");
+        $("#cantidadunitaria, #items,#items_descripcion,#codigoBarra,#almacen,#ubicacion,#descripcionitem, #codigofabricante,#cantidadunitaria,#costounitario, #totalitem_tmp,#cantidaddeberia,#observacion,#cantidad_existente,#fecha_vence,#unidad_paleta,#fVencimiento,#fechaelaboracion,#nlote,#fecha_vencimiento").val("");
     },
     IncluirRegistros: function(options) {
         var html = "";

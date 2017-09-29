@@ -197,7 +197,8 @@ pBuscaItem.main = {
                 {header:'Código', width:120, sortable: true, menuDisabled:true, dataIndex:'cod_item'},
                 {header:'Código de Barras', width:120, sortable: true, menuDisabled:true, dataIndex:'codigo_barras'},
                 {header:'Descripción', width:410, sortable: true, menuDisabled:true, dataIndex:'descripcion1'},
-                {header:'Fecha Vencimiento', width:120, sortable: true, menuDisabled:true, dataIndex:'producto_vencimiento'}
+                {header:'Fecha Vencimiento', width:120, sortable: true, menuDisabled:true, dataIndex:'producto_vencimiento'},
+                {header:'Unidad Paleta', width:120, sortable: true, menuDisabled:true, dataIndex:'unidad_paleta'},
             ],
             bbar: new Ext.PagingToolbar({
                 pageSize: pBuscaItem.main.limitePaginacion,
@@ -289,6 +290,7 @@ pBuscaItem.main = {
             $("input[name='codigoBarra']").val(this.record.data["codigo_barras"]);
             $("input[name='items_descripcion']").val(this.record.data["cod_item"]+'-'+this.record.data["descripcion1"]);
             $("input[name='fecha_vence']").val(this.record.data["producto_vencimiento"]);
+            $("input[name='unidad_paleta']").val(this.record.data["unidad_paleta"]);
             $("input[name='items']").val(this.record.data["id_item"]);
             $("#items").change();
             //$.filtrarArticulo(filtro_referencia);
@@ -424,6 +426,9 @@ pBuscaItem.main = {
             },
             {
                 name: 'producto_vencimiento'
+            },
+            {
+                name: 'unidad_paleta'
             },
             ]
         });

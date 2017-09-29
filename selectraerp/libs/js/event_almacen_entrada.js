@@ -375,22 +375,68 @@ $("#cantidaddeberia").change(function(){
                            return false;
                     }
                 }
-
-                eventos_form.IncluirRegistros({
-                    //cod_item:           $("#items").val(),/////// Añadido
-                    id_item:            $("#items").val(),
-                    descripcion:        $("#items :selected").text()=="" ? $("#items_descripcion").val() : $("#items :selected").text(),
-                    id_almacen:         $("#almacen").val(),
-                    id_ubicacion:       $("#ubicacion").val(),
-                    cantidad:           $("#cantidadunitaria").val(),
-                    vencimiento:        $("#fVencimiento").val(),
-                    elaboracion:        $("#fechaelaboracion").val(),
-                    lote:               $("#nlote").val(),
-                    c_esperada:         $("#cantidaddeberia").val(),
-                    observacion:        $("#observacion1").val()
+                /*
+                /se comienza a realizar el proceso de dividir por paletas las cantidades
+                /debemos obtener la cantidad unitaria, despues se debe dividir entre la unidad_paleta
+                /del producto, ese resultado nos dirá la cantidad de paletas necesarias el cual sería nuestro limite de bucle
+                /ya teniendo el bucle, se divide la cantida unitaria entre paletas para obtener la cantidad de cada
+                /una de las paletas considerando el factor de redondeo, pues no siempre será exacta la división
+                */
+                //se obtiene el valor del unidad_paleta
+                unidad_paleta=$("#unidad_paleta").val();
+                if(unidad_paleta>0 || (unidad_paleta>0 && $("#cantidadunitaria").val()>unidad_paleta))
+                {
+                    //obtengo la cantida de paletas necesarias para procesar la petición
+                    var paletas=Math.ceil(parseInt($("#cantidadunitaria").val())/parseInt(unidad_paleta));
+                    cantidad=$("#cantidadunitaria").val();
+                    for(var i=0; i<paletas; i++)
+                    {
+                        //se resta cantida con unidad_paleta para ir dividiendo las cantidades por palestas
+                        if(paletas!=1+i)
+                        {
+                            cantidadxpaleta=unidad_paleta;
+                            cantidad-=unidad_paleta;
+                        }
+                        else
+                        {
+                            cantidadxpaleta=cantidad;
+                        }
+                        eventos_form.IncluirRegistros
+                        ({
+                            //cod_item:           $("#items").val(),/////// Añadido
+                            id_item:            $("#items").val(),
+                            descripcion:        $("#items :selected").text()=="" ? $("#items_descripcion").val() : $("#items :selected").text(),
+                            id_almacen:         $("#almacen").val(),
+                            id_ubicacion:       $("#ubicacion").val(),
+                            cantidad:           cantidadxpaleta,//$("#cantidadunitaria").val(),
+                            vencimiento:        $("#fVencimiento").val(),
+                            elaboracion:        $("#fechaelaboracion").val(),
+                            lote:               $("#nlote").val(),
+                            c_esperada:         $("#cantidaddeberia").val(),
+                            observacion:        $("#observacion1").val()
+                        });
+                    }
+                        
                     
-                    
-                });
+                }
+                else
+                {
+                    eventos_form.IncluirRegistros({
+                        //cod_item:           $("#items").val(),/////// Añadido
+                        id_item:            $("#items").val(),
+                        descripcion:        $("#items :selected").text()=="" ? $("#items_descripcion").val() : $("#items :selected").text(),
+                        id_almacen:         $("#almacen").val(),
+                        id_ubicacion:       $("#ubicacion").val(),
+                        cantidad:           $("#cantidadunitaria").val(),
+                        vencimiento:        $("#fVencimiento").val(),
+                        elaboracion:        $("#fechaelaboracion").val(),
+                        lote:               $("#nlote").val(),
+                        c_esperada:         $("#cantidaddeberia").val(),
+                        observacion:        $("#observacion1").val()
+                        
+                        
+                    });
+                }
                 var cod = $("#items").val();
                 var cant = $("#cantidadunitaria").val();
 			        var mask = new Ext.LoadMask(Ext.get("Contenido"), {

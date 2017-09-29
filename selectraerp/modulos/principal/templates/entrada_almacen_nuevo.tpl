@@ -511,6 +511,7 @@
             <p>
                 <label><b>Inventario a la Fecha</b></label><br/>
                 <input type="text" name="cantidad_existente" id="cantidad_existente" readonly/>
+                <input type="hidden" name="unidad_paleta" id="unidad_paleta" readonly/>
             </p>
         </div>
     </body>

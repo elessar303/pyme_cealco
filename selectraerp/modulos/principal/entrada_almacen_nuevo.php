@@ -123,15 +123,19 @@ if (isset($_POST["input_cantidad_items"])) {
 
     }
 
-    $res = array_diff($cadena_item, array_diff(array_unique($cadena_item), array_diff_assoc($cadena_item, array_unique($cadena_item))));
-    if($res[0]!=''){
-    foreach(array_unique($res) as $v) {
-        $sql="SELECT * FROM item WHERE id_item=".$v."";
-        $item = $almacen->ObtenerFilasBySqlSelect($sql);
-        echo "Producto Duplicado Durante la Operacion: ".$v." ".$item[0]['descripcion1']."<br/>";
+    
+    //en cealco será normal que se repitan productos
+    /*$res = array_diff($cadena_item, array_diff(array_unique($cadena_item), array_diff_assoc($cadena_item, array_unique($cadena_item))));
+    if($res[0]!='')
+    {
+        foreach(array_unique($res) as $v) 
+        {
+            $sql="SELECT * FROM item WHERE id_item=".$v."";
+            $item = $almacen->ObtenerFilasBySqlSelect($sql);
+            echo "Producto Duplicado Durante la Operacion: ".$v." ".$item[0]['descripcion1']."<br/>";
         }
-    exit();  
-    }
+        exit();  
+    }*/
 // si el usuario hizo post
     if (!$pendiente) 
     {# Verificar que no se trata de una compra con estatus de entrega de productos "Pendiente"
@@ -185,6 +189,7 @@ if (isset($_POST["input_cantidad_items"])) {
 
         for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
 
+            
             //Se consulta el precio actual para dejar el historico en kardex (Junior)
             $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$_POST["_id_item"][$i]}'";
             $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
