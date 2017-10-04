@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-13 19:37:51
+<?php /* Smarty version 2.6.21, created on 2017-10-03 17:59:58
          compiled from entrada_almacen.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format', 'entrada_almacen.tpl', 43, false),)), $this); ?>

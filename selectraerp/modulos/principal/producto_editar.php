@@ -166,21 +166,27 @@ if (isset($_POST["aceptar"]))
 		}
 	}	
 	
-	
-	
-	
+	if(isset($_POST['sae']))
+    {
+    	if(!isset($_POST['impresion']) || $_POST['impresion']=='NULL')
+    	{
+    		echo "
+	    			<script language='JavaScript'>
+	    				alert('Error, Seleccione Tipo de Impresion de Producto');
+	    				history.go(-1);
+	    			</script>
+    			"; exit();
+
+    	}
+    }
     $_POST["iva"] = $_POST["monto_exento"] == 0 ? $_POST["iva"] : 0;
     $instruccion = "UPDATE item SET cod_item = '" . $_POST["cod_item"] . "', codigo_barras = '" . $_POST["cod_barras"] . "',
     		codigo_cpe = '".$_POST["cod_cpe"]."', costo_actual = '" . $_POST["costo_actual"] . "', descripcion1 = '" . $_POST["descripcion1"] . "',
             descripcion2 = '" . $_POST["descripcion2"] . "', descripcion3 = '" . $_POST["descripcion3"] . "',
             referencia = '" . $_POST["referencia"] . "', codigo_fabricante = '" . $_POST["codigo_fabricante"] . "',
-            precio1 = '" . $_POST["precio_1"] . "', utilidad1 = '" . $_POST["utilidad1"] . "',
-            coniva1 = '" . $_POST["coniva1"] . "', precio2 = '" . $_POST["precio_2"] . "',
-            utilidad2 = '" . $_POST["utilidad2"] . "', coniva2 = '" . $_POST["coniva2"] . "',
-            precio3 = '" . $_POST["precio_3"] . "', utilidad3 = '" . $_POST["utilidad3"] . "',
-            coniva3 = '" . $_POST["coniva3"] . "', monto_exento = '" . $_POST["monto_exento"] . "',
+            monto_exento = '" . $_POST["monto_exento"] . "',
             iva = '" . $_POST["iva"] . "', cod_departamento = '" . $_POST["cod_departamento"] . "',
-            cod_grupo = '" . $_POST["cod_grupo"] . "', id_marca ='" . $_POST["marca"] . "', cod_linea = '" . $_POST["cod_linea"] . "',
+            cod_grupo = '" . $_POST["cod_grupo"] . "', sub_categoria = " . $_POST["sub_categoria"] . ", id_marca =" . $_POST["marca"] . ", cod_linea = '" . $_POST["cod_linea"] . "',
             estatus = '" . $_POST["estatus"] . "', existencia_min = '" . $_POST["existencia_min"] . "',
             existencia_max = '" . $_POST["existencia_max"] . "', unidad_empaque = '" . $_POST["empaque"] . "',
             cantidad = '" . $_POST["unidad_empaque"] . "', seriales = '" . $_POST["serial"] . "',
@@ -193,8 +199,9 @@ if (isset($_POST["aceptar"]))
             punto_pedido='".$_POST["punto_pedido"]."', tejido='".$_POST["tejido"]."', reg_sanit='".$_POST["reg_sanit"]."', 
             cod_barra_bulto='".$_POST["cod_barra_bulto"]."', observacion='".$_POST["observacion"]."', cont_licen_nro='".$_POST["cont_licen_nro"]."',
             precio_cont='".$_POST["precio_cont"]."', aprob_arte='".$_POST["aprob_arte"]."', propiedad='".$_POST["propiedad"]."', regulado='".$_POST["regulado"]."',
-            cestack_basica='".$_POST["cestack_basica"]."', bcv='".$_POST["bcv"]."', unidadxpeso='".$_POST["unidadxpeso"]."', pesoxunidad='".$_POST["pesoxunidad"]."', unidad_venta='".$_POST["unidad_venta"]."',
-            producto_vencimiento='".$_POST["producto_vencimiento"]."'
+            cestack_basica='".$_POST["cestack_basica"]."', bcv='".$_POST["bcv"]."', clap='".$_POST["clap"]."', unidadxpeso='".$_POST["unidadxpeso"]."', pesoxunidad='".$_POST["pesoxunidad"]."', unidad_venta='".$_POST["unidad_venta"]."',
+            producto_vencimiento='".$_POST["producto_vencimiento"]."', tipo_almacenamiento='".$_POST["tipo_almacenamiento"]."',
+            central='".$_POST["central"]."', nacional='".$_POST["nacional"]."', precio_bulto=".$_POST["precio_bulto"].", sae='".$_POST["sae"]."', impresion='".$_POST["impresion"]."', id_arancel='".$_POST["codigo_arancelario"]."', unidad_paleta='".$_POST["unidad_paleta"]."'
         WHERE id_item = '" . $_GET["cod"] . "'";
     // Originalmente: WHERE cod_item = '" . $_POST["cod_item"] . "'";
     // Modificado para permitir edita el codigo del item.
@@ -249,6 +256,33 @@ if (isset($_POST["aceptar"]))
 $campos_item = $productos->ObtenerFilasBySqlSelect("SELECT *, round(precio1 / (1 + (utilidad1/100)),2) AS p1, round(precio2 / (1 + (utilidad2/100)),2) AS p2 , round(precio3 / (1 + (utilidad3/100)),2) AS p3 FROM item WHERE id_item = {$_GET["cod"]};");
 $smarty->assign("campos_item", $campos_item);
 
+/*Evaluo si el rubro esta cotizado*/
+$campos_cotizacion = $productos->ObtenerFilasBySqlSelect("SELECT cmd._pvp,cmd._estatus_producto,cme.estatus_name
+                    FROM selectrapyme_central.cotizacion_mercado_detalle cmd
+                    INNER JOIN selectrapyme.item i ON i.id_item = cmd.id_producto
+                    INNER JOIN selectrapyme_central.cotizacion_mercado_estatus cme ON cme.id_estatus = cmd._estatus_producto
+                    WHERE i.id_item = '{$_GET["cod"]}'
+                    ORDER BY cmd._pvp DESC
+                    LIMIT 1");
+
+if (count($campos_cotizacion)!=0) {
+	$varCotiza = 1;
+	$camposcotiza = $campos_cotizacion[0]["_pvp"];
+
+	$smarty->assign("varCotiza",$varCotiza);
+	$smarty->assign("camposcotiza",$camposcotiza);
+
+	// echo "[{'rc':'-1','mensaje1':'".$campos2[0]["_pvp"]."','mensaje2':'".$campos2[0]["estatus_name"]."'}]";
+}else{
+	$varCotiza = 0;
+	$camposcotiza = 0;
+
+	$smarty->assign("varCotiza",$varCotiza);
+	$smarty->assign("camposcotiza",$camposcotiza);
+	// echo "[{'rc':'-1','mensaje1':'0','mensaje2':'Rubro no cotizado'}]";
+}
+/*Fin de la evaluación*/
+
 $campos_kit = $productos->ObtenerFilasBySqlSelect("SELECT * FROM productos_kit p, item i WHERE p.id_item_hijo = i.id_item AND p.id_item_padre = '{$_GET['cod']}';");
 
 // Cargando departamentos en combo select
@@ -270,16 +304,35 @@ $smarty->assign("option_selected_departamentos", $campos_item[0]["cod_departamen
  $smarty->assign("option_selected_marca", $campo[0]["id_marca"]);
  $smarty->assign("option_selected_unidadxpeso", $campo[0]["unidadxpeso"]);
  $smarty->assign("option_selected_unidad_venta", $campo[0]["unidad_venta"]);
-// $arraySelectOption = "";
-// $arraySelectoutPut = "";
-// $campos_comunes = $productos->ObtenerFilasBySqlSelect("SELECT * FROM grupo");
-// foreach ($campos_comunes as $key => $item) {
-//     $arraySelectOption[] = $item["descripcion"];
-//     $arraySelectoutPut[] = $item["cod_grupo"];
-// }
-// $smarty->assign("option_values_grupo", $arraySelectOption);
-// $smarty->assign("option_output_grupo", $arraySelectoutPut);
-// $smarty->assign("option_selected_grupo", $campos_item[0]["cod_grupo"]);
+/*Seleccion de sub grupo*/
+$arraySelectOption = "";
+$arraySelectoutPut = "";
+$campos_comunes = $productos->ObtenerFilasBySqlSelect("SELECT * FROM sub_grupo WHERE cod_grupo = ".$campo[0]["cod_grupo"]);
+foreach ($campos_comunes as $key => $item) {
+    $arraySelectOption[] = $item["descripcion"];
+    $arraySelectoutPut[] = $item["id_sub_grupo"];
+}
+$smarty->assign("option_values_grupo", $arraySelectOption);
+$smarty->assign("option_output_grupo", $arraySelectoutPut);
+ $smarty->assign("option_selected_sub_categoria", $campo[0]["sub_categoria"]);
+//$smarty->assign("option_selected_sub_categoria", $campo[0]["sub_categoria"]);
+
+/*Selección de código arancelario*/
+$arraySelectOption = "";
+$arraySelectoutPut = "";
+$campos_comunes= $productos->ObtenerFilasBySqlSelect("SELECT id, CONCAT(codigo_Arancelario,' ',descripcion_rubro,' ',descripcion_arancel) as descripcion
+	FROM codigos_arancelarios");
+// $campos_comunes = $campos_comunes->set_charset("utf8");
+foreach ($campos_comunes as $key => $item) {
+    $arraySelectOption[] = $item["id"];
+    $arraySelectoutPut[] = utf8_encode($item["descripcion"]);
+    // $arraySelectoutPut[] = $item["descripcion"];
+}
+$smarty->assign("option_values_arancel", $arraySelectOption);
+$smarty->assign("option_output_arancel", $arraySelectoutPut);
+$smarty->assign("option_selected_arancel", $campos_item[0]["id_arancel"]);
+/*fin de la selección del código arancelario*/
+
 //cargando select de marca
 $arraySelectOption = "";
 $arraySelectoutPut = "";
@@ -427,5 +480,19 @@ foreach ($proveedores as $prov) {
 $smarty->assign("option_values_prov", $valueSELECT);
 $smarty->assign("option_output_prov", $outputSELECT);
 $smarty->assign("option_selected_prov", $campos_item[0]["proveedor"]);
+
+//impresion_entrega
+// Cargando tipo de precio en combo select
+$arraySelectOption = "";
+$arraySelectoutPut = "";
+$campos_comunes = $productos->ObtenerFilasBySqlSelect("SELECT * FROM impresion_entrega");
+foreach ($campos_comunes as $key => $item) {
+    $arraySelectOption[] = $item["id"];
+    $arraySelectoutPut[] = $item["valor"];
+}
+$smarty->assign("option_values_impresion", $arraySelectOption);
+$smarty->assign("option_output_impresion", $arraySelectoutPut);
+$smarty->assign("option_selected_impresion", $campos_item[0]["impresion"]);
+//fin
 
 ?>

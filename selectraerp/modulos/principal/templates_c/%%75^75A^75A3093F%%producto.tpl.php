@@ -1,7 +1,5 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-12 21:18:21
+<?php /* Smarty version 2.6.21, created on 2017-10-04 17:47:40
          compiled from producto.tpl */ ?>
-<?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('modifier', 'string_format', 'producto.tpl', 57, false),)), $this); ?>
 <!DOCTYPE html>
 <!--
 Modificado por: Charli Vivenes
@@ -44,18 +42,19 @@ unset($_smarty_tpl_vars);
             <br/>
             <table class="seleccionLista">
                 <thead>
-                    <tr class="tb-head" style="text-align:center;">
+                    <tr class="tb-head">
                         <?php $_from = $this->_tpl_vars['cabecera']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['i'] => $this->_tpl_vars['campos']):
 ?>
-                        <th style="text-align:center;"><?php echo $this->_tpl_vars['campos']; ?>
+                        <th><?php echo $this->_tpl_vars['campos']; ?>
 </th>
                         <?php endforeach; endif; unset($_from); ?>
+                        <th colspan="4">Opciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if ($this->_tpl_vars['cantidadFilas'] == 0): ?>
-                    <tr><td colspan="9" style="text-align:center;"><?php echo $this->_tpl_vars['mensaje']; ?>
+                    <tr><td colspan="10" style="text-align:center;"><?php echo $this->_tpl_vars['mensaje']; ?>
 </td></tr>
                     <?php else: ?>
                     <?php $_from = $this->_tpl_vars['registros']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
@@ -68,39 +67,38 @@ unset($_smarty_tpl_vars);
                     <?php endif; ?>
                     <tr bgcolor="<?php echo $this->_tpl_vars['bgcolor']; ?>
 ">
-                      
-                      <!-- <td style="text-align:center;">
-                        <?php if ($this->_tpl_vars['campos']['foto'] == ""): ?>                                		
-                        &nbsp;
-                        <?php else: ?>
-                        <img src="../../imagenes/<?php echo $this->_tpl_vars['campos']['foto']; ?>
-" width="100" align="absmiddle" height="100"/>
-                        <?php endif; ?>                                		
-                    </td>-->
-                    <?php $this->assign('coniva', ($this->_tpl_vars['campos']['precio1']*$this->_tpl_vars['campos']['iva']/100)); ?>
+                    <td style="text-align:center;"><?php echo $this->_tpl_vars['campos']['cod_item']; ?>
+</td>
                     <td style="text-align:right; padding-right:20px;"><?php echo $this->_tpl_vars['campos']['codigo_barras']; ?>
 </td>
                     <td style="padding-left:10px;"><?php echo $this->_tpl_vars['campos']['descripcion1']; ?>
  - <?php echo $this->_tpl_vars['campos']['marca']; ?>
- <?php echo ((is_array($_tmp=$this->_tpl_vars['campos']['pesoxunidad'])) ? $this->_run_mod_handler('string_format', true, $_tmp, "%.2f") : smarty_modifier_string_format($_tmp, "%.2f")); ?>
+ <?php echo $this->_tpl_vars['campos']['pesoxunidad']; ?>
 <?php echo $this->_tpl_vars['campos']['nombre_unidad']; ?>
 </td>
-                    <td style="text-align:center; padding-right:20px;"><?php echo $this->_tpl_vars['campos']['descripcion']; ?>
+                    <td class="cantidades"><?php echo $this->_tpl_vars['campos']['precio1']; ?>
 </td>
-                    <td class="cantidades"><?php echo ((is_array($_tmp=$this->_tpl_vars['campos']['precio1'])) ? $this->_run_mod_handler('string_format', true, $_tmp, "%.2f") : smarty_modifier_string_format($_tmp, "%.2f")); ?>
-</td>
-                    <td class="cantidades"><?php echo ((is_array($_tmp=$this->_tpl_vars['campos']['iva'])) ? $this->_run_mod_handler('string_format', true, $_tmp, "%.2f") : smarty_modifier_string_format($_tmp, "%.2f")); ?>
-</td>
-                    <td class="cantidades"><?php echo ((is_array($_tmp=$this->_tpl_vars['coniva']+$this->_tpl_vars['campos']['precio1'])) ? $this->_run_mod_handler('string_format', true, $_tmp, "%.2f") : smarty_modifier_string_format($_tmp, "%.2f")); ?>
-</td>
+                    <td style="cursor:pointer; width:30px; text-align:center">
+                        <img class="editar" onclick="javascript: window.location.href='?opt_menu=<?php echo $_GET['opt_menu']; ?>
+&amp;opt_seccion=<?php echo $_GET['opt_seccion']; ?>
+&amp;opt_subseccion=edit&amp;cod=<?php echo $this->_tpl_vars['campos']['id_item']; ?>
+'" title="Editar" src="../../../includes/imagenes/edit.gif"/>
+                    </td>
                     <!--
                     <td style="cursor: pointer; width: 30px; text-align:center">
                         <img class="eliminar" onclick="javascript: window.location.href='?opt_menu=<?php echo $_GET['opt_menu']; ?>
 &amp;opt_seccion=<?php echo $_GET['opt_seccion']; ?>
 &amp;opt_subseccion=delete&amp;cod=<?php echo $this->_tpl_vars['campos']['id_item']; ?>
 '" title="Eliminar" src="../../../includes/imagenes/delete.gif"/>
-                    </td> -->
-         
+                    </td>
+                    -->
+                    <td style="width: 30px; text-align:center">
+                        <?php if (( $this->_tpl_vars['campos']['total_inventario'] > $this->_tpl_vars['campos']['existencia_min'] )): ?>
+                        <img title="OK" src="../../../includes/imagenes/ico_ok.gif"/>
+                        <?php else: ?>
+                        <img title="Existencia Bajo M&iacute;nimo" src="../../../includes/imagenes/ico_note.gif"/>
+                        <?php endif; ?>
+                    </td>
                     <!-- boton donde se agregan los seriales -->
                       <?php if (( $this->_tpl_vars['campos']['seriales'] == 1 )): ?>
                     <td style="cursor: pointer; width: 30px; text-align:center">

@@ -3,6 +3,7 @@
 include("../../libs/php/clases/producto.php");
 include("../../libs/php/clases/correlativos.php");
 include("../../../menu_sistemas/lib/common.php");
+include('nusoap/nusoap.php');
 
 $productos = new Producto();
 $correlativos = new Correlativos();
@@ -172,34 +173,114 @@ if (isset($_POST["aceptar"]))
 			$mensajefoto="Imagen invalida";
 		}
 	}
+	///Prueba para tomar el tipo de rubro B-50 o B-99
+	if ($_POST["cod_departamento"]==1) {
+		$cod_siga = 'B-50';
+	}else{
+		$cod_siga = 'B-99';
+	}
     $idpos=$comun->codigo_pos($_POST["descripcion1"]);
     $_POST["referencia"]=$_POST["cod_item"];
+
+    if(isset($_POST['sae']))
+    {
+    	if(!isset($_POST['impresion']) || $_POST['impresion']=='NULL')
+    	{
+    		echo "
+	    			<script language='JavaScript'>
+	    				alert('Error, Seleccione Tipo de Impresion de Producto');
+	    				history.go(-1);
+	    			</script>
+    			"; exit();
+
+    	}
+    }
     $instruccion = "
         INSERT INTO `item`(
-        `cod_item`, `codigo_barras`, `codigo_cpe`,`costo_actual`, `descripcion1`, `descripcion2`, `descripcion3`, `referencia`,
+        `cod_item`, `codigo_barras`, `codigo_cpe`, `costo_actual`, `descripcion1`, `descripcion2`, `descripcion3`, `referencia`,
+        `presentacion`,`talla`,
         `codigo_fabricante`, `precio1`, `utilidad1`, `coniva1`, `precio2`, `utilidad2`,
         `coniva2`, `precio3`, `utilidad3`, `coniva3`, `existencia_min`,
         `existencia_max`, `monto_exento`, `iva`,
-        `cod_departamento`, `cod_grupo`, `id_marca`, `cod_linea`,
+        `cod_departamento`, `cod_siga`, `cod_grupo`,sub_categoria, `id_marca`, `cod_linea`,
         `estatus`,`usuario_creacion`, `fecha_creacion`, `cod_item_forma`,unidad_empaque, cantidad, seriales,garantia, tipo_item, tipo_prod,
         costo_promedio, costo_anterior, cuenta_contable1, cuenta_contable2, serial1,
         foto,foto1,foto2,foto3,foto4,cantidad_bulto,kilos_bulto,proveedor,fecha_ingreso,origen,costo_cif,costo_origen,temporada,
         mate_compo_clase, punto_pedido,tejido, reg_sanit, cod_barra_bulto, observacion, cont_licen_nro, precio_cont, aprob_arte, propiedad,
-        regulado,cestack_basica,bcv,unidadxpeso, unidad_venta, pesoxunidad, itempos, producto_vencimiento)
+        regulado,cestack_basica,bcv,clap, unidadxpeso, unidad_venta, pesoxunidad, itempos, producto_vencimiento, tipo_almacenamiento, central, nacional, precio_bulto, sae, impresion, unidad_paleta)
         VALUES(
         '{$_POST["cod_item"]}', '{$_POST["cod_barras"]}','{$_POST["cod_cpe"]}', '{$_POST["costo_actual"]}', '{$_POST["descripcion1"]}',
-        '{$_POST["descripcion2"]}', '" . $_POST["descripcion3"] . "', '" . $_POST["referencia"] . "', '" . $_POST["codigo_fabricante"] . "',
+        '{$_POST["descripcion2"]}', '" . $_POST["descripcion3"] . "', '" . $_POST["referencia"] . "',
+        '" . $_POST["presentacion"] . "','" . $_POST["talla"] . "','" . $_POST["codigo_fabricante"] . "',
         '" . $_POST["precio_1"] . "', '" . $_POST["utilidad1"] . "', '" . $_POST["coniva1"] . "', '" . $_POST["precio_2"] . "',
         '" . $_POST["utilidad2"] . "', '" . $_POST["coniva2"] . "', '" . $_POST["precio_3"] . "', '" . $_POST["utilidad3"] . "',
         '" . $_POST["coniva3"] . "', '" . $_POST["existencia_min"] . "',  '" . $_POST["existencia_max"] . "', '" . $_POST["monto_exento"] . "',
-        '" . $_POST["iva"] . "', '" . $_POST["cod_departamento"] . "', '" . $_POST["cod_grupo"] . "',  '" . $_POST["marca"] . "', '" . $_POST["cod_linea"] . "',
+        '" . $_POST["iva"] . "', '" . $_POST["cod_departamento"] . "', '".$cod_siga."', '" . $_POST["cod_grupo"] . "'," . $_POST["sub_categoria"] . ",  '" . $_POST["marca"] . "', '" . $_POST["cod_linea"] . "',
         '" . $_POST["estatus"] . "', '" . $login->getUsuario() . "', CURRENT_TIMESTAMP, 1, '" . $_POST["empaque"] . "',
         '" . $_POST["unidad_empaque"] . "', '" . $_POST["serial"] . "', '" . $_POST["garantia"] . "', '" . $_POST["tipo_producto"] . "', '" . $_POST["tipo"] . "',
-        '" . $_POST["costo_promedio"]."', '" . $_POST["costo_anterior"] . "', '" . $_POST["cuenta_contable1"] . "', '" . $_POST["cuenta_contable2"] . "', '" . $_POST["serial1"] . "','$foto','$foto1','$foto2','$foto3','$foto4', '".$_POST["cantidad_bulto"]."', '".$_POST["kilos_bulto"]."', '".$_POST["proveedor"]."', '".fecha_sql($_POST["fecha_ingreso"])."', '".$_POST["origen"]."', '".$_POST["costo_cif"]."', '".$_POST["costo_origen"]."', '".$_POST["temporada"]."', '".$_POST["mate_compo_clase"]."', '".$_POST["punto_pedido"]."', '".$_POST["tejido"]."', '".$_POST["reg_sanit"]."', '".$_POST["cod_barra_bulto"]."', '".$_POST["observacion"]."', '".$_POST["cont_licen_nro"]."', '".$_POST["precio_cont"]."', '".$_POST["aprob_arte"]."', '".$_POST["propiedad"]."','".$_POST["regulado"]."','".$_POST["cesta"]."','".$_POST["bcv"]."','".$_POST["unidadxpeso"]."',
-        '" . $_POST["unidad_venta"]."', '" . $_POST["pesoxunidad"]."','".$idpos."','{$_POST["producto_vencimiento"]}');";
-
+        '" . $_POST["costo_promedio"]."', '" . $_POST["costo_anterior"] . "', '" . $_POST["cuenta_contable1"] . "', '" . $_POST["cuenta_contable2"] . "', '" . $_POST["serial1"] . "','$foto','$foto1','$foto2','$foto3','$foto4', '".$_POST["cantidad_bulto"]."', '".$_POST["kilos_bulto"]."', '".$_POST["proveedor"]."', '".fecha_sql($_POST["fecha_ingreso"])."', '".$_POST["origen"]."', '".$_POST["costo_cif"]."', '".$_POST["costo_origen"]."', '".$_POST["temporada"]."', '".$_POST["mate_compo_clase"]."', '".$_POST["punto_pedido"]."', '".$_POST["tejido"]."', '".$_POST["reg_sanit"]."', '".$_POST["cod_barra_bulto"]."', '".$_POST["observacion"]."', '".$_POST["cont_licen_nro"]."', '".$_POST["precio_cont"]."', '".$_POST["aprob_arte"]."', '".$_POST["propiedad"]."','".$_POST["regulado"]."','".$_POST["cesta"]."','".$_POST["bcv"]."','".$_POST["clap"]."','".$_POST["unidadxpeso"]."',
+        '" . $_POST["unidad_venta"]."', '" . $_POST["pesoxunidad"]."','".$idpos."','".$_POST["producto_vencimiento"]."', '".$_POST["tipo_almacenamiento"]."', '".$_POST["central"]."', '".$_POST["nacional"]."', ".$_POST["precio_bulto"]." , '".$_POST["sae"]."', ".$_POST["impresion"].", ".$_POST["unidad_paleta"].");";
         //echo $instruccion; exit();
     $productos->ExecuteTrans($instruccion);
+
+    /*Pruebas para enviar los datos por el cliente del Web Service*/
+    //if ($_POST['cod_barras']!='' && $_POST['descripcion1']!='') {
+    	
+    	//include('nusoap/nusoap.php');
+
+		//$url="http://localhost/ws_Humberto/servicioproducto.php";
+		$url="http://192.168.15.2/WebService/servicioproducto.php";
+		$cliente = new nusoap_client($url."?wsdl",'wsdl');
+
+		$codigo = $_POST["cod_barras"];
+		$descripcion = $_POST["descripcion1"];
+		$ubica_producto = $_POST["central"];
+		$fabrica_producto = $_POST["nacional"];
+		$precio_bulto = $_POST["precio_bulto"];
+		$codigo_siga = $cod_siga;
+
+		////variable que recibe lo que solicita la funcion, los parametros
+		$parametros = array("codigo"=>$codigo,"descripcion"=>$descripcion,"ubica_producto"=>$ubica_producto,
+			"fabrica_producto"=>$fabrica_producto,"precio_bulto"=>$precio_bulto,"codigo_siga"=>$codigo_siga);
+
+		$products = $cliente->call('listarProductos',$parametros,'uri:'.$url.'/listarProductos');
+
+		/*if ($cliente->fault) {
+			echo "Error";
+			print_r($products);
+		}else{
+			if ($cliente->getError()) {
+				echo '<b>Error: '.$cliente->getError().'</b>';
+			}else{
+				print_r($products);
+			}
+		}*/
+		if ($cliente->fault) {
+			echo "Error";
+			print_r($products);
+		}else{
+			if ($cliente->getError()) {
+				echo '<b>Error: '.$cliente->getError().'</b>';
+			}else{
+				echo "No hay error <br>";
+				$conn = mysql_connect("192.168.15.2","root","admin.2040")or die(mysql_error());
+				//echo $conn."<br>";
+				//mysql_select_db("pyme_prueba_humberto",$conn)or die(mysql_error());
+				
+				$var = $products;
+				$xml = simplexml_load_string($var);
+				//echo $xml."<br>";
+				//print_r($xml);
+				//var_dump($products);//Para ver que devuelve el webservice, el XML
+				$sql_prueba = "INSERT INTO selectrapyme.prueba_webservice_correlativo(id_correlativo)VALUES('".$xml->codigo."')";
+				//echo $sql_prueba."<br>";exit();
+				$rs = mysql_query($sql_prueba,$conn)or die(mysql_error());
+
+			}
+		}
+    //}
+    /*Fin de las pruebas del web service*/
+
     if ($productos->errorTransaccion == 1) {
         Msg::setMessage("<span style=\"color:#62875f;\">Producto Generado Exitosamente con en Nro. " . $nro_producto . "</span>");
     }
@@ -447,7 +528,18 @@ $smarty->assign("option_values_prov", $valueSELECT);
 $smarty->assign("option_output_prov", $outputSELECT);
 $smarty->assign("option_selected_prov", $campos_item[0]["proveedor"]);
 
-
+//impresion_entrega
+// Cargando tipo de precio en combo select
+$arraySelectOption = "";
+$arraySelectoutPut = "";
+$campos_comunes = $productos->ObtenerFilasBySqlSelect("SELECT * FROM impresion_entrega");
+foreach ($campos_comunes as $key => $item) {
+    $arraySelectOption[] = $item["id"];
+    $arraySelectoutPut[] = $item["valor"];
+}
+$smarty->assign("option_values_impresion", $arraySelectOption);
+$smarty->assign("option_output_impresion", $arraySelectoutPut);
+//fin
 // Cargando tipo de precio en combo select
 $arraySelectOption = "";
 $arraySelectoutPut = "";

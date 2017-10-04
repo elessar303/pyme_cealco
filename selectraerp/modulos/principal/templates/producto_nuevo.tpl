@@ -5,17 +5,65 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
           <script type="text/javascript" src="../../../includes/js/jquery-ui-1.10.0/js/jquery-1.9.0.js"></script>
          <script type="text/javascript" src="../../libs/js/jquery.numeric.js"></script>
-        <script type="text/javascript" src="../../libs/js/config_items_tabs.js"></script>       
+        <script type="text/javascript" src="../../libs/js/config_items_tabs.js"></script>
         <script type="text/javascript" src="../../libs/js/ajax.js"></script>
-      
+
         <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
         {literal}
-      
-            <script type="text/javascript">//<![CDATA[
+        <script language="JavaScript"> 
+                var nav4 = window.Event ? true : false; 
+                function acceptNum(evt){  
+                // NOTE: Backspace = 8, Enter = 13, '0' = 48, '9' = 57  
+                var key = nav4 ? evt.which : evt.keyCode;  
+                return (key <= 13 || (key >= 48 && key <= 57 || key==46)); 
+                } 
+            </script>
+
+            <script type="text/javascript">
 
             function soloNumeros(e){
             var key = window.Event ? e.which : e.keyCode
-            return (key >= 48 && key <= 57)
+            return (key >= 48 && key <= 57 || key==46)
+            }
+            //div oculto de impresion de entrega
+            function mostrar_impresion()
+            {
+
+                if(document.getElementById('sae').checked)
+                {
+                    document.getElementById('impresion_entrega').style.display = 'block';
+                }
+                else
+                {
+                    document.getElementById('impresion_entrega').style.display = 'none';
+                    $("#impresion").val("");
+
+                }
+            }
+
+
+            function NumCheck(e, field) {
+              key = e.keyCode ? e.keyCode : e.which
+              // backspace
+              if (key == 8) return true
+              // 0-9
+              if (key > 47 && key < 58) {
+                if (field.value == "") return true
+                regexp = /.[0-9]{3}$/
+                return !(regexp.test(field.value))
+              }
+              // .
+              if (key == 46) {
+                if (field.value == "") return false
+                regexp = /^[0-9]+$/
+                return regexp.test(field.value)
+              }
+              // other key
+              return false
+ 
             }
 
             function buscarProducto(id,nombre,empaque,cantidad)
@@ -146,7 +194,7 @@
                 return Math.round(cantidad * Math.pow(10, decimales)) / Math.pow(10, decimales);
             }
 
-            function calcularMonto(precio, utilidad, campoiva, ocultos){              
+            function calcularMonto(precio, utilidad, campoiva, ocultos){
                 /*
                 Función modificada para hacer funcionar correctamente
                 la configuración de productos exentos o no de IVA.
@@ -154,17 +202,17 @@
 
                 // var exonerado = document.getElementById('monto_exento');
                 // var iva = document.getElementById('iva');
-                iva=$("#iva").val();         
+                iva=$("#iva").val();
                 // precio.value = parseFloat(ocultos.value * (1 + (parseFloat(utilidad.value) / 100)));
                 // precio.value = redondear(precio.value,2);
                 var utilidad=$("#"+utilidad).val();
                 if(utilidad=="")
                     utilidad=0;
-                
+
                 $("#"+precio).val( parseFloat( $("#"+ocultos).val() * (1 + (parseFloat(utilidad) / 100))));
                 $("#"+precio).val(redondear($("#"+precio).val(),2));
                montoE=$("#monto_exento").val();
-               
+
                 if (montoE == '1'){
 
                         // Cambiar cero (0) el valor para guardarlo en campo 'iva' de la tabla 'item'
@@ -178,10 +226,10 @@
                         // Cambiar al valor configurado IVA para guardarlo en campo 'iva' de la tabla 'item'
                         // iva.value = {/literal}{$parametros_generales[0].porcentaje_impuesto_principal}{literal};
                          iva=$("#iva").val();
-                       
+
                         coniva=redondear($("#"+precio).val() * (1 + (iva/100)), 2);
-                        
-                        $("#"+campoiva).val(coniva);                      
+
+                        $("#"+campoiva).val(coniva);
 
                 }
             }
@@ -195,7 +243,7 @@
                 calcularMonto("fila_precio1","utilidad1","fila_precio1_iva","ocultos1");
                 calcularMonto("fila_precio2","utilidad2","fila_precio2_iva","ocultos2");
                 calcularMonto("fila_precio3","utilidad3","fila_precio3_iva","ocultos3");
-              
+
             }
 
             function agregar_impuesto(){
@@ -243,11 +291,15 @@
               };
             }
 
-               
+
 
 
             $(document).ready(function(){
+
+                
+
                 $("#cod_departamento").focus();
+
                 $("#cod_item").blur(function(){
                     return false;
                     vcoditem = $(this).val();
@@ -272,37 +324,41 @@
                         });
                         }
                     });
-                   
+
+                
+
                     $("#formulario").submit(function(){
                       // validacion del formulario producto
-                        if( 
-                            $("#cod_barras").val()=="" ||
+                        if(
                             $("#descripcion1").val()=="" ||
-                            $("#producto_vencimiento").val()==""
+                            $("#cod_barras").val()=="" ||
+                            $("#marca").val()==""||
+                            $("#producto_vencimiento").val()=="" ||
+                            $("#tipo_almacenamiento").val()==""
+
+
                           ){
                             alert("Debe Ingresar los campos obligatorios!.");
                             $("#descripcion1").focus();
                             return false;
                         }
-                            if(
 
-                                $("#cod_barras").val()=='0' ||
-                                $("#cod_barras").val()=='00' ||
-                                $("#cod_barras").val()=='000' ||
-                                $("#cod_barras").val()=='0000' ||
-                                $("#cod_barras").val()=='00000' ||
-                                $("#cod_barras").val()=='000000' ||
-                                $("#cod_barras").val()=='0000000' ||
-                                $("#cod_barras").val()=='00000000' ||
-                                $("#cod_barras").val()=='000000000' ||
-                                $("#cod_barras").val()=='0000000000'
-                                )
-                        {
-                        alert("Codigo de Barras debe ser Distinto de 0.");
-                        $("#cod_barras").focus();
-                        return false;
+                        if(
+                            $("#unidad_venta").val()==""
+                          ){
+                            alert("Debe Ingresar la Unidad de Venta!.");
+                            $("#unidad_venta").focus();
+                            return false;
                         }
-                        
+
+                        if(
+                            $("#unidadxpeso").val()==""
+                          ){
+                            alert("Debe Ingresar la Unidad de Peso!.");
+                            $("#unidadxpeso").focus();
+                            return false;
+                        }
+
                     });
 
                    // agregado el 22/01/14 para regargar el select dependiente de rubro y sub rubro
@@ -317,6 +373,26 @@
                                 },
                                 success: function(datos){
                                     $("#"+idSelect).html(datos);
+                                    id_categoria=$("#cod_grupo").val();
+                                    listarSubcategoria("sub_categoria", 0, id_categoria);
+                                },
+                                error: function(datos,falla, otroobj){
+                                    $("#"+idSelect).html('<option value = 0> Error... </option>');
+                                }
+                            });
+
+                    };
+                    function listarSubcategoria(idSelect, tipoSql, idCarga){
+                            var paramentros="opt=cargarSubrubro&idCarga="+idCarga+"&tipoSql="+tipoSql;
+                            $.ajax({
+                                type: "POST",
+                                url: "listarSubcategoria.php",
+                                data: paramentros,
+                                beforeSend: function(datos){
+                                    $("#"+idSelect).html('<option value = 0> Cargando... </option>');
+                                },
+                                success: function(datos){
+                                    $("#"+idSelect).html(datos);
                                 },
                                 error: function(datos,falla, otroobj){
                                     $("#"+idSelect).html('<option value = 0> Error... </option>');
@@ -325,18 +401,64 @@
                     };
                    // fin de la funcion para select dependiente
                    // llamada de la funcion para cargar el select dependiente de subrubro
-                        id_rubro=$("#cod_departamento").val();                        
+                        id_rubro=$("#cod_departamento").val();
                         listarSubrubro("cod_grupo", 0, id_rubro);
                     // cuando cambia rubro salta la funcion ajax
                        $("#cod_departamento").change(function(){
-                              id_rubro=$("#cod_departamento").val(); 
+                              id_rubro=$("#cod_departamento").val();
                               listarSubrubro("cod_grupo", 0, id_rubro);
+                       });
+
+                        $("#cod_grupo").change(function(){
+                              id_categoria=$("#cod_grupo").val();
+                              listarSubcategoria("sub_categoria", 0, id_categoria);
                        });
                    //fin de la llamada
                    // $(".camposP").focus(function(event) {
                    //     $(this).val("");
                    // });
-                
+                    $("#cantidad_bulto").change(function(event) {
+                        peso_unidad= $("#pesoxunidad").val();
+                        cantidad=$("#cantidad_bulto").val();
+                        conver=$("#unidadxpeso").val();
+                        if(conver==1 || conver==3  ){
+                        kiloxbulto=peso_unidad*cantidad;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                        if(conver==2  ){
+                        kiloxbulto=peso_unidad*cantidad*0.001;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                    });
+
+                    $("#pesoxunidad").change(function(event) {
+                        peso_unidad= $("#pesoxunidad").val();
+                        cantidad=$("#cantidad_bulto").val();
+                        conver=$("#unidadxpeso").val();
+                        if(conver==1 || conver==3  ){
+                        kiloxbulto=peso_unidad*cantidad;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                        if(conver==2  ){
+                        kiloxbulto=peso_unidad*cantidad*0.001;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                    });
+
+                    $("#unidadxpeso").change(function(event) {
+                        peso_unidad= $("#pesoxunidad").val();
+                        cantidad=$("#cantidad_bulto").val();
+                        conver=$("#unidadxpeso").val();
+                        if(conver==1 || conver==3  ){
+                        kiloxbulto=peso_unidad*cantidad;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                        if(conver==2 || conver==4 || conver==5 ){
+                        kiloxbulto=peso_unidad*cantidad*0.001;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                    });
+
                     $("#monto_exento").change(function(event) {
                         tipo= $("#monto_exento").val();
                         if(tipo==1){
@@ -349,16 +471,81 @@
                     });
                       tipo= $("#monto_exento").val();
                         if(tipo==1){
-                           
+
                             $(".monto_iva").hide();
                         }
                         if(tipo==0){
                              $(".monto_iva").show();
-                           
+
                         }
-            
+
+                
+
                 });
-                //]]>
+                
+
+            function validaritem(){
+                    //return false;
+                    vcoditem = $("#cod_barras").val();
+                    if(vcoditem!=''){
+                        $.ajax({
+                            type: "GET",
+                            url:  "../../libs/php/ajax/ajax.php",
+                            data: "opt=ValidarCodigoBarrasItem&v1="+vcoditem,
+                            beforeSend: function(){
+                                $("#notificacion_codigo_barras").html(MensajeEspera("<b>Veficando Cod. barras..<b>"));
+                            },
+                            success: function(data){
+                                resultado = eval(data);
+                                rc = resultado[0].rc;
+                                mensaje1 = resultado[0].mensaje1;
+                                mensaje2 = resultado[0].mensaje2;
+                                if(rc == -1){
+                                    //$("#cod_item").val("").focus();
+                                    // $("#notificacion_codigo_barras").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ico_note.gif\"><span style=\"color:red;\"><b>Disculpe, este c&oacute;digo ya existe.</b></span>");
+                                    $("#notificacion_codigo_barras").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ico_note.gif\"><span style=\"color:red;\"><b>Disculpe, este c&oacute;digo ya existe.</b></span>");
+                                    if (mensaje1 != 0) {
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ok.gif\"><span style=\"color:#0c880c;\"><b>"+mensaje2+"</b></span>");
+                                    }else{
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ico_note.gif\"><span style=\"color:red;\"><b>"+mensaje2+"</b></span>");
+                                    }
+                                }else{
+                                    $("#notificacion_codigo_barras").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ok.gif\"><span style=\"color:#0c880c;\"><b> C&oacute;digo Disponible</b></span>");
+                                    // $("#ultimo_costo_cotizado").val(mensaje1);
+                                    // $("#notificacion_ultimo_costo").html(mensaje2);
+                                    if (mensaje1 != 0) {
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ok.gif\"><span style=\"color:#0c880c;\"><b>"+mensaje2+"</b></span>");
+                                    }else{
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\"absmiddle\" src=\"../../libs/imagenes/ico_note.gif\"><span style=\"color:red;\"><b>"+mensaje2+"</b></span>");
+                                    }
+                                };
+                            }
+                        });
+                        }
+                    };
+
+            $(document).ready(function(){
+
+                $('#cod_grupo').select2({
+                    placeholder: "Seleccione una Categoria...",
+                    allowClear: true
+                });
+
+                $('#sub_categoria').select2({
+                    placeholder: "Seleccione una Categoria...",
+                    allowClear: true
+                });
+
+                $('#marca').select2({
+                    placeholder: "Seleccione una marca...",
+                    allowClear: true
+                });
+
+            });
             </script>
             <style type="text/css">
                 .tab{
@@ -394,44 +581,37 @@
                     right:20px;
                     height:300px;
                 }
-                #contenedorTAB {
-                    background-color: #e3ebf1;
-                    border-radius: 5px;
-                    padding: 2px;
-                    border: 1px solid #adafb0;
-                    width:550px;
-                }
+                
                 #tabs {
                     margin-top:15px;
                 }
             </style>
         {/literal}
-</head>
-<body>
-<form name="formulario" id="formulario" method="post" enctype="multipart/form-data" action="">
-    <input type="hidden" name="codigo_empresa" value="{$DatosEmpresa[0].codigo}"/>
-    <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>
-    <input type="hidden" name="opt_seccion" value="{$smarty.get.opt_seccion}"/>
-
-<table style="width:100%;">
-    <tbody>
-        <tr>
-            <td class="tb-tit">
-            <img src="{$subseccion[0].img_ruta}" width="20" height="20" style="vertical-align: middle;"/><strong>{$subseccion[0].descripcion}</strong>
-            </td>
-        </tr>
-    </tbody>
+ </head>
+ <body>
+  <form name="formulario" id="formulario" method="post" enctype="multipart/form-data" action="">
+<input type="hidden" name="codigo_empresa" value="{$DatosEmpresa[0].codigo}"/>
+<input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>
+<input type="hidden" name="opt_seccion" value="{$smarty.get.opt_seccion}"/>
+<table style="width: 100%;">
+ <tbody>
+  <tr>
+<td class="tb-tit">
+ <img src="{$subseccion[0].img_ruta}" width="20" height="20" style="vertical-align: middle;"/>
+ <strong>{$subseccion[0].descripcion}</strong>
+</td>
+  </tr>
+ </tbody>
 </table>
-
 <div id="tabs">
-    <table style="margin-left:20px;">
-        <tr style="height:25px;">
-            <td id="tab1" class="tab">
+ <table style="margin-left:20px;">
+  <tr style="height:25px;">
+<td id="tab1" class="tab">
  <!--<img src="../../libs/imagenes/1.png" width="20" height="20" style="vertical-align: middle;"/>&nbsp;<b>Datos Generales</b>-->
-            <b>Datos Generales</b>
-            </td>
+ <b>Datos Generales</b>
+</td>
 <!--<td id="tab2" class="tab">
-  <b>Datos Particulares</b> 
+  <b>Datos Particulares</b>
 </td>
 <td id="tab3" class="tab">
  <b>Fotos</b>
@@ -441,13 +621,13 @@
 </td>
 <td id="tab5" class="tab">
  <b>Precios</b>
-</td>
+</td>-->
 <td id="tab5" class="tab">
  <b>Datos Compra</b>
-</td>-->
-        <td>&nbsp;&nbsp;</td>
-    </tr>
-</table>
+</td>
+<td>&nbsp;&nbsp;</td>
+  </tr>
+ </table>
 </div>
 <div id='productosKit'></div>
 <div id="contenedorTAB">
@@ -457,18 +637,18 @@
 <tr>
  <td colspan="4" class="label" style="text-align: center;">COMPLETE LOS CAMPOS MARCADOS CON&nbsp;** OBLIGATORIAMENTE</td>
 </tr>
-<tr hidden="hidden">
+<tr>
  <td colspan="3" class="label" style="width: 30%;">Foto</td>
  <td>
   <input type="file" name="foto" id="foto"  class="form-text"/>
-  
+
  </td>
 </tr>
 <tr>
  <td colspan="3" width="30%" class="label">Fecha de Creaci&oacute;n</td>
  <td>
   <input type="text" name="fecha_ingreso" id="fecha_ingreso" size="50" value="{$smarty.now|date_format:'%e-%m-%G'}" class="form-text" disabled="disabled" />
-  
+
  </td>
 </tr>
 <tr hidden="hidden">
@@ -497,9 +677,17 @@
  </td>
 </tr>
 <tr>
- <td colspan="3" class="label"><!-- {$DatosGenerales[0].string_clasificador_inventario2} -->Sub Rubro</td>
+ <td colspan="3" class="label"><!-- {$DatosGenerales[0].string_clasificador_inventario2} -->Categor&iacute;a</td>
  <td>
   <select name="cod_grupo" id="cod_grupo" class="form-text">
+<!-- {html_options values=$option_output_grupo output=$option_values_grupo} -->
+  </select>
+ </td>
+</tr>
+<tr>
+ <td colspan="3" class="label"><!-- {$DatosGenerales[0].string_clasificador_inventario2} -->Sub Categor&iacute;a</td>
+ <td>
+  <select name="sub_categoria" id="sub_categoria" class="form-text">
 <!-- {html_options values=$option_output_grupo output=$option_values_grupo} -->
   </select>
  </td>
@@ -508,27 +696,44 @@
 <!-- <tr>
  <td colspan="3" class="label">{$DatosGenerales[0].string_clasificador_inventario3}</td>
 
- <td> 
+ <td>
   <select name="cod_linea" id="cod_linea" class="form-text">{html_options values=$option_output_linea output=$option_values_linea}</select>
  </td>
 </tr> -->
 <tr>
  <td colspan="3" class="label">C&oacute;digo de barras**</td>
  <td>
-  <input type="text" name="cod_barras" id="cod_barras" size="50" value="{$campos_item[0].codigo_barras}" class="form-text"/>
+  <input type="text" name="cod_barras" id="cod_barras" size="50" value="{$campos_item[0].codigo_barras}" class="form-text" onchange="validaritem()" />
+  <div id="notificacion_codigo_barras"></div>
  </td>
 </tr>
-<tr hidden="hidden">
+<tr>
  <td colspan="3" width="30%" class="label">Cod. CPE</td>
  <td>
   <input type="text" name="cod_cpe" id="cod_cpe" size="50" value="" class="form-text"/>
-  
+
  </td>
-</tr> 
+</tr>
+<tr>
+ <td colspan="3" width="30%" class="label">Registro Sanitario</td>
+ <td>
+  <input type="text" name="reg_sanit" id="reg_sanit" size="50" value="" class="form-text"/>
+ </td>
+</tr>
 <tr>
  <td colspan="3" class="label">Descripci&oacute;n 1 **</td>
  <td>
   <input type="text" name="descripcion1" id="descripcion1" size="50" value="{$campos_item[0].descripcion1}" class="form-text"/>
+ </td>
+</tr>
+<tr>
+ <td class="label" colspan="3">Tipo de Almacenamiento</td>
+ <td>
+  <select name="tipo_almacenamiento" id="tipo_almacenamiento" class="form-text">
+<option value="">Seleccione Tipo de Almacenamiento</option>
+<option value="SECO">SECO</option>
+<option value="FRIO">FRIO</option>
+  </select>
  </td>
 </tr>
 <!--  comentado el 3 de nenero 2015 para facilitar la creacion en pdval -->
@@ -543,9 +748,8 @@
   <input type="text" name="descripcion3" id="descripcion3" size="50" value="{$campos_item[0].descripcion3}" class="form-text"/>
  </td>
 </tr>
--->
-<tr hidden="hidden"> 
- <td class="label" colspan="3">Referencia</td>
+<tr> -->
+ <td class="label" colspan="3">SKU</td>
  <td>
   <input type="text" name="referencia" id="referencia" size="50" value="{$campos_item[0].referencia}" class="form-text"/>
  </td>
@@ -553,34 +757,43 @@
 <tr>
  <td class="label" colspan="3">Unidad Venta</td>
  <td>
-  
+
    <!--<input type="text" name="unidad_empaque" id="unidad_empaque" size="5" value="{$campos_item[0].cantidad}" class="form-text"/>
   <input type="text" name="empaque_descripcion" id="empaque_descripcion" size="5" value="{$campos_item[0].unidad_empaque}" readonly style="border-style:none; background:none;" class="form-text"/>-->
   <select name="unidad_venta" id="unidad_venta" class="form-text">
-<option value="0">Seleccione Unidad de Venta</option>
+<option value="">Seleccione Unidad de Venta</option>
 {html_options values=$option_values_unidad_venta output=$option_output_unidad_venta}
   </select>
- 
-  
+
+
  </td>
 </tr>
 
-<!-- <tr>
+<tr>
  <td class="label" colspan="3">Unidad de Peso**</td>
  <td>
    <select name="unidadxpeso" id="unidadxpeso" class="form-text">
-<option>Seleccione Peso por Unidad</option>
+<option value="">Seleccione Unidad de Peso</option>
 {html_options values=$option_values_unidadxpeso output=$option_output_unidadxpeso}
   </select>
  </td>
-</tr> 
+</tr>
 
 <tr>
-<td  colspan="3">
+<td  colspan="3" class="label">
 Peso por Unidad
 </td>
 <td>
- <input type="text" name="pesoxunidad" id="pesoxunidad" size="10" value="{$campos_item[0].pesoxunidad}" class="form-text" onKeyPress="return soloNumeros(event)"/>
+ <input type="text" name="pesoxunidad" id="pesoxunidad" size="10" value="{$campos_item[0].pesoxunidad}" class="form-text" onKeyPress="return NumCheck(event, this)"/>
+</td>
+</tr>
+
+<tr>
+<td  colspan="3" class="label">
+Cantidad por Paleta
+</td>
+<td>
+ <input type="text" name="unidad_paleta" id="unidad_paleta" size="10" value="{$campos_item[0].unidad_paleta}" class="form-text" onKeyPress="return NumCheck(event, this)"/>
 </td>
 </tr>
 
@@ -594,18 +807,18 @@ Peso por Unidad
   </select>
  </td>
 </tr>
- comentado el 3 de nenero 2015 para facilitar la creacion en pdval 
- -->
-<tr hidden="hidden">
+
+<!--  comentado el 3 de nenero 2015 para facilitar la creacion en pdval -->
+<tr>
  <td class="label" colspan="3">Marca</td>
  <td>
    <select name="marca" id="marca" class="form-text">
-<option value="0">Seleccione Marca del Producto</option>
+<option value="">Seleccione Marca del Producto</option>
 {html_options values=$option_values_marca output=$option_output_marca}
   </select>
-  <input type="text" name="codigo_fabricante" id="codigo_fabricante" size="50" value="{$campos_item[0].codigo_fabricante}" class="form-text"/>
+  <!--<input type="text" name="codigo_fabricante" id="codigo_fabricante" size="50" value="{$campos_item[0].codigo_fabricante}" class="form-text"/>-->
  </td>
-</tr> 
+</tr>
 <tr>
  <td class="label" colspan="3">Estatus</td>
  <td>
@@ -617,7 +830,7 @@ Peso por Unidad
 </tr>
 
 <tr>
-<td  colspan="3" class="label">Producto con Fecha de Vencimiento</td>
+<td  colspan="3" class="label">Producto con Fecha de Vencimiento**</td>
 <td>
  <select name="producto_vencimiento" id="producto_vencimiento" class="form-text">
  <option value="">Indique si el Producto posee Fecha de Vencimiento**</option>
@@ -627,12 +840,53 @@ Peso por Unidad
 </td>
 </tr>
 
-<!-- <tr>
+<tr>
  <td class="label" colspan="3">Indices</td>
  <td>
-  Regulado&nbsp;&nbsp;<input type="checkbox" name="regulado" id="regulado"  value="1" class="form-text"/> &nbsp;&nbsp;Cestack Basica&nbsp;&nbsp;<input type="checkbox" name="cesta" id="cesta"  value="1" class="form-text"/>&nbsp;&nbsp;&nbsp;BCV&nbsp;&nbsp;&nbsp;<input type="checkbox" name="bcv" id="bcv"  value="1" class="form-text"/>
+  Regulado&nbsp;&nbsp;<input type="checkbox" name="regulado" id="regulado"  value="1" class="form-text"/> &nbsp;&nbsp;Cestack Basica&nbsp;&nbsp;<input type="checkbox" name="cesta" id="cesta"  value="1" class="form-text"/>&nbsp;&nbsp;&nbsp;BCV&nbsp;&nbsp;&nbsp;<input type="checkbox" name="bcv" id="bcv"  value="1" class="form-text"/>&nbsp;&nbsp;&nbsp;CLAP&nbsp;&nbsp;&nbsp;<input type="checkbox" name="clap" id="clap"  value="1" class="form-text"/>
  </td>
-</tr> -->
+</tr>
+<tr>
+    <td class="label" colspan="3">
+        Producto de Producci&oacute;n
+    </td>
+    <td>
+        <input type="checkbox" name="sae" id="sae"  value="1" class="form-text" onclick="mostrar_impresion()" />
+        
+    </td>
+</tr>
+<tr>
+    
+    <td class="label" colspan="4">
+        <div style="display: none;" id='impresion_entrega'>
+            <table align="center" style="margin-left: 90px">
+                <tr>
+                    <td>
+                        Impresi&oacute;n De Entrega
+                    </td>
+                    <td>
+                        <select name="impresion" id="impresion" class="form-text">
+                            <option value="NULL">Seleccione</option>
+                            {html_options values=$option_values_impresion output=$option_output_impresion}
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+<tr>
+ <td class="label" colspan="3"></td>
+ <td>
+   <input type="radio" name="central" value="C" class="form-text" checked="checked"> Central <input type="radio" name="central" value="R" class="form-text"> Regional
+ </td>
+</tr>
+<tr>
+ <td class="label" colspan="3"></td>
+ <td>
+   <input type="radio" name="nacional" value="N" class="form-text" checked="checked"> Nacional <input type="radio" name="nacional" value="I" class="form-text"> Importado
+ </td>
+</tr>
 <tr>
  <td class="label" colspan="3"> Producto con Serial</td>
  <td>
@@ -661,8 +915,8 @@ Peso por Unidad
 <!-- <tr>
  <td class="label" colspan="3"><br/></td>
  <td>
- 
-  
+
+
   <div id='serialGarantia' style='display:inline; visibility:hidden'>
 &nbsp;&nbsp;&nbsp;&nbsp;Serial Con Garant&iacute;a.
 {/literal} -->
@@ -701,34 +955,40 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <input size="50" type="text" name="serial1" id="serial1" value="{$campos_item[0].serial1}" class="form-text"/>
 </td>
   </tr>
-  </div> 
-<tr>
-<td class="label" colspan="3">Costo Actual**</td>
+  </div> -->
+  <tr>
+<td class="label" colspan="3">Precio Actual**</td>
 <td>
- <input size="50" type="text" name="costo_actual" id="costo_actual" onchange='this.form.precio_1.value= this.value ; this.form.costo_promedio.value= this.value; this.form.costo_anterior.value= this.value; this.form.ocultos1.value= this.value;  this.form.ocultos2.value= this.value; this.form.ocultos3.value= this.value; calcular_todo();' value="{$campos_item[0].costo_actual}" class="form-text"/>
-</td>
-</tr>
-<tr>
-<td class="label" colspan="3">Costo Promedio</td>
-<td>
- <input size="50" type="text" name="costo_promedio" id="costo_promedio" value="{$campos_item[0].costo_promedio}" class="form-text"/>
+ <input size="50" type="text" name="costo_actual" id="costo_actual" onchange='this.form.precio_1.value= this.value ; this.form.costo_promedio.value= this.value; this.form.costo_anterior.value= this.value; this.form.ocultos1.value= this.value;  this.form.ocultos2.value= this.value; this.form.ocultos3.value= this.value; calcular_todo();' value="{$campos_item[0].costo_actual}" disabled="true" class="form-text"/>
 </td>
   </tr>
   <tr>
-<td class="label" colspan="3">Costo Anterior</td>
+<td class="label" colspan="3">Precio Promedio</td>
 <td>
- <input size="50" type="text" name="costo_anterior" id="costo_anterior" value="{$campos_item[0].costo_anterior}" class="form-text"/>
+ <input size="50" type="text" name="costo_promedio" id="costo_promedio" value="{$campos_item[0].costo_promedio}" disabled="true" class="form-text"/>
 </td>
   </tr>
-  -->
-  </tbody>
- </table>
+  <tr>
+<td class="label" colspan="3">Precio Anterior</td>
+<td>
+ <input size="50" type="text" name="costo_anterior" id="costo_anterior" value="{$campos_item[0].costo_anterior}" disabled="true" class="form-text"/>
+</td>
+  </tr>
+<tr>
+    <td class="label" colspan="3">Ultimo Costo Cotizado</td>
+    <td>
+        <input type="text" name="ultimo_costo_cotizado" id="ultimo_costo_cotizado" size="30" class="form-text" disabled="true" />
+        <div id="notificacion_ultimo_costo"></div>
+    </td>
+</tr>
+</tbody>
+</table>
  <!--/td>
  </tr>
  </tbody>
  </table-->
-                            
-                            
+
+
 <table style="width: 100%;">
 <tr>
  <td>
@@ -746,7 +1006,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
   <table id="tabla_total" style="border: 1px solid #507e95; background-color: white;">
 <thead>
  <tr>
-  <th style="text-align:left;">Costos</th>
+  <th style="text-align:left;">Precios</th>
   <th style="text-align:left;">Utilidad</th>
   <th style="text-align:left;">Con Utilidad</th>
   <th style="text-align:left;">Gravado</th>
@@ -758,36 +1018,36 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
 <input type='text' name='ocultos1' id='ocultos1' value="{$campos_item[0].p1}" onchange="calcular_todo();" size="9" class="form-text"/>
   </td>
   <td>
-<input onchange="calcularMonto('fila_precio1','utilidad1','fila_precio1_iva','ocultos1');" class="campo_decimal form-text" size="3" name="utilidad1" id="utilidad1" type="text" value="{$campos_item[0].utilidad1}" />
+<input onchange="calcularMonto('fila_precio1','utilidad1','fila_precio1_iva','ocultos1');" class="campo_decimal form-text" size="3" name="utilidad1" id="utilidad1" type="text" value="{$campos_item[0].utilidad1}" disabled="true" />
 <label for="utilidad1">%</label>
   </td>
   <td>
 <input onchange='calcular_todo();' class="campo_decimal form-text" title="{$DatosGenerales[0].titulo_precio1}" id="fila_precio1" name="precio_1" value="{$campos_item[0].precio1}" size="10" readonly type="text" />
   </td>
   <td>
-<input class="campo_decimal form-text" id="fila_precio1_iva" name="coniva1" size="10" type="text" value="{$campos_item[0].coniva1}"/>
+<input class="campo_decimal form-text" id="fila_precio1_iva" name="coniva1" size="10" type="text" value="{$campos_item[0].coniva1}" disabled="true"/>
   </td>
  </tr>
  <tr>
   <td><input type='text' id='ocultos2' name='ocultos2' value="{$campos_item[0].p2}" onchange="calcular_todo();" size="9" class="form-text"></td>
   <td>
-<input onchange="calcularMonto('fila_precio2','utilidad2','fila_precio2_iva','ocultos2');" class="campo_decimal form-text" size="3" name="utilidad2" id="utilidad2" type="text" value="{$campos_item[0].utilidad2}">
+<input onchange="calcularMonto('fila_precio2','utilidad2','fila_precio2_iva','ocultos2');" class="campo_decimal form-text" size="3" name="utilidad2" id="utilidad2" type="text" value="{$campos_item[0].utilidad2}" disabled="true">
 <label for="utilidad2">%</label>
   </td>
-  <td><input onchange='this.form.oculto2.value=this.value; calcular_todo();' class="campo_decimal form-text" title="{$DatosGenerales[0].titulo_precio2}" id="fila_precio2" name="precio_2" readonly value="{$campos_item[0].precio2}" size="10" type="text"/></td>
-  <td><input class="campo_decimal form-text" id="fila_precio2_iva" value="{$campos_item[0].coniva2}" name="coniva2" size="10" type="text"/></td>
+  <td><input onchange='this.form.oculto2.value=this.value; calcular_todo();' class="campo_decimal form-text" title="{$DatosGenerales[0].titulo_precio2}" id="fila_precio2" name="precio_2" readonly value="{$campos_item[0].precio2}" size="10" type="text" disabled="true"/></td>
+  <td><input class="campo_decimal form-text" id="fila_precio2_iva" value="{$campos_item[0].coniva2}" name="coniva2" size="10" type="text" disabled="true"/></td>
  </tr>
  <tr>
   <td><input type='text' id='ocultos3' name='ocultos3' value="{$campos_item[0].p3}" onchange="calcular_todo();" size="9" class="form-text"/></td>
   <td>
-<input onchange="calcularMonto('fila_precio3','utilidad3','fila_precio3_iva','ocultos3');" class="campo_decimal form-text" value="{$campos_item[0].utilidad3}" size="3" name="utilidad3" id="utilidad3" type="text">
+<input onchange="calcularMonto('fila_precio3','utilidad3','fila_precio3_iva','ocultos3');" class="campo_decimal form-text" value="{$campos_item[0].utilidad3}" size="3" name="utilidad3" id="utilidad3" type="text" disabled="true">
 <label for="utilidad3">%</label>
   </td>
   <td>
-<input onchange='this.form.oculto3.value=this; calcular_todo();' class="campo_decimal form-text" title="{$DatosGenerales[0].titulo_precio3}" id="fila_precio3" name="precio_3" readonly value="{$campos_item[0].precio3}" size="10" type="text"/>
+<input onchange='this.form.oculto3.value=this; calcular_todo();' class="campo_decimal form-text" title="{$DatosGenerales[0].titulo_precio3}" id="fila_precio3" name="precio_3" readonly value="{$campos_item[0].precio3}" size="10" type="text" disabled="true"/>
   </td>
   <td>
-<input class="campo_decimal form-text" id="fila_precio3_iva"  value="{$campos_item[0].coniva3}" name="coniva3" size="10" type="text"/>
+<input class="campo_decimal form-text" id="fila_precio3_iva"  value="{$campos_item[0].coniva3}" name="coniva3" size="10" type="text" disabled="true"/>
   </td>
  </tr>
  <tr>
@@ -797,7 +1057,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
   <td valign="top" class="label" colspan="3"><b>Existencia M&iacute;nima del &iacute;tem</b></td>
   <td>
 <div class="string_empaque"></div>
-<input onkeypress="return validarNumero(event)" name="existencia_min" type="text" value="{$campos_item[0].existencia_min}" class="form-text"/>
+<input onkeypress="return validarNumero(event)" name="existencia_min" type="text" value="{$campos_item[0].existencia_min}" class="form-text" />
   </td>
  </tr>
  <tr>
@@ -890,7 +1150,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Origen</td>
  <td>
   <input type="text" name="origen" id="origen" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -898,7 +1158,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Costo Cif</td>
  <td>
   <input type="text" name="costo_cif" id="costo_cif" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -906,7 +1166,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Costo Origen</td>
  <td>
   <input type="text" name="costo_origen" id="costo_origen" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -914,7 +1174,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Temporada</td>
  <td>
   <input type="text" name="temporada" id="temporada" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -922,7 +1182,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Material/Composicion/Clase</td>
  <td>
   <input type="text" name="mate_compo_clase" id="mate_compo_clase" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -930,7 +1190,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Punto pedido</td>
  <td>
   <input type="text" name="punto_pedido" id="punto_pedido" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -938,23 +1198,23 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Tejido</td>
  <td>
   <input type="text" name="tejido" id="tejido" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
-<tr>
+<!--<tr>
  <td colspan="3" width="30%" class="label">Reg. Sanit.</td>
  <td>
   <input type="text" name="reg_sanit" id="reg_sanit" size="50" value="" class="form-text"/>
-  
+
  </td>
-</tr>
+</tr>-->
 
 <tr>
  <td colspan="3" width="30%" class="label">Cod. barra bulto</td>
  <td>
   <input type="text" name="cod_barra_bulto" id="cod_barra_bulto" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -962,9 +1222,9 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Observaciones</td>
  <td>
   <textarea rows="5" cols="50" name="observacion" >
-  
+
   </textarea>
-  
+
  </td>
 </tr>
 
@@ -982,7 +1242,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" class="label" style="width: 30%;">Foto 1</td>
  <td>
   <input type="file" name="foto1" id="foto1"  class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -990,7 +1250,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Foto 2</td>
  <td>
    <input type="file" name="foto2" id="foto2"  class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -998,7 +1258,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Foto 3</td>
  <td>
    <input type="file" name="foto3" id="foto3"  class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1006,20 +1266,20 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Foto 4</td>
  <td>
    <input type="file" name="foto4" id="foto4"  class="form-text"/>
-  
+
  </td>
 </tr>
 
 </table>
 
-</div>           
+</div>
 <div id="div_tab4">
 <table style="width: 100%; height: 100px;">
 <tr>
  <td colspan="3" class="label" style="width: 30%;">Contrato Licencia Nro</td>
  <td>
   <input type="text" name="cont_licen_nro" id="cont_licen_nro" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1027,7 +1287,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Precio de Contrato</td>
  <td>
   <input type="text" name="precio_cont" id="precio_cont" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1035,7 +1295,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Aprobacion de Arte</td>
  <td>
   <input type="text" name="aprob_arte" id="aprob_arte" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1043,7 +1303,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td colspan="3" width="30%" class="label">Propiedad</td>
  <td>
   <input type="text" name="propiedad" id="propiedad" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1052,32 +1312,32 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
 
 <!-- tab 5  -->
 <!-- <div style="margin:20px 0px 20px 10px" id="div_tab5">
-   
+
     <table style="width: 100%;" class="tab5t">
-       
+
         <tr class="tb-head" style="height: 35px;">
             <td><b>Region</b></td>
             <td><b>Precio Red comercial </b></td>
             <td><b>Precio PAE</b></td>
             <td><b>Pdvalito</b></td>
-           
+
         </tr>
-         
+
             {foreach from=$campos_precio key=i item=campos}
              <tr  style="height: 35px;">
-                 <td><b>{$campos.descripcion}</b></td>  
+                 <td><b>{$campos.descripcion}</b></td>
                  <input name="region[]" value="{$campos.id}" type="hidden" >
-                 <td><input class="form-text" onkeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;" class="camposP" name="precio1[]" type="text"></td>  
-                 <td><input class="form-text" onkeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;" class="camposP" name="precio2[]" type="text"></td>  
-                 <td><input class="form-text" onkeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;" class="camposP" name="precio3[]" type="text"></td>  
-               
-             </tr>   
-            {/foreach}                         
-      
-              
-       
+                 <td><input class="form-text" onkeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;" class="camposP" name="precio1[]" type="text"></td>
+                 <td><input class="form-text" onkeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;" class="camposP" name="precio2[]" type="text"></td>
+                 <td><input class="form-text" onkeypress="if (event.keyCode < 46 || event.keyCode > 57) event.returnValue = false;" class="camposP" name="precio3[]" type="text"></td>
 
-        
+             </tr>
+            {/foreach}
+
+
+
+
+
     </table>
 </div>-->
 
@@ -1088,29 +1348,35 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <td>
   <!--<input type="text" name="empaque" id="empaque" size="50" value="{$campos_item[0].unidad_empaque}" onchange='this.form.empaque_descripcion.value = this.value;' class="form-text"/>-->
   <select name="empaque" id="empaque" class="form-text" onchange='this.form.empaque_descripcion.value = this.form.empaque.options[this.form.empaque.selectedIndex].text;'(s)>
-<option value="0">Seleccione Unidad de Empaque</option>
+<option value="3">Seleccione Unidad de Empaque</option>
 {html_options values=$option_values_empaque output=$option_output_empaque selected=$campos_item[0].unidad_empaque}
   </select>
+ </td>
+</tr>
+<tr>
+ <td colspan="3" width="30%" class="label">Precio Empaque</td>
+ <td>
+  <input type="text" name="precio_bulto" id="precio_bulto" size="50" value="0.00" class="form-text" onKeyPress="return acceptNum(event)"/>
  </td>
 </tr>
 <tr>
  <td colspan="3" width="30%" class="label">Cod. barra bulto</td>
  <td>
   <input type="text" name="cod_barra_bulto" id="cod_barra_bulto" size="50" value="" class="form-text"/>
-  
+
  </td>
 </tr>
 <tr>
  <td class="label" colspan="3">Cantidad por Bulto**</td>
  <td>
-  <input type="text" name="cantidad_bulto" id="cantidad_bulto" size="50"  class="form-text" value="1" />
+  <input type="text" name="cantidad_bulto" id="cantidad_bulto" size="50"  class="form-text"/>
  </td>
 </tr>
 
 <tr>
  <td class="label" colspan="3">Kilos por Bulto**</td>
  <td>
-  <input type="text" name="kilos_bulto" id="kilos_bulto" size="50"  class="form-text" value="1" />
+  <input type="text" name="kilos_bulto" id="kilos_bulto" size="50"  class="form-text" disabled="disabled" />
  </td>
 </tr>
 </table>
@@ -1118,11 +1384,11 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
 
 <!-- +++++++++++++++ -->
   </div>
-  
+
   <input type="hidden" name="pg_iva" id="pg_iva" value="{$parametros_generales[0].porcentaje_impuesto_principal}"/>
 
  {literal}
-  <script type="text/javascript">//<![CDATA[
+  <script type="text/javascript">
 var mikit= document.getElementById('producto_kit');
 mikit.onclick();
 
@@ -1135,10 +1401,10 @@ aux.onchange();
 var aux= document.getElementById('tipo_producto2');
 aux.onchange();
 
-  //]]>
+  
   </script>
-				
-<table style="width: 100%;">         
+
+<table style="width: 100%;">
   <tr class="tb-tit" align="right">
  <td colspan="4">
   <input type="submit" name="aceptar" id="aceptar" value="Guardar" class="form-text"/>

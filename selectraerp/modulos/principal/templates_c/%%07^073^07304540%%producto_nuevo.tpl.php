@@ -1,7 +1,7 @@
-<?php /* Smarty version 2.6.21, created on 2017-08-28 10:21:14
+<?php /* Smarty version 2.6.21, created on 2017-10-04 17:47:36
          compiled from producto_nuevo.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format', 'producto_nuevo.tpl', 628, false),array('function', 'html_options', 'producto_nuevo.tpl', 653, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format', 'producto_nuevo.tpl', 650, false),array('function', 'html_options', 'producto_nuevo.tpl', 675, false),)), $this); ?>
 <!DOCTYPE html>
 <html>
     <head>
@@ -13,6 +13,9 @@ smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format
         <script type="text/javascript" src="../../libs/js/ajax.js"></script>
 
         <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
         <?php echo '
         <script language="JavaScript"> 
                 var nav4 = window.Event ? true : false; 
@@ -23,7 +26,7 @@ smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format
                 } 
             </script>
 
-            <script type="text/javascript">//<![CDATA[
+            <script type="text/javascript">
 
             function soloNumeros(e){
             var key = window.Event ? e.which : e.keyCode
@@ -494,8 +497,10 @@ smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format
 
                         }
 
+                
+
                 });
-                //]]>
+                
 
             function validaritem(){
                     //return false;
@@ -541,7 +546,24 @@ smarty_core_load_plugins(array('plugins' => array(array('modifier', 'date_format
                         }
                     };
 
-            
+            $(document).ready(function(){
+
+                $(\'#cod_grupo\').select2({
+                    placeholder: "Seleccione una Categoria...",
+                    allowClear: true
+                });
+
+                $(\'#sub_categoria\').select2({
+                    placeholder: "Seleccione una Categoria...",
+                    allowClear: true
+                });
+
+                $(\'#marca\').select2({
+                    placeholder: "Seleccione una marca...",
+                    allowClear: true
+                });
+
+            });
             </script>
             <style type="text/css">
                 .tab{
@@ -809,7 +831,17 @@ Peso por Unidad
  <input type="text" name="pesoxunidad" id="pesoxunidad" size="10" value="<?php echo $this->_tpl_vars['campos_item'][0]['pesoxunidad']; ?>
 " class="form-text" onKeyPress="return NumCheck(event, this)"/>
 </td>
-  </tr>
+</tr>
+
+<tr>
+<td  colspan="3" class="label">
+Cantidad por Paleta
+</td>
+<td>
+ <input type="text" name="unidad_paleta" id="unidad_paleta" size="10" value="<?php echo $this->_tpl_vars['campos_item'][0]['unidad_paleta']; ?>
+" class="form-text" onKeyPress="return NumCheck(event, this)"/>
+</td>
+</tr>
 
 
 <tr>
@@ -1045,7 +1077,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  <tr>
   <td>
 <input type='text' name='ocultos1' id='ocultos1' value="<?php echo $this->_tpl_vars['campos_item'][0]['p1']; ?>
-" onchange="calcular_todo();" size="9" class="form-text" disabled="true"/>
+" onchange="calcular_todo();" size="9" class="form-text"/>
   </td>
   <td>
 <input onchange="calcularMonto('fila_precio1','utilidad1','fila_precio1_iva','ocultos1');" class="campo_decimal form-text" size="3" name="utilidad1" id="utilidad1" type="text" value="<?php echo $this->_tpl_vars['campos_item'][0]['utilidad1']; ?>
@@ -1055,7 +1087,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
   <td>
 <input onchange='calcular_todo();' class="campo_decimal form-text" title="<?php echo $this->_tpl_vars['DatosGenerales'][0]['titulo_precio1']; ?>
 " id="fila_precio1" name="precio_1" value="<?php echo $this->_tpl_vars['campos_item'][0]['precio1']; ?>
-" size="10" readonly type="text" disabled="true" />
+" size="10" readonly type="text" />
   </td>
   <td>
 <input class="campo_decimal form-text" id="fila_precio1_iva" name="coniva1" size="10" type="text" value="<?php echo $this->_tpl_vars['campos_item'][0]['coniva1']; ?>
@@ -1064,7 +1096,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  </tr>
  <tr>
   <td><input type='text' id='ocultos2' name='ocultos2' value="<?php echo $this->_tpl_vars['campos_item'][0]['p2']; ?>
-" onchange="calcular_todo();" size="9" class="form-text" disabled="true"></td>
+" onchange="calcular_todo();" size="9" class="form-text"></td>
   <td>
 <input onchange="calcularMonto('fila_precio2','utilidad2','fila_precio2_iva','ocultos2');" class="campo_decimal form-text" size="3" name="utilidad2" id="utilidad2" type="text" value="<?php echo $this->_tpl_vars['campos_item'][0]['utilidad2']; ?>
 " disabled="true">
@@ -1078,7 +1110,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
  </tr>
  <tr>
   <td><input type='text' id='ocultos3' name='ocultos3' value="<?php echo $this->_tpl_vars['campos_item'][0]['p3']; ?>
-" onchange="calcular_todo();" size="9" class="form-text" disabled="true"/></td>
+" onchange="calcular_todo();" size="9" class="form-text"/></td>
   <td>
 <input onchange="calcularMonto('fila_precio3','utilidad3','fila_precio3_iva','ocultos3');" class="campo_decimal form-text" value="<?php echo $this->_tpl_vars['campos_item'][0]['utilidad3']; ?>
 " size="3" name="utilidad3" id="utilidad3" type="text" disabled="true">
@@ -1452,7 +1484,7 @@ Nacional <input type="radio" name="tipo_producto" id="tipo_producto1" value='0' 
 "/>
 
  <?php echo '
-  <script type="text/javascript">//<![CDATA[
+  <script type="text/javascript">
 var mikit= document.getElementById(\'producto_kit\');
 mikit.onclick();
 
@@ -1465,7 +1497,7 @@ aux.onchange();
 var aux= document.getElementById(\'tipo_producto2\');
 aux.onchange();
 
-  //]]>
+  
   </script>
 
 <table style="width: 100%;">

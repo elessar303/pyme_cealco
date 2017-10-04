@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-07-11 09:24:07
+<?php /* Smarty version 2.6.21, created on 2017-09-18 19:34:01
          compiled from cliente.tpl */ ?>
 <!DOCTYPE html>
 <!--
@@ -47,7 +47,7 @@ unset($_smarty_tpl_vars);
                                 <td><strong><?php echo $this->_tpl_vars['campos']; ?>
 </strong></td>
                             <?php endforeach; endif; unset($_from); ?>
-                            <td colspan="2" style="text-align:center;"><strong>Opciones</strong></td>
+                            <td colspan="3" style="text-align:center;"><strong>Opciones</strong></td>
                         </tr>
                         <?php if ($this->_tpl_vars['cantidadFilas'] == 0): ?>
                             <tr><td colspan="6" style="text-align: center;"><?php echo $this->_tpl_vars['mensaje']; ?>
@@ -82,6 +82,12 @@ unset($_smarty_tpl_vars);
 &amp;opt_seccion=<?php echo $_GET['opt_seccion']; ?>
 &amp;opt_subseccion=delete&amp;cod=<?php echo $this->_tpl_vars['campos']['id_cliente']; ?>
 '" title="Eliminar"  src="../../../includes/imagenes/delete.gif"/>
+                                    </td>
+                                    <td style="text-align: center; cursor: pointer; width: 30px;">
+                                        <img style="cursor: pointer;" class="editar" onclick="javascript: window.location.href='?opt_menu=<?php echo $_GET['opt_menu']; ?>
+&amp;opt_seccion=<?php echo $_GET['opt_seccion']; ?>
+&amp;opt_subseccion=addcargo&amp;cod=<?php echo $this->_tpl_vars['campos']['id_cliente']; ?>
+'" title="Agregar Cargo"  src="../../../includes/imagenes/factu.png"/>
                                     </td>
                                 </tr>
                                 <?php $this->assign('ultimo_cod_valor', $this->_tpl_vars['campos']['id_cliente']); ?>

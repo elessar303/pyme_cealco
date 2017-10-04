@@ -22,6 +22,40 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "ValidarCodigoBarrasItem":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item WHERE codigo_barras = '" . $_GET["v1"] . "'");
+                        
+            if (count($campos)!=0) {
+                                
+                $campos2 = $conn->ObtenerFilasBySqlSelect("SELECT cmd._pvp,cmd._estatus_producto,cme.estatus_name
+                    FROM selectrapyme_central.cotizacion_mercado_detalle cmd
+                    INNER JOIN selectrapyme.item i ON i.id_item = cmd.id_producto
+                    INNER JOIN selectrapyme_central.cotizacion_mercado_estatus cme ON cme.id_estatus = cmd._estatus_producto
+                    WHERE i.codigo_barras = '" . $_GET["v1"] . "'");
+
+                if (count($campos2)!=0) {
+                    echo "[{'rc':'-1','mensaje1':'".$campos2[0]["_pvp"]."','mensaje2':'".$campos2[0]["estatus_name"]."'}]";
+                }else{
+                    echo "[{'rc':'-1','mensaje1':'0','mensaje2':'Rubro no cotizado'}]";
+                }
+
+            }else{
+
+                $campos2 = $conn->ObtenerFilasBySqlSelect("SELECT cmd._pvp,cmd._estatus_producto,cme.estatus_name
+                    FROM selectrapyme_central.cotizacion_mercado_detalle cmd
+                    INNER JOIN selectrapyme.item i ON i.id_item = cmd.id_producto
+                    INNER JOIN selectrapyme_central.cotizacion_mercado_estatus cme ON cme.id_estatus = cmd._estatus_producto
+                    WHERE i.codigo_barras = '" . $_GET["v1"] . "'");
+
+                if (count($campos2)!=0) {
+                    echo "[{'rc':'0','mensaje1':'".$campos2[0]["_pvp"]."','mensaje2':'".$campos2[0]["estatus_name"]."'}]";
+                }else{
+                    echo "[{'rc':'0','mensaje1':'0','mensaje2':'Rubro no cotizado'}]";
+                }
+            };
+
+            break;
+
         case "eliminarServicioMovimiento":
             $delete="delete from movimiento_almacen_servicio where id=".$_GET['v1'];
             if($conn->Execute2($delete))

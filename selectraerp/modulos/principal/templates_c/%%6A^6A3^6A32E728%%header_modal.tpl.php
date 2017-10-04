@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-13 18:13:43
+<?php /* Smarty version 2.6.21, created on 2017-09-18 19:32:32
          compiled from header_modal.tpl */ ?>
 <!--link type="text/css" rel="stylesheet" href="../../../includes/css/reset.css" /-->
 <link rel="shortcut icon" href="../../../includes/imagenes/selectra.ico" />

@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-08-18 01:03:34
+<?php /* Smarty version 2.6.21, created on 2017-09-18 19:35:46
          compiled from almacen_localidad.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
 smarty_core_load_plugins(array('plugins' => array(array('function', 'html_options', 'almacen_localidad.tpl', 64, false),)), $this); ?>

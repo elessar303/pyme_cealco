@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-07-11 10:35:30
+<?php /* Smarty version 2.6.21, created on 2017-09-18 18:22:30
          compiled from calidad_visita.tpl */ ?>
 <!DOCTYPE html>
 <!--

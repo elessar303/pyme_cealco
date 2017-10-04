@@ -1,24 +1,57 @@
-<?php /* Smarty version 2.6.21, created on 2017-08-28 22:28:45
+<?php /* Smarty version 2.6.21, created on 2017-10-04 17:51:14
          compiled from producto_editar.tpl */ ?>
 <?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('function', 'html_options', 'producto_editar.tpl', 426, false),)), $this); ?>
+smarty_core_load_plugins(array('plugins' => array(array('function', 'html_options', 'producto_editar.tpl', 619, false),)), $this); ?>
 <!DOCTYPE html>
 <html>
     <head>
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <script type="text/javascript" src="../../../includes/js/jquery-ui-1.10.0/js/jquery-1.9.0.js"></script>
-         <script type="text/javascript" src="../../libs/js/jquery.numeric.js"></script>
+        <script type="text/javascript" src="../../libs/js/jquery.numeric.js"></script>
         <script type="text/javascript" src="../../libs/js/config_items_tabs.js"></script>
         <script type="text/javascript" src="../../libs/js/ajax.js"></script>
-         <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
-          
+        <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
+
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+
         <?php echo '
+        <script language="JavaScript"> 
+                var nav4 = window.Event ? true : false; 
+                function acceptNum(evt){  
+                // NOTE: Backspace = 8, Enter = 13, \'0\' = 48, \'9\' = 57  
+                var key = nav4 ? evt.which : evt.keyCode;  
+                return (key <= 13 || (key >= 48 && key <= 57 || key==46)); 
+                } 
+            </script>
+
             <script type="text/javascript">//<![CDATA[
 
             function soloNumeros(e){
             var key = window.Event ? e.which : e.keyCode
-            return (key >= 48 && key <= 57)
+            return (key >= 48 && key <= 57 || key==46)
+            }
+
+            function NumCheck(e, field) {
+              key = e.keyCode ? e.keyCode : e.which
+              // backspace
+              if (key == 8) return true
+              // 0-9
+              if (key > 47 && key < 58) {
+                if (field.value == "") return true
+                regexp = /.[0-9]{3}$/
+                return !(regexp.test(field.value))
+              }
+              // .
+              if (key == 46) {
+                if (field.value == "") return false
+                regexp = /^[0-9]+$/
+                return regexp.test(field.value)
+              }
+              // other key
+              return false
+ 
             }
 
             function buscarProducto(id,nombre,empaque,cantidad){
@@ -145,13 +178,13 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
             }
 
             function calcularMonto(precio, utilidad, campoiva, ocultos){
-                 iva=$("#iva").val();         
+                 iva=$("#iva").val();
                 // precio.value = parseFloat(ocultos.value * (1 + (parseFloat(utilidad.value) / 100)));
                 // precio.value = redondear(precio.value,2);
                 $("#"+precio).val( parseFloat( $("#"+ocultos).val() * (1 + (parseFloat($("#"+utilidad).val()) / 100))));
                 $("#"+precio).val(redondear($("#"+precio).val(),2));
                montoE=$("#monto_exento").val();
-               
+
                 if (montoE == \'1\'){
 
                         // Cambiar cero (0) el valor para guardarlo en campo \'iva\' de la tabla \'item\'
@@ -167,10 +200,10 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
 <?php echo $this->_tpl_vars['parametros_generales'][0]['porcentaje_impuesto_principal']; ?>
 <?php echo ';
                          iva=$("#iva").val();
-                       
+
                         coniva=redondear($("#"+precio).val() * (1 + (iva/100)), 2);
-                        
-                        $("#"+campoiva).val(coniva);                      
+
+                        $("#"+campoiva).val(coniva);
 
                 }
             }
@@ -182,7 +215,39 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                 calcularMonto("fila_precio3","utilidad3","fila_precio3_iva","ocultos3");
             }
 
+            //div oculto de impresion de entrega
+            function mostrar_impresion()
+            {
+
+                if(document.getElementById(\'sae\').checked)
+                {
+                    document.getElementById(\'impresion_entrega\').style.display = \'block\';
+                }
+                else
+                {
+                    document.getElementById(\'impresion_entrega\').style.display = \'none\';
+                    $("#impresion").val("");
+                    
+
+                }
+            }
+
             $(document).ready(function(){
+
+                calcular_todo();
+
+                $(\'.cod_arancel\').select2({
+                    placeholder: "Seleccione un código arancelario...",
+                    allowClear: true
+                });
+
+
+
+
+                if(document.getElementById(\'sae\').checked)
+                {
+                    document.getElementById(\'impresion_entrega\').style.display = \'block\';
+                };
 
                 $("#cod_item").change(function(){
                     //return false;
@@ -210,34 +275,33 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                 });
 
                 $("#formulario").submit(function(){
-                    if(   $("#cod_barras").val()=="" ||
+                    if(
                             $("#descripcion1").val()=="" ||
+                            $("#cod_barras").val()=="" ||
+                            $("#marca").val()=="" ||
                             $("#producto_vencimiento").val()==""
-                           
+
                 ){
                         alert("Debe Ingresar los campos obligatorios!");
                         $("#descripcion1").focus();
                         return false;
                     }
 
-                if(
+                 if(
+                            $("#unidad_venta").val()==""
+                          ){
+                            alert("Debe Ingresar la Unidad de Venta!.");
+                            $("#unidad_venta").focus();
+                            return false;
+                        }
 
-                                $("#cod_barras").val()==\'0\' ||
-                                $("#cod_barras").val()==\'00\' ||
-                                $("#cod_barras").val()==\'000\' ||
-                                $("#cod_barras").val()==\'0000\' ||
-                                $("#cod_barras").val()==\'00000\' ||
-                                $("#cod_barras").val()==\'000000\' ||
-                                $("#cod_barras").val()==\'0000000\' ||
-                                $("#cod_barras").val()==\'00000000\' ||
-                                $("#cod_barras").val()==\'000000000\' ||
-                                $("#cod_barras").val()==\'0000000000\'
-                                )
-                        {
-                        alert("Codigo de Barras debe ser Distinto de 0.");
-                        $("#cod_barras").focus();
-                        return false;
-                        }       
+                        if(
+                            $("#unidadxpeso").val()==""
+                          ){
+                            alert("Debe Ingresar la Unidad de Peso!.");
+                            $("#unidadxpeso").focus();
+                            return false;
+                        }
                 });
                   // agregado el 22/01/14 para regargar el select dependiente de rubro y sub rubro
                         function listarSubrubro(idSelect, tipoSql, idCarga,id){
@@ -251,6 +315,28 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                                 },
                                 success: function(datos){
                                     $("#"+idSelect).html(datos);
+                                    id_categoria=$("#cod_grupo").val();
+                                    listarSubcategoria("sub_categoria", 0, id_categoria);
+                                     document.formulario.sub_categoria.value = id_sub_categoria;
+                                },
+                                error: function(datos,falla, otroobj){
+                                    $("#"+idSelect).html(\'<option value = 0> Error... </option>\');
+                                }
+                            });
+                    };
+
+                    function listarSubcategoria(idSelect, tipoSql, idCarga){
+                            var paramentros="opt=cargarSubrubro&idCarga="+idCarga+"&tipoSql="+tipoSql;
+                            $.ajax({
+                                type: "POST",
+                                url: "listarSubcategoria.php",
+                                data: paramentros,
+                                beforeSend: function(datos){
+                                    $("#"+idSelect).html(\'<option value = 0> Cargando... </option>\');
+                                },
+                                success: function(datos){
+                                    $("#"+idSelect).html(datos);
+                                     document.formulario.sub_categoria.value = id_sub_categoria;
                                 },
                                 error: function(datos,falla, otroobj){
                                     $("#"+idSelect).html(\'<option value = 0> Error... </option>\');
@@ -259,18 +345,67 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                     };
                    // fin de la funcion para select dependiente
                    // llamada de la funcion para cargar el select dependiente de subrubro
-                        id_rubro=$("#cod_departamento").val(); 
-                        id_prod=$("#id_prod1").val(); 
-                                               
+                        id_rubro=$("#cod_departamento").val();
+                        id_prod=$("#id_prod1").val();
+
                         listarSubrubro("cod_grupo", 1, id_rubro,id_prod);
                     // cuando cambia rubro salta la funcion ajax
                        $("#cod_departamento").change(function(){
-                              id_rubro=$("#cod_departamento").val(); 
+                              id_rubro=$("#cod_departamento").val();
                               listarSubrubro("cod_grupo", 1, id_rubro,id_prod);
+                               document.formulario.sub_categoria.value = id_sub_categoria;
+                       });
+
+                        $("#cod_grupo").change(function(){
+                              id_categoria=$("#cod_grupo").val();
+                              listarSubcategoria("sub_categoria", 0, id_categoria);
+                               document.formulario.sub_categoria.value = id_sub_categoria;
                        });
                    //fin de la llamada
 
-                     $("#monto_exento").change(function(event) {
+                    $("#cantidad_bulto").change(function(event) {
+                        peso_unidad= $("#pesoxunidad").val();
+                        cantidad=$("#cantidad_bulto").val();
+                        conver=$("#unidadxpeso").val();
+                        if(conver==1 || conver==3  ){
+                        kiloxbulto=peso_unidad*cantidad;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                        if(conver==2  ){
+                        kiloxbulto=peso_unidad*cantidad*0.001;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                    });
+
+                    $("#pesoxunidad").change(function(event) {
+                        peso_unidad= $("#pesoxunidad").val();
+                        cantidad=$("#cantidad_bulto").val();
+                        conver=$("#unidadxpeso").val();
+                        if(conver==1 || conver==3  ){
+                        kiloxbulto=peso_unidad*cantidad;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                        if(conver==2  ){
+                        kiloxbulto=peso_unidad*cantidad*0.001;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                    });
+
+                    $("#unidadxpeso").change(function(event) {
+                        peso_unidad= $("#pesoxunidad").val();
+                        cantidad=$("#cantidad_bulto").val();
+                        conver=$("#unidadxpeso").val();
+                        if(conver==1 || conver==3  ){
+                        kiloxbulto=peso_unidad*cantidad;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                        if(conver==2  || conver==4 || conver==5){
+                        kiloxbulto=peso_unidad*cantidad*0.001;
+                        $("#kilos_bulto").val(kiloxbulto);
+                        }
+                    });
+
+                    $("#monto_exento").change(function(event) {
                         tipo= $("#monto_exento").val();
                         if(tipo==1){
                             $("#iva").hide();
@@ -282,18 +417,83 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                     });
                       tipo= $("#monto_exento").val();
                         if(tipo==1){
-                         
+
                             $(".monto_iva").hide();
                         }
                         if(tipo==0){
                              $(".monto_iva").show();
-                           
+
                         }
-            
+            id_sub_categoria=$("#sub_categoria").val();
+            //alert(id_sub_categoria);
+            document.formulario.sub_categoria.value = id_sub_categoria;
+
+            $(\'#marca\').select2({
+                    placeholder: "Seleccione una marca...",
+                    allowClear: true
                 });
 
-          
+                $(\'#cod_grupo\').select2({
+                    placeholder: "Seleccione una Categoria...",
+                    allowClear: true
+                });
+
+                $(\'#sub_categoria\').select2({
+                    placeholder: "Seleccione una Categoria...",
+                    allowClear: true
+                });
+               });
+
+
+            
+
+
             //]]>
+
+            function validaritem(){
+                    //return false;
+                    vcoditem = $("#cod_barras").val();
+                    if(vcoditem!=\'\'){
+                        $.ajax({
+                            type: "GET",
+                            url:  "../../libs/php/ajax/ajax.php",
+                            data: "opt=ValidarCodigoBarrasItem&v1="+vcoditem,
+                            beforeSend: function(){
+                                $("#notificacion_codigo_barras").html(MensajeEspera("<b>Veficando Cod. barras..<b>"));
+                            },
+                            success: function(data){
+                                resultado = eval(data);
+                                rc = resultado[0].rc;
+                                mensaje1 = resultado[0].mensaje1;
+                                mensaje2 = resultado[0].mensaje2;
+                                if(rc == -1){
+                                    //$("#cod_item").val("").focus();
+                                    // $("#notificacion_codigo_barras").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ico_note.gif\\"><span style=\\"color:red;\\"><b>Disculpe, este c&oacute;digo ya existe.</b></span>");
+                                    $("#notificacion_codigo_barras").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ico_note.gif\\"><span style=\\"color:red;\\"><b>Disculpe, este c&oacute;digo ya existe.</b></span>");
+                                    if (mensaje1 != 0) {
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ok.gif\\"><span style=\\"color:#0c880c;\\"><b>"+mensaje2+"</b></span>");
+                                    }else{
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ico_note.gif\\"><span style=\\"color:red;\\"><b>"+mensaje2+"</b></span>");
+                                    }
+                                }else{
+                                    $("#notificacion_codigo_barras").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ok.gif\\"><span style=\\"color:#0c880c;\\"><b> C&oacute;digo Disponible</b></span>");
+                                    // $("#ultimo_costo_cotizado").val(mensaje1);
+                                    // $("#notificacion_ultimo_costo").html(mensaje2);
+                                    if (mensaje1 != 0) {
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ok.gif\\"><span style=\\"color:#0c880c;\\"><b>"+mensaje2+"</b></span>");
+                                    }else{
+                                        $("#ultimo_costo_cotizado").val(mensaje1);
+                                        $("#notificacion_ultimo_costo").html("<img align=\\"absmiddle\\" src=\\"../../libs/imagenes/ico_note.gif\\"><span style=\\"color:red;\\"><b>"+mensaje2+"</b></span>");
+                                    }
+                                };
+                            }
+                        });
+                        }
+                    };
+
             </script>
             <style type="text/css">
                 .tab{
@@ -330,50 +530,40 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                     height:300px;
 
                 }
-                #contenedorTAB {
-                    background-color: #e3ebf1;
-                    -moz-border-radius: 5px; padding: 2px;
-                    -webkit-border-radius: 5px;
-                    border: 1px solid #adafb0;
-                    width:550px;
-                }
                 #tabs {
                     margin-top:15px;
                 }
             </style>
         '; ?>
 
-</head>
-<body>
-<form name="formulario" id="formulario" method="post" enctype="multipart/form-data" action="">
-    <input type="hidden" name="codigo_empresa" value="<?php echo $this->_tpl_vars['DatosEmpresa'][0]['codigo']; ?>
+ <form name="formulario" id="formulario" method="post" enctype="multipart/form-data" action="">
+  <input type="hidden" name="codigo_empresa" value="<?php echo $this->_tpl_vars['DatosEmpresa'][0]['codigo']; ?>
 "/>
-    <input type="hidden" name="opt_menu" value="<?php echo $_GET['opt_menu']; ?>
+  <input type="hidden" name="opt_menu" value="<?php echo $_GET['opt_menu']; ?>
 "/>
-    <input type="hidden" name="opt_seccion" value="<?php echo $_GET['opt_seccion']; ?>
+  <input type="hidden" name="opt_seccion" value="<?php echo $_GET['opt_seccion']; ?>
 "/>
-    <input type="hidden" name="id_prod1" id="id_prod1" value="<?php echo $_GET['cod']; ?>
+  <input type="hidden" name="id_prod1" id="id_prod1" value="<?php echo $_GET['cod']; ?>
 "/>
-<table style="width:100%;">
-    <tbody>
-        <tr>
-            <td class="tb-tit">
-            <img src="<?php echo $this->_tpl_vars['subseccion'][0]['img_ruta']; ?>
-" width="20" height="20" style="vertical-align: middle;"/><strong><?php echo $this->_tpl_vars['subseccion'][0]['descripcion']; ?>
+  <table style="width:100%">
+<tbody>
+ <tr>
+  <td class="tb-tit">
+<img src="<?php echo $this->_tpl_vars['subseccion'][0]['img_ruta']; ?>
+" width="20" align="absmiddle" height="20"/>&nbsp;&nbsp;<strong><?php echo $this->_tpl_vars['subseccion'][0]['descripcion']; ?>
 </strong>
-            </td>
-        </tr>
-    </tbody>
-</table>
-
-<div id="tabs">
-    <table style="margin-left:20px;">
-        <tr style="height:25px;">
-            <td id="tab1" class="tab">
+  </td>
+ </tr>
+</tbody>
+  </table>
+  <div id="tabs">
+<table style="margin-left:20px;" >
+ <tr style="height:25px;">
+  <td id="tab1" class="tab">
 <!--<img src="../../libs/imagenes/1.png" width="20" align="absmiddle" height="20"/>&nbsp;&nbsp;-->
-            <b>Datos Generales</b>
-            </td>
- <!--  
+<b>Datos Generales</b>
+</td>
+ <!--
 <td id="tab2" class="tab">
  <b>Datos Particulares</b>
 </td>
@@ -385,35 +575,35 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
 </td>
 <td id="tab5" class="tab">
  <b>Precio</b>
-</td> 
+</td> -->
 <td id="tab5" class="tab">
  <b>Datos Compra</b>
-</td>-->
-        <td>&nbsp;&nbsp;</td>
-    </tr>
+</td>
+  <td>&nbsp;&nbsp;</td>
+ </tr>
 </table>
-</div>
-<div id='productosKit'></div>
-<div id="contenedorTAB">
+  </div>
+  <div id='productosKit'></div>
+  <div id="contenedorTAB" class="contieneOtro">
 <!-- TAB1 -->
 <div id="div_tab1">
  <table style="width: 100%;">
   <tr>
-<td colspan="4"  class="label" style="text-align: center;"> COMPLETLE LOS CAMPOS MARCADOS CON&nbsp;** OBLIGATORIAMENTE</td>
+<td colspan="4"  class="label" style="text-align: center;"> COMPLETE LOS CAMPOS MARCADOS CON&nbsp;** OBLIGATORIAMENTE</td>
   </tr>
- <tr hidden="hidden">
+ <tr>
  <td colspan="3" class="label" style="width: 30%;">Foto</td>
  <td>
   <input type="file" name="foto" id="foto"  class="form-text"/>
-  
+
  </td>
 </tr>
 <!-- <tr>
- <td colspan="5" align="center"> 
+ <td colspan="5" align="center">
 <img src="../../imagenes/<?php echo $this->_tpl_vars['campos_item'][0]['foto']; ?>
-" width="100" align="absmiddle" height="100"/> 
+" width="100" align="absmiddle" height="100"/>
  </td>
- 
+
 </tr> -->
 
 <tr>
@@ -421,7 +611,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
  <td>
   <input type="text" name="fecha_ingreso" id="fecha_ingreso" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['fecha_creacion']; ?>
 " class="form-text" disabled="disabled" />
-  
+
  </td>
 </tr>
 
@@ -436,11 +626,14 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
  <div id="notificacionVCoditem"></div>
 </td>
 </tr>
-<tr>
+  <tr>
+<td  colspan="4" align="center" width="180">DATOS DEL PRODUCTO</td>
+  </tr>
+  <tr>
 <td colspan="3" class="label"><!-- <?php echo $this->_tpl_vars['DatosGenerales'][0]['string_clasificador_inventario1']; ?>
  -->Rubro</td>
 <td>
- <select name="cod_departamento" id="cod_departamento" class="form-text">
+ <select name="cod_departamento" id="cod_departamento" class="form-text" width="200px">
   <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_output_departamentos'],'output' => $this->_tpl_vars['option_values_departamentos'],'selected' => $this->_tpl_vars['option_selected_departamentos']), $this);?>
 
  </select>
@@ -448,7 +641,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
   </tr>
   <tr>
 <td colspan="3" class="label"><!-- <?php echo $this->_tpl_vars['DatosGenerales'][0]['string_clasificador_inventario2']; ?>
- -->Sub Rubro</td>
+ -->Categor&iacute;a</td>
 <td>
  <select name="cod_grupo" id="cod_grupo" class="form-text">
   <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_subrubro'],'output' => $this->_tpl_vars['option_output_subrubro'],'selected' => $this->_tpl_vars['option_selected_subrubro']), $this);?>
@@ -456,34 +649,61 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
  </select>
 </td>
   </tr>
-  <!--  comentado el 3 de febrero 2015 para facilitar la creacion en pdval -->
+  <tr>
+ <td colspan="3" class="label"><!-- <?php echo $this->_tpl_vars['DatosGenerales'][0]['string_clasificador_inventario2']; ?>
+ -->Sub Categor&iacute;a</td>
+ <td>
+  <select name="sub_categoria" id="sub_categoria" class="form-text">
+<?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_output_grupo'],'output' => $this->_tpl_vars['option_values_grupo'],'selected' => $this->_tpl_vars['option_selected_sub_categoria']), $this);?>
 
-<!--   <tr>
-<td colspan="3" >
- <?php echo $this->_tpl_vars['DatosGenerales'][0]['string_clasificador_inventario3']; ?>
+  </select>
+ </td>
+</tr>
+<!--
+<tr>
+    <td colspan="3" class="label">Código arancelario</td>
+    <td>
+        <select name="codigo_arancelario" id="codigo_arancelario" class="form-text cod_arancel" style="width: 400px;">
+            <option></option>
+            <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_arancel'],'output' => $this->_tpl_vars['option_output_arancel'],'selected' => $this->_tpl_vars['option_selected_arancel']), $this);?>
 
-</td>
-<td>
- <select name="cod_linea" id="cod_linea" class="form-text">
-  <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_output_linea'],'output' => $this->_tpl_vars['option_values_linea'],'selected' => $this->_tpl_vars['option_selected_linea']), $this);?>
+        </select>
+    </td>
+</tr>
 
- </select>
-</td>
-  </tr> -->
+ <tr>
+    <td>
+        <select class="ejemploselect2" name="state">
+          <option value="AL">Alabama</option>
+          <option value="WY">Wyoming</option>
+          <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_arancel'],'output' => $this->_tpl_vars['option_output_arancel'],'selected' => $this->_tpl_vars['option_selected_arancel']), $this);?>
+
+        </select>
+    </td>
+</tr> -->
   <tr>
 <td colspan="3" class="label">C&oacute;digo de barras**</td>
 <td>
  <input type="text" name="cod_barras" id="cod_barras" size="60" value="<?php echo $this->_tpl_vars['campos_item'][0]['codigo_barras']; ?>
-" class="form-text"/>
+" class="form-text"
+ onchange="validaritem()" />
+  <div id="notificacion_codigo_barras"></div>
 </td>
   </tr>
 
-  <tr hidden="hidden">
+  <tr>
  <td colspan="3" width="30%" class="label">Cod. CPE</td>
  <td>
   <input type="text" name="cod_cpe" id="cod_cpe" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['codigo_cpe']; ?>
 " class="form-text"/>
-  
+
+ </td>
+</tr>
+<tr>
+ <td colspan="3" width="30%" class="label">Registro Sanitario</td>
+ <td>
+  <input type="text" name="reg_sanit" id="reg_sanit" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['reg_sanit']; ?>
+" class="form-text"/>
  </td>
 </tr>
   <!--tr>
@@ -507,6 +727,16 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
 " class="form-text"/>
 </td>
   </tr>
+  <tr>
+ <td class="label" colspan="3">Tipo de Almacenamiento</td>
+ <td>
+  <select name="tipo_almacenamiento" id="tipo_almacenamiento" class="form-text">
+<option value="">Seleccione Tipo de Almacenamiento</option>
+<option <?php if ($this->_tpl_vars['campos_item'][0]['tipo_almacenamiento'] == 'SECO'): ?> selected <?php endif; ?>value="SECO">SECO</option>
+<option <?php if ($this->_tpl_vars['campos_item'][0]['tipo_almacenamiento'] == 'FRIO'): ?> selected <?php endif; ?>value="FRIO">FRIO</option>
+  </select>
+ </td>
+</tr>
   <!--  comentado el 3 de enero 2015 para facilitar la creacion en pdval -->
 
 <!--   <tr>
@@ -524,9 +754,9 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
 " class="form-text"/>
 </td>
   </tr> -->
-  <tr hidden="hidden">
-<td  colspan="3">
- Referencia
+  <tr>
+<td  colspan="3" class="label">
+ SKU
 </td>
 <td>
  <input type="text" name="referencia" id="referencia" size="60" value="<?php echo $this->_tpl_vars['campos_item'][0]['referencia']; ?>
@@ -537,43 +767,53 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
   <tr>
  <td class="label" colspan="3">Unidad Venta</td>
  <td>
-  
+
    <!--<input type="text" name="unidad_empaque" id="unidad_empaque" size="5" value="<?php echo $this->_tpl_vars['campos_item'][0]['cantidad']; ?>
 " class="form-text"/>
   <input type="text" name="empaque_descripcion" id="empaque_descripcion" size="5" value="<?php echo $this->_tpl_vars['campos_item'][0]['unidad_empaque']; ?>
 " readonly style="border-style:none; background:none;" class="form-text"/>-->
   <select name="unidad_venta" id="unidad_venta" class="form-text">
-<option value="0">Seleccione Unidad de Venta</option>
+<option value="">Seleccione Unidad de Venta</option>
 <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_unidad_venta'],'output' => $this->_tpl_vars['option_output_unidad_venta'],'selected' => $this->_tpl_vars['option_selected_unidad_venta']), $this);?>
 
   </select>
- 
-  
+
+
  </td>
 </tr>
 
-<tr hidden="hidden">
+<tr>
  <td class="label" colspan="3">Unidad de Peso**</td>
  <td>
    <select name="unidadxpeso" id="unidadxpeso" class="form-text">
-<option value="0">Seleccione Peso por Unidad</option>
+<option value="">Seleccione Unidad de Peso</option>
 <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_unidadxpeso'],'output' => $this->_tpl_vars['option_output_unidadxpeso'],'selected' => $this->_tpl_vars['option_selected_unidadxpeso']), $this);?>
 
   </select>
  </td>
 </tr>
 
-<tr hidden="hidden">
-<td  colspan="3">
+<tr>
+<td  colspan="3" class="label">
 Peso por Unidad
 </td>
 <td>
  <input type="text" name="pesoxunidad" id="pesoxunidad" size="10" value="<?php echo $this->_tpl_vars['campos_item'][0]['pesoxunidad']; ?>
-" class="form-text" onKeyPress="return soloNumeros(event)"/>
+" class="form-text" onKeyPress="return NumCheck(event, this)"/>
 </td>
-  </tr>
+</tr>
 
-<tr hidden="hidden">
+<tr>
+<td  colspan="3" class="label">
+Cantidad por Paleta
+</td>
+<td>
+ <input type="text" name="unidad_paleta" id="unidad_paleta" size="10" value="<?php echo $this->_tpl_vars['campos_item'][0]['unidad_paleta']; ?>
+" class="form-text" onKeyPress="return NumCheck(event, this)"/>
+</td>
+</tr>
+
+<tr>
  <td class="label" colspan="3">Tipo de Producto</td>
  <td>
   <select name="tipo" id="tipo" class="form-text">
@@ -584,7 +824,7 @@ Peso por Unidad
  </td>
 </tr>
 
-<tr hidden="hidden">
+<tr>
  <td class="label" colspan="3">Marca</td>
  <td>
    <select name="marca" id="marca" class="form-text">
@@ -595,7 +835,7 @@ Peso por Unidad
   <!--<input type="text" name="codigo_fabricante" id="codigo_fabricante" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['codigo_fabricante']; ?>
 " class="form-text"/>-->
  </td>
-</tr> 
+</tr>
 <!--
 <tr>
  <td class="label" colspan="3">Estatus</td>
@@ -619,7 +859,7 @@ Peso por Unidad
 
   </select>
 
- 
+
  </td>
   </tr>
   <tr>
@@ -674,12 +914,53 @@ Peso por Unidad
  </select>
 </td>
 </tr>
-  <tr hidden="hidden">
+  <tr>
  <td class="label" colspan="3">Indices</td>
  <td>
   Regulado<input <?php if ($this->_tpl_vars['campos_item'][0]['regulado'] == '1'): ?> checked <?php endif; ?>type="checkbox" name="regulado" id="regulado" size="50" value="1" class="form-text"/>
   Cesta Basica<input <?php if ($this->_tpl_vars['campos_item'][0]['cestack_basica'] == '1'): ?> checked <?php endif; ?>type="checkbox" name="cestack_basica" id="cestack_basica" size="50" value="1" class="form-text"/>
-  BCV<input <?php if ($this->_tpl_vars['campos_item'][0]['bcv'] == '1'): ?> checked <?php endif; ?>type="checkbox" name="bcv" id="bcv" size="50" value="1" class="form-text"/>
+  BCV<input <?php if ($this->_tpl_vars['campos_item'][0]['bcv'] == '1'): ?> checked <?php endif; ?>type="checkbox" name="bcv" id="bcv" size="50" value="1" class="form-text"/>&nbsp;&nbsp;&nbsp;CLAP&nbsp;&nbsp;&nbsp;<input type="checkbox" <?php if ($this->_tpl_vars['campos_item'][0]['clap'] == '1'): ?> checked <?php endif; ?> name="clap" id="clap"  value="1" class="form-text"/>
+ </td>
+</tr>
+<tr>
+    <td class="label" colspan="3">
+        Producto de Producci&oacute;n
+    </td>
+    <td>
+        <input type="checkbox" <?php if ($this->_tpl_vars['campos_item'][0]['sae'] == '1'): ?> checked <?php endif; ?> name="sae" id="sae"  value="1" class="form-text" onclick="mostrar_impresion()" />
+    </td>
+</tr>
+<tr>
+    
+    <td class="label" colspan="4">
+        <div style="display: none;" id='impresion_entrega'>
+            <table align="center" style="margin-left: 90px">
+                <tr>
+                    <td>
+                        Impresi&oacute;n De Entrega
+                    </td>
+                    <td>
+                        <select name="impresion" id="impresion" class="form-text">
+                            <option value="NULL">Seleccione</option>
+                            <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_impresion'],'output' => $this->_tpl_vars['option_output_impresion'],'selected' => $this->_tpl_vars['option_selected_impresion']), $this);?>
+
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </td>
+</tr>
+<tr>
+ <td class="label" colspan="3"></td>
+ <td>
+   <input type="radio" name="central" value="C" class="form-text" <?php if ($this->_tpl_vars['campos_item'][0]['central'] == 'C'): ?> checked="checked" <?php endif; ?>> Central <input type="radio" name="central" value="R" class="form-text" <?php if ($this->_tpl_vars['campos_item'][0]['central'] == 'R'): ?> checked="checked" <?php endif; ?>> Regional
+ </td>
+</tr>
+<tr>
+ <td class="label" colspan="3"></td>
+ <td>
+   <input type="radio" name="nacional" value="N" class="form-text" <?php if ($this->_tpl_vars['campos_item'][0]['nacional'] == 'N'): ?> checked="checked" <?php endif; ?>> Nacional <input type="radio" name="nacional" value="I" class="form-text" <?php if ($this->_tpl_vars['campos_item'][0]['nacional'] == 'I'): ?> checked="checked" <?php endif; ?>> Importado
  </td>
 </tr>
  <tr>
@@ -719,7 +1000,7 @@ Peso por Unidad
 <td  colspan="3">
  <br>
 </td>
-<td>  
+<td>
  <div id=\'serialGarantia\' style=\'display:inline; visibility:hidden\'>
   &nbsp;  &nbsp; &nbsp;   &nbsp;Serial Con Garant&iacute;a.
   '; ?>
@@ -733,9 +1014,8 @@ Peso por Unidad
  Producto con Kit
  <input type="checkbox" name="producto_kit" id="producto_kit" class="form-text" value='1' <?php echo $this->_tpl_vars['campos_kit']; ?>
    <?php echo ' onclick="if (this.checked) {cargarUrl(\'kitproductos.php?codigo=\' + this.form.cod_item.value,\'productosKit\'); document.getElementById(\'productosKit\').style.visibility=\'visible\';} else {document.getElementById(\'productosKit\').style.visibility=\'hidden\';ocultarVarios(\'productosKit\');}"/>
-</div>-->
+</div>
 &nbsp;&nbsp;&nbsp;&nbsp;
-<!--
 '; ?>
 
  <br/>
@@ -758,7 +1038,7 @@ Factor de Cambio
  <br/>
   </td>
  </tr>
- 
+
 <div id='serial1' style='display:inline; visibility:hidden'>
 <tr>
 <td  colspan="3">Serial</td>
@@ -767,32 +1047,54 @@ Factor de Cambio
 " class="form-text"/>
 </td>
   </tr>
-  </div>    -->                         
- 
- 
- <tr hidden="hidden">
-  <td  colspan="3">
-Costo Actual
+  </div>    -->
+
+
+ <tr>
+  <td class="label" colspan="3">
+    Precio Actual
   </td>
   <td>
 <input size="60" type="text" name="costo_actual"  id="costo_actual" onchange='this.form.precio_1.value= this.value ; this.form.costo_promedio.value= this.value; this.form.costo_anterior.value= this.value; this.form.ocultos1.value= this.value;  this.form.ocultos2.value= this.value; this.form.ocultos3.value= this.value; calcular_todo();' value="<?php echo $this->_tpl_vars['campos_item'][0]['costo_actual']; ?>
-" class="form-text"/>
+" class="form-text" disabled="true"/>
   </td>
  </tr>
- <tr hidden="hidden">
-  <td  colspan="3">Costo Promedio</td>
+ <tr>
+  <td class="label" colspan="3">Precio Promedio</td>
   <td>
 <input size="60" type="text" name="costo_promedio" id="costo_promedio" onchange='' value="<?php echo $this->_tpl_vars['campos_item'][0]['costo_promedio']; ?>
-" class="form-text"/>
+" class="form-text" disabled="true"/>
   </td>
  </tr>
- <tr hidden="hidden">
-  <td  colspan="3">Costo Anterior</td>
+ <tr>
+  <td class="label" colspan="3">Precio Anterior</td>
   <td>
 <input size="60" type="text" name="costo_anterior" id="costo_anterior" onchange='' value="<?php echo $this->_tpl_vars['campos_item'][0]['costo_anterior']; ?>
-" class="form-text"/>
+" class="form-text" disabled="true"/>
   </td>
  </tr>
+ 
+    <?php if ($this->_tpl_vars['varCotiza'] == '1'): ?>
+    <tr>
+        <td class="label" colspan="3">Ultimo Costo Cotizado</td>
+        <td>
+            <input type="text" name="ultimo_costo_cotizado" id="ultimo_costo_cotizado" size="30" class="form-text" disabled="true" value="<?php echo $this->_tpl_vars['camposcotiza']; ?>
+" />
+            <div id="notificacion_ultimo_costo"></div>
+        </td>
+    </tr>
+    <?php endif; ?>
+    <?php if ($this->_tpl_vars['varCotiza'] == '0'): ?>
+    <tr>
+        <td class="label" colspan="3">Ultimo Costo Cotizado</td>
+        <td>
+            <input type="text" name="ultimo_costo_cotizado" id="ultimo_costo_cotizado" size="30" class="form-text" disabled="true" value="<?php echo $this->_tpl_vars['camposcotiza']; ?>
+" />
+            <div id="notificacion_ultimo_costo"></div>
+        </td>
+    </tr>
+    <?php endif; ?>
+
  </tbody>
 </table>
 </td>
@@ -806,24 +1108,24 @@ Costo Actual
  <br/>
  <table>
   <tr>
-<td colspan="4" class="label" style="text-align:center;">&nbsp;</td>
+<td colspan="4"  align="center">&nbsp;</td>
   </tr>
   <tr>
-<td  class="label" colspan="4" align="center" width="180" class="label"></td>
+<td  colspan="4" align="center" width="180"></td>
   </tr>
   <tr>
-<td  colspan="3" align="right" class="label">&nbsp;&nbsp;&nbsp;</td>
+<td  colspan="3" align="right">&nbsp;&nbsp;&nbsp;</td>
 <td>
  <table id="tabla_total" style="border: 1px solid #507e95;" bgcolor="white">
   <thead>
 <tr>
- <th style="text-align:left;">Costos</th>
-  <th style="text-align:left;">Utilidad</th>
-  <th style="text-align:left;">Con Utilidad</th>
-  <th style="text-align:left;">Gravado</th>
+ <th align="left">Precios</th>
+ <th align="left">Utilidad %</th>
+ <th align="left">Con Utilidad</th>
+ <th align="left">Gravado</th>
 </tr>
   </thead>
-  <tbody id="tbody">
+  <tbody>
 <tr>
  <td>
   <input type='text' name='ocultos1' id='ocultos1' value="<?php echo $this->_tpl_vars['campos_item'][0]['p1']; ?>
@@ -831,36 +1133,36 @@ Costo Actual
  </td>
  <td>
   <input type="text" onchange="calcularMonto(this.form.precio_1,this,this.form.coniva1,this.form.ocultos1);" class="campo_decimal" size="3" name="utilidad1" id="utilidad1" name="utilidad1" value="<?php echo $this->_tpl_vars['campos_item'][0]['utilidad1']; ?>
-" class="form-text"/>%</td>
+" class="form-text" />%</td>
  <td>
   <input type="text" onchange='calcular_todo();' class="campo_decimal" title="<?php echo $this->_tpl_vars['DatosGenerales'][0]['titulo_precio1']; ?>
 " id="fila_precio1" name="precio_1" value="<?php echo $this->_tpl_vars['campos_item'][0]['precio1']; ?>
-" size="10" readonly  class="form-text"/>
+" size="10" readonly  class="form-text" disabled="true"/>
  </td>
  <td><input type="text" class="campo_decimal" id="fila_precio1_iva" name="coniva1" size="10" value="<?php echo $this->_tpl_vars['campos_item'][0]['coniva1']; ?>
-" class="form-text"/></td>
+" class="form-text" /></td>
 </tr>
 <tr>
  <td><input type='text' id="ocultos2" name='ocultos2' value="<?php echo $this->_tpl_vars['campos_item'][0]['p2']; ?>
 " onchange=" calcular_todo();" size="9" class="form-text"/></td>
  <td><input type="text" onchange="calcularMonto(this.form.precio_2,this,this.form.coniva2,this.form.ocultos2);" class="campo_decimal" size="3"  name="utilidad2" id="utilidad2" value="<?php echo $this->_tpl_vars['campos_item'][0]['utilidad2']; ?>
-" class="form-text"/>%</td>
+" class="form-text" disabled="true"/>%</td>
  <td><input type="text" onchange='this.form.oculto2.value=this.value; calcular_todo();' class="campo_decimal" title="<?php echo $this->_tpl_vars['DatosGenerales'][0]['titulo_precio2']; ?>
 " id="fila_precio2" name="precio_2" readonly value="<?php echo $this->_tpl_vars['campos_item'][0]['precio2']; ?>
-" size="10" class="form-text"/></td>
+" size="10" class="form-text" disabled="true"/></td>
  <td><input type="text" class="campo_decimal" id="fila_precio2_iva" value="<?php echo $this->_tpl_vars['campos_item'][0]['coniva2']; ?>
-" name="coniva2" size="10" class="form-text"/></td>
+" name="coniva2" size="10" class="form-text" disabled="true"/></td>
 </tr>
 <tr>
  <td><input type='text' id="ocultos3" name='ocultos3' value="<?php echo $this->_tpl_vars['campos_item'][0]['p3']; ?>
 " onchange=" calcular_todo();" size="9" class="form-text"/></td>
  <td><input type="text" onchange="calcularMonto(this.form.precio_3,this,this.form.coniva3,this.form.ocultos3);" class="campo_decimal" value="<?php echo $this->_tpl_vars['campos_item'][0]['utilidad3']; ?>
-" size="3" name="utilidad3" id="utilidad3" class="form-text"/>%</td>
+" size="3" name="utilidad3" id="utilidad3" class="form-text" disabled="true"/>%</td>
  <td><input type="text" onchange='this.form.oculto3.value=this; calcular_todo();' class="campo_decimal" title="<?php echo $this->_tpl_vars['DatosGenerales'][0]['titulo_precio3']; ?>
 " id="fila_precio3" name="precio_3" readonly  value="<?php echo $this->_tpl_vars['campos_item'][0]['precio3']; ?>
-" size="10" class="form-text"/></td>
+" size="10" class="form-text" disabled="true"/></td>
  <td><input type="text" class="campo_decimal" id="fila_precio3_iva"  value="<?php echo $this->_tpl_vars['campos_item'][0]['coniva3']; ?>
-" name="coniva3" size="10" class="form-text"/></td>
+" name="coniva3" size="10" class="form-text" disabled="true"/></td>
 </tr>
 <tr>
  <td colspan="4"  align="center">
@@ -917,24 +1219,24 @@ Costo Actual
 <td style='left:100px;'>
  <table style='width:200px; margin-left:200px; height:200px; overflow:auto; background:white; -moz-border-radius:20px; border-style:none;'>
   <tr>
-<!--<td colspan='2'> Existencia en Almac&eacute;n  </td> -->
+<td colspan='2'> Existencia en Almac&eacute;n  </td>
   </tr>
   <tr>
-<!--<td style='background:#ccccdd; color:green; font-size:12px ; height:20px; font-weight:bold;'> Nombre Almac&eacute;n </td>
+<td style='background:#ccccdd; color:green; font-size:12px ; height:20px; font-weight:bold;'> Nombre Almac&eacute;n </td>
 <td style='background:#ccccdd; color:green; font-size:12px ; height:20px; font-weight:bold;'> Ubicacion</td>
-<td style=' color:green; height:20px; background:#ccccdd; width:30px'> Cantidad Existencia</td>-->
+<td style=' color:green; height:20px; background:#ccccdd; width:30px'> Cantidad Existencia</td>
   </tr>
   <?php $_from = $this->_tpl_vars['almacenes2']; if (!is_array($_from) && !is_object($_from)) { settype($_from, 'array'); }if (count($_from)):
     foreach ($_from as $this->_tpl_vars['i'] => $this->_tpl_vars['miItem']):
 ?>
-<!--<tr>
+<tr>
  <td style='color:blue; font-size:12px ; font-weight:bold;'><?php echo $this->_tpl_vars['miItem']['descripcion']; ?>
 </td>
  <td style='color:blue; font-size:12px ; font-weight:bold;'><?php echo $this->_tpl_vars['miItem']['ubicacion']; ?>
 </td>
  <td style='background:#dddddd; width:30px'><?php echo $this->_tpl_vars['miItem']['cantidad']; ?>
 </td>
-</tr>-->
+</tr>
   <?php endforeach; endif; unset($_from); ?>
  </table>
  </div>
@@ -970,7 +1272,7 @@ Costo Actual
  <td>
   <input type="text" name="fecha_ingreso" id="fecha_ingreso" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['fecha_ingreso']; ?>
 "  class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -979,7 +1281,7 @@ Costo Actual
  <td>
   <input type="text" name="origen" id="origen" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['origen']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -988,7 +1290,7 @@ Costo Actual
  <td>
   <input type="text" name="costo_cif" id="costo_cif" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['costo_cif']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -997,7 +1299,7 @@ Costo Actual
  <td>
   <input type="text" name="costo_origen" id="costo_origen" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['costo_origen']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1006,7 +1308,7 @@ Costo Actual
  <td>
   <input type="text" name="temporada" id="temporada" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['temporada']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1015,7 +1317,7 @@ Costo Actual
  <td>
   <input type="text" name="mate_compo_clase" id="mate_compo_clase" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['mate_compo_clase']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1024,7 +1326,7 @@ Costo Actual
  <td>
   <input type="text" name="punto_pedido" id="punto_pedido" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['punto_pedido']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1033,25 +1335,25 @@ Costo Actual
  <td>
   <input type="text" name="tejido" id="tejido" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['tejido']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
-<tr>
+<!--<tr>
  <td colspan="3" width="30%" class="label">Reg. Sanit.</td>
  <td>
   <input type="text" name="reg_sanit" id="reg_sanit" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['reg_sanit']; ?>
 " class="form-text"/>
-  
+
  </td>
-</tr>
+</tr>-->
 
 <tr>
  <td colspan="3" width="30%" class="label">Cod. barra bulto</td>
  <td>
   <input type="text" name="cod_barra_bulto" id="cod_barra_bulto" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['cod_barra_bulto']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1062,7 +1364,7 @@ Costo Actual
   <?php echo $this->_tpl_vars['campos_item'][0]['observacion']; ?>
 
   </textarea>
-  
+
  </td>
 </tr>
 
@@ -1080,11 +1382,11 @@ Costo Actual
  <td  class="label" >Foto 1</td>
  <td>
   <input type="file" name="foto1" id="foto1"  class="form-text"/>
-  
+
  </td>
-   <td  align="center"> 
+   <td  align="center">
 <img src="../../imagenes/<?php echo $this->_tpl_vars['campos_item'][0]['foto1']; ?>
-" width="100" align="absmiddle" height="100"/> 
+" width="100" align="absmiddle" height="100"/>
  </td>
 </tr>
 
@@ -1093,9 +1395,9 @@ Costo Actual
  <td>
    <input type="file" name="foto2" id="foto2"  class="form-text"/>
  </td>
-  <td  align="center"> 
+  <td  align="center">
 <img src="../../imagenes/<?php echo $this->_tpl_vars['campos_item'][0]['foto2']; ?>
-" width="100" align="absmiddle" height="100"/> 
+" width="100" align="absmiddle" height="100"/>
  </td>
 </tr>
 
@@ -1103,11 +1405,11 @@ Costo Actual
  <td  width="30%" class="label">Foto 3</td>
  <td>
    <input type="file" name="foto3" id="foto3"  class="form-text"/>
-  
+
  </td>
-   <td  align="center"> 
+   <td  align="center">
 <img src="../../imagenes/<?php echo $this->_tpl_vars['campos_item'][0]['foto3']; ?>
-" width="100" align="absmiddle" height="100"/> 
+" width="100" align="absmiddle" height="100"/>
  </td>
 </tr>
 
@@ -1115,17 +1417,17 @@ Costo Actual
  <td  width="30%" class="label">Foto 4</td>
  <td>
    <input type="file" name="foto4" id="foto4"  class="form-text"/>
-  
+
  </td>
-   <td  align="center"> 
+   <td  align="center">
 <img src="../../imagenes/<?php echo $this->_tpl_vars['campos_item'][0]['foto4']; ?>
-" width="100" align="absmiddle" height="100"/> 
+" width="100" align="absmiddle" height="100"/>
  </td>
 </tr>
 
 </table>
 
-</div>           
+</div>
 <div id="div_tab4">
 <table style="width: 100%; height: 100px;">
 <tr>
@@ -1133,7 +1435,7 @@ Costo Actual
  <td>
   <input type="text" name="cont_licen_nro" id="cont_licen_nro" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['cont_licen_nro']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1142,7 +1444,7 @@ Costo Actual
  <td>
   <input type="text" name="precio_cont" id="precio_cont" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['precio_cont']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1151,7 +1453,7 @@ Costo Actual
  <td>
   <input type="text" name="aprob_arte" id="aprob_arte" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['aprob_arte']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1160,7 +1462,7 @@ Costo Actual
  <td>
   <input type="text" name="propiedad" id="propiedad" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['propiedad']; ?>
 " class="form-text"/>
-  
+
  </td>
 </tr>
 
@@ -1176,10 +1478,17 @@ Costo Actual
   <!--<input type="text" name="empaque" id="empaque" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['unidad_empaque']; ?>
 " onchange='this.form.empaque_descripcion.value = this.value;' class="form-text"/>-->
   <select name="empaque" id="empaque" class="form-text" onchange='this.form.empaque_descripcion.value = this.form.empaque.options[this.form.empaque.selectedIndex].text;'(s)>
-<option>Seleccione Unidad de Empaque</option>
+<option value="3">Seleccione Unidad de Empaque</option>
 <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_empaque'],'output' => $this->_tpl_vars['option_output_empaque'],'selected' => $this->_tpl_vars['campos_item'][0]['unidad_empaque']), $this);?>
 
   </select>
+ </td>
+</tr>
+<tr>
+ <td colspan="3" width="30%" class="label">Precio Empaque</td>
+ <td>
+  <input type="text" name="precio_bulto" id="precio_bulto" size="50" value="<?php echo $this->_tpl_vars['campos_item'][0]['precio_bulto']; ?>
+" class="form-text" onKeyPress="return acceptNum(event)"/>
  </td>
 </tr>
 <tr>
@@ -1187,7 +1496,7 @@ Costo Actual
  <td>
   <input type="text" name="cod_barra_bulto" id="cod_barra_bulto" size="50" class="form-text" value="<?php echo $this->_tpl_vars['campos_item'][0]['cod_barra_bulto']; ?>
 "/>
-  
+
  </td>
 </tr>
 <tr>
@@ -1202,21 +1511,21 @@ Costo Actual
  <td class="label" colspan="3">Kilos por Bulto**</td>
  <td>
   <input type="text" name="kilos_bulto" id="kilos_bulto" size="50"  class="form-text" value="<?php echo $this->_tpl_vars['campos_item'][0]['kilos_bulto']; ?>
-"/>
+" disabled="disabled" />
  </td>
 </tr>
 </table>
+</div>
 
-        
-    
+
 </div>
 <!-- +++++++++++++++ -->
  </div>
 
  <input type="hidden" name="pg_iva" id="pg_iva" value="<?php echo $this->_tpl_vars['parametros_generales'][0]['porcentaje_impuesto_principal']; ?>
 "/>
- 
-<table style="width: 100%;">   
+
+<table style="width: 100%;">
 <tr class="tb-tit" align="right">
  <td colspan="4">
   <input type="submit" id="aceptar" name="aceptar" value="Guardar"/>
@@ -1224,7 +1533,7 @@ Costo Actual
 &opt_seccion=<?php echo $_GET['opt_seccion']; ?>
 ';" value="Cancelar"/>
  </td>
-</tr> 
+</tr>
  </table>
 </form>
 

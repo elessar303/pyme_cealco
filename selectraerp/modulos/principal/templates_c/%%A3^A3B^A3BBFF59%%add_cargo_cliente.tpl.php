@@ -1,21 +1,21 @@
-<?php /* Smarty version 2.6.21, created on 2017-09-18 19:51:18
-         compiled from transformacion_add.tpl */ ?>
-<?php require_once(SMARTY_CORE_DIR . 'core.load_plugins.php');
-smarty_core_load_plugins(array('plugins' => array(array('function', 'html_options', 'transformacion_add.tpl', 240, false),)), $this); ?>
+<?php /* Smarty version 2.6.21, created on 2017-09-18 19:34:01
+         compiled from add_cargo_cliente.tpl */ ?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title></title>
-        <script type="text/javascript" src="../../libs/js/event_almacen_entrada_calidad.js"></script>
-        <script type="text/javascript" src="../../libs/js/eventos_formAlmacen_calidad.js"></script>
-         <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
+        <script type="text/javascript" src="../../libs/js/event_almacen_entrada_clientecargo.js"></script>
+        <script type="text/javascript" src="../../libs/js/eventos_formAlmacen_clientecargo.js"></script>
+        <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
         <?php echo '
+
         <script language="JavaScript" type="text/JavaScript">
         
         $(document).ready(function()
         {
         //funcion para cargar los puntos 
+          
 
             $("#cantidadunitaria").keyup(function()
             {
@@ -248,28 +248,25 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                                 <tr>
                                     <td>
                                         <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
-                                        <span style="font-family:'Verdana';font-weight:bold;"><b>Producto (*)</b></span>
+                                        <span style="font-family:'Verdana';font-weight:bold;"><b>Cliente (*)</b></span>
                                     </td>
                                     <td>
-                                        <select name="rubro1" id="rubro1" class="form-text" onChange='verificar()'>
-                                            <option value="">Seleccione una opcion</option>
-                                            <?php echo smarty_function_html_options(array('values' => $this->_tpl_vars['option_values_rubro'],'output' => $this->_tpl_vars['option_output_rubro']), $this);?>
-
-                                            
-                                        </select>
-                                        <input type="hidden" name="rubro[]" id="rubro[]" />
-                                        <input type="hidden" name="cantidad[]" id="cantidad[]"/>
+                                        <input type="text" name="nombre_cliente"   size="30" maxlength="70" class="form-text" readonly="readonly" value=<?php echo $this->_tpl_vars['nombre_cliente']; ?>
+ />
+                                        <input type="hidden" name="id_cliente" id="id_cliente" value=<?php echo $this->_tpl_vars['id_cliente']; ?>
+ />
                                     </td>
                                 </tr>
-                                <tr>
+                                <!--<tr>
                                     <td>
-                                        <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
+                                        <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"
                                         <span style="font-family:'Verdana';font-weight:bold;"><b>Cantidad (*)</b></span>
                                     </td>
                                     <td>
                                         <input type="numeric" name="cantidad1" maxlength="100" id="cantidad1" size="30" maxlength="70" class="form-text" value="" onkeyup='verificar()'/>
                                     </td>
                                 </tr>
+                                -->
                                 </table>
                             </div>
                         </td>
@@ -281,7 +278,7 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                                 </td>
                                 <td><img src="../../../includes/imagenes/add.gif" width="16" height="16" />
                                 </td>
-                                <td style="padding: 0px 6px;">Agregar Otro Producto
+                                <td style="padding: 0px 6px;">Agregar Otro Servicio
                                 </td>
                                 <td><img src="../../../includes/imagenes/bt_right.gif" style="border-width: 0px; width: 4px; height: 21px;" />
                                 </td>
@@ -303,7 +300,8 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
                                         <tr>
                                             <th class="tb-tit" style="text-align: center;">C&oacute;digo</th>
                                             <th class="tb-tit" style="text-align: center;">Descripci&oacute;n</th>
-                                            <th class="tb-tit" style="text-align: center;">Cantidad</th>
+                                            <th class="tb-tit" style="text-align: center;">Fecha Inicio</th>
+                                            <th class="tb-tit" style="text-align: center;">Fecha Fin</th>
                                             <th class="tb-tit" style="text-align: center;">Opci&oacute;n</th>
                                         </tr>
                                     </thead>
@@ -354,22 +352,53 @@ smarty_core_load_plugins(array('plugins' => array(array('function', 'html_option
         <div id="incluirproducto" class="x-hide-display">
           
             <p>
-               <label><b>Codigo de barra</b></label><br/>
+               <label><b>Codigo de Servicio</b></label><br/>
                <input type="text" name="codigoBarra" id="codigoBarra">
                <button id="buscarCodigo" name="buscarCodigo">Buscar</button>
             </p>
 
             <p>
-                <label><b>Productos</b></label><br/>
+                <label><b>Servicio</b></label><br/>
                 <input type="hidden" name="items" id="items">
-                 <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
-                <!--<select style="width:100%" id="items" name="items" onchange="comprobarfechavencimiento(this.id)"></select>-->
+                <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
             </p>
-            
             <p>
-                <label><b>Cantidad Unitaria</b></label><br/>
-                <input type="text" name="cantidadunitaria" id="cantidadunitaria"/>
+                <label><b>Fecha Inicio</b></label><br/>
+                <input type="text" name="fechainicio" id="fechainicio"/>
+                <?php echo '
+                <script type="text/javascript">
+                    var cal = Calendar.setup(
+                    {
+                        onSelect: function(cal) 
+                        {
+                            cal.hide();
+                        }
+                    });
+                cal.manageFields("fechainicio", "fechainicio", "%d-%m-%Y");
+            
+            </script>
+            '; ?>
+
             </p>
+            <p>
+                <label><b>Fecha Fin</b></label><br/>
+                <input type="text" name="fechafin" id="fechafin"/>
+                <?php echo '
+                <script type="text/javascript">
+                    var cal = Calendar.setup(
+                    {
+                        onSelect: function(cal) 
+                        {
+                            cal.hide();
+                        }
+                    });
+                cal.manageFields("fechafin", "fechafin", "%d-%m-%Y");
+            
+            </script>
+            '; ?>
+
+            </p>
+
          
         </div>
     </body>
