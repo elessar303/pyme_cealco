@@ -1,7 +1,7 @@
 <?php
 
 $comunes = new Comunes();
-$tabla = $name_form = "kardex_almacen";
+$tabla = $name_form = "calidad_almacen";
 $tipob = @$_GET['tipo'];
 $des = @$_GET['des'];
 $pagina = @$_GET['pagina'];

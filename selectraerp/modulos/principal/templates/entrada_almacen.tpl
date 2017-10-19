@@ -14,6 +14,16 @@ Objetivos:
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         {include file="snippets/header_form.tpl"}
         <script type="text/javascript" src="../../libs/js/entrada_almacen.js"></script>
+        {literal}
+        <script language="JavaScript" type="text/JavaScript">
+            function entradapaleta(id)
+            {
+                opt_menu=$('#opt_menu').val();
+                opt_seccion=$('#opt_section').val();
+                window.location='?opt_menu='+opt_menu+'&opt_seccion='+opt_seccion+'&opt_subseccion=entradapaleta&id='+id;
+            }
+        </script>
+        {/literal}
     </head>
     <body>
         <form id="form-{$name_form}" name="form-{$name_form}" action="?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}" method="post">
@@ -22,6 +32,7 @@ Objetivos:
                 {include file = "snippets/tb_head.tpl"}
                 <br/>
                 <table class="seleccionLista">
+                    
                     <tbody>
                         <tr class="tb-head">
                             {foreach from=$cabecera key=i item=campos}
@@ -40,6 +51,8 @@ Objetivos:
                                 {/if}
                                 <tr bgcolor="{$color}" style="cursor: pointer;" class="detalle">
                                     <td style="text-align: right; padding-right: 20px;">{$campos.id_transaccion}</td>
+                                    <input type='hidden' name='opt_menu' id='opt_menu' value='{$smarty.get.opt_menu}'/>
+                                    <input type='hidden' name='opt_section' id='opt_section' value='{$smarty.get.opt_seccion}'/>
                                     <td style="text-align:center;">{$campos.fecha|date_format:"%d-%m-%Y"}</td>
                                     <td style="padding-left: 20px;">{$campos.autorizado_por}</td>
                                     <td style="padding-left: 20px;">{$campos.descripcion}</td>

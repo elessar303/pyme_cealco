@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    
     $('tr.edocuenta').mouseover(function() {
         if ($(this).attr("bgcolor") != "#b6ceff") {
             $(this).attr("bgcolor", "#fbf6f6");
@@ -54,7 +55,7 @@ $(document).ready(function() {
         //Cargamos los debitos y creditos
         $.ajax({
             type: 'GET',
-            data: 'opt=det_items&id_transaccion=' + id_transaccion + '&id_tipo_movimiento_almacen=' + id_tipo_movimiento_almacen,
+            data: 'opt=det_items_calidad&id_transaccion=' + id_transaccion + '&id_tipo_movimiento_almacen=' + id_tipo_movimiento_almacen,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
             },

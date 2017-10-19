@@ -183,6 +183,7 @@ if (isset($_POST["input_cantidad_items"])) {
             $status='RD';
         }
 
+        //no se de quien es esto XD
         $entrada_control="INSERT INTO entrada_control (id_transaccion, ref_salida, fecha_salida, tipo, status, conciliado)
         VALUES ()
         ";

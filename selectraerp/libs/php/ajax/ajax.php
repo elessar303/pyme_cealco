@@ -22,6 +22,447 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "ValidarTicketEntrada":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM kardex_almacen WHERE ticket_entrada = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+        break;
+        case "EntradaNuevaAlmacen" :
+            //buscamos los datos básicos en calidad y a su ves nos aseguramos no que se ha registrado en kardex almacen
+            $sql=
+            "
+                Select 
+                a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
+                a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
+                a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
+                a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion
+                from calidad_almacen as a 
+                inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+                where b.id_transaccion_detalle=".$_POST['id_movimiento']." 
+                AND  a.id_transaccion not in (select id_transaccion from kardex_almacen)
+            ";
+            $datospadre=$conn->ObtenerFilasBySqlSelect($sql);
+            if($datospadre==null)
+            {
+                //si es null es por que ya existe
+                $sql=
+                "
+                    select 
+                    a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
+                    a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
+                    a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
+                    a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion 
+                    from kardex_almacen as a
+                    inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+                    where b.id_transaccion=".$_POST['id_movimiento'];
+                
+                $maestro=$conn->ObtenerFilasBySqlSelect($sql);
+                if($maestro==null)
+                {
+                    //error
+                    echo "-1"; exit();
+                }
+                else
+                {
+                    $datospadre=$maestro;
+                    $conn->BeginTrans();
+                    //Se consulta el precio actual para dejar el historico en kardex (Junior)
+                    $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$datospadre[0]['id_item']}'";
+                    $precio_actual=$conn->ObtenerFilasBySqlSelect($sql);
+                    $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
+                    //correlativo de ticket
+                    $sql="Select contador from correlativos where campo='id_ticket'";
+                    $idticket=$conn->ObtenerFilasBySqlSelect($sql);
+                    //sql kardex_detalle
+                    $kardex_almacen_detalle_instruccion = 
+                    "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
+                        `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
+                        VALUES (
+                        NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
+                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contandor'] .");
+                    ";
+                    $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                    //actualizo correlativo
+                    $sql="update correlativos set contador=(contador+1) where campo='id_ticket'";
+                    $conn->ExecuteTrans($sql);
+                    //bloqueando las ubicaciones
+                    $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
+                    $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
+                    if($ocupado[0]['ocupado']!=1)
+                    {
+                        $sql=
+                        "
+                            update ubicacion set ocupado=1 where id=".$_POST['ubicacion_detalle'];
+                        $conn->ExecuteTrans($sql);
+                    }
+                    else
+                    {
+                        echo "-1"; exit();
+                    }
+        
+                    $sql=
+                    "
+                        SELECT * FROM item_existencia_almacen WHERE
+                        id_item  = '{$datospadre[0]['id_item']}' 
+                        AND id_ubicacion = '{$_POST['ubicacion_detalle']}'
+                        AND lote='{$datospadre[0]['lote']}' 
+                        AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                    ";
+                    $campos = $conn->ObtenerFilasBySqlSelect($sql);
+        
+                    if (count($campos) > 0) 
+                    {
+                        $cantidadExistente = $campos[0]["cantidad"];
+                        $conn->ExecuteTrans(
+                        "
+                            UPDATE item_existencia_almacen 
+                            SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "'
+                            WHERE id_item  = '{$datospadre[0]['id_item']}' 
+                            AND id_ubicacion = '{$_POST['ubicacion_detalle']}' 
+                            AND lote='{$datospadre[0]['lote']}' 
+                            AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                        ");
+                    } 
+                    else 
+                    {
+                        $instruccion = 
+                        "
+                            INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, `lote`, `id_proveedor`)
+                            VALUES 
+                            ('{$_POST['ubicacion_principal']}',
+                            '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['ubicacion_detalle']}',
+                            '{$datospadre[0]['lote']}', '{$datospadre[0]['id_proveedor']}');
+                        ";
+                        $conn->ExecuteTrans($instruccion);
+                    }    
+                }//fin del else
+            }
+            else
+            {
+                //se comienza a realizar el insert maestro(kardex_almacen=calidad_almacen)
+                $conn->BeginTrans();
+                $kardex_almacen_instruccion = 
+                "
+                    INSERT INTO kardex_almacen (
+                    `id_transaccion` , `tipo_movimiento_almacen`, `autorizado_por`,
+                    `observacion`, `fecha`, `usuario_creacion`,
+                    `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, 
+                    `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,  `id_seguridad`, `id_aprobado`,
+                    `id_receptor`, `nro_contenedor`, `ticket_entrada`)
+                    VALUES (
+                    {$datospadre[0]['id_transaccion']} , '3', '{$datospadre[0]['autorizado_por']}',
+                    '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
+                    CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_datospadre[0]['id_documento']}', '{$datospadre[0]['empresa_transporte']}',
+                    '{$datospadre[0]['id_conductor']}', '{$datospadre[0]['placa']}', '{$datospadre[0]['guia_sunagro']}',
+                    '{$datospadre[0]['orden_despacho']}',
+                    '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
+                    '{$datospadre[0]['id_aprobado']}',
+                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$POST['ticket']}');
+                ";
+                
+                $conn->ExecuteTrans($kardex_almacen_instruccion);
+                //el id de calidad y de kardex siempre serán lo mismo por lo que no es necesario recuperar el id de este insert
+                //Se consulta el precio actual para dejar el historico en kardex (Junior)
+                $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$datospadre[0]['id_item']}'";
+                $precio_actual=$conn->ObtenerFilasBySqlSelect($sql);
+                $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
+                //correlativo de ticket
+                $sql="Select contador from correlativos where campo='id_ticket'";
+                $idticket=$conn->ObtenerFilasBySqlSelect($sql);
+                //sql kardex_detalle
+                $kardex_almacen_detalle_instruccion = 
+                "
+                    INSERT INTO kardex_almacen_detalle (
+                    `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
+                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
+                    VALUES (
+                    NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
+                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                    '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].");
+                ";
+                $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                //actualizo correlativo
+                $sql="update correlativos set contador=(contador+1) where campo='id_ticket'";
+                $conn->ExecuteTrans($sql);
+                //bloqueando las ubicaciones
+                $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
+                $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
+                if($ocupado[0]['ocupado']!=1)
+                {
+                    $sql=
+                    "
+                        update ubicacion set ocupado=1 where id=".$_POST['ubicacion_detalle'];
+                    $conn->ExecuteTrans($sql);
+                }
+                else
+                {
+                    echo "-1"; exit();
+                }
+                $sql=
+                "
+                    SELECT * FROM item_existencia_almacen WHERE
+                    id_item  = '{$datospadre[0]['id_item']}' 
+                    AND id_ubicacion = '{$_POST['ubicacion_detalle']}'
+                    AND lote='{$datospadre[0]['lote']}' 
+                    AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                ";
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+    
+                if (count($campos) > 0) 
+                {
+                    $cantidadExistente = $campos[0]["cantidad"];
+                    $conn->ExecuteTrans(
+                    "
+                        UPDATE item_existencia_almacen 
+                        SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "'
+                        WHERE id_item  = '{$datospadre[0]['id_item']}' 
+                        AND id_ubicacion = '{$_POST['ubicacion_detalle']}' 
+                        AND lote='{$datospadre[0]['lote']}' 
+                        AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                    ");
+                } 
+                else 
+                {
+                    $instruccion = 
+                    "
+                        INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, `lote`, `id_proveedor`)
+                        VALUES 
+                        ('{$_POST['ubicacion_principal']}',
+                        '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['ubicacion_detalle']}',
+                        '{$datospadre[0]['lote']}', '{$datospadre[0]['id_proveedor']}');
+                    ";
+                    $conn->ExecuteTrans($instruccion);
+                }
+                
+                
+            }
+            //se procede a realizar el commit(quedaría pendiente realizar el pedido por entrada)
+            if ($conn->errorTransaccion == 1)
+            {    
+                echo "1";
+            }
+            elseif($conn->errorTransaccion == 0)
+            {
+                echo "-1";
+            }
+            $conn->CommitTrans($conn->errorTransaccion);
+            
+        break;
+        case "cargaUbicacionNuevo":
+           $almacen=$_POST["idUbicacion"];
+           $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado<>1");
+            if (count($campos) == 0) 
+            {
+                echo "[{band:'-1'}]";
+            } 
+            else 
+            {
+                foreach ($campos as $filas)
+                {
+                ?>
+                    <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
+    
+                <?php 
+                }
+            }
+        break;
+        case "det_items_calidad":
+            if ($_GET["id_tipo_movimiento_almacen"] == '3' || $_GET["id_tipo_movimiento_almacen"] == '1') 
+            {
+                $operacion = "Entrada";
+
+                $campos = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT ite.*,m.*, kad.id_transaccion_detalle, kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                    FROM calidad_almacen_detalle AS kad
+                    JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
+                    LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
+                    LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
+                    LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+                    LEFT JOIN marca m ON m.id = ite.id_marca
+                    LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]
+                );
+            } 
+            else if ($_GET["id_tipo_movimiento_almacen"] == '4' || $_GET["id_tipo_movimiento_almacen"] == '2' || $_GET["id_tipo_movimiento_almacen"] == '8') 
+            {
+                $operacion = "Salida";
+                $campos = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                    FROM calidad_almacen_detalle AS kad
+                    join calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
+                    LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
+                    LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id
+                    LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+                    LEFT JOIN marca m ON m.id = ite.id_marca
+                    LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]
+                );
+            } 
+            else if ($_GET["id_tipo_movimiento_almacen"] == '5') 
+            {
+                $operacion = "Traslado";
+                $campos = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                    FROM calidad_almacen_detalle AS kad
+                    LEFT JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
+                    LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
+                    LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
+                    LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+                    LEFT JOIN marca m ON m.id = ite.id_marca
+                    LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+                    
+                $campos1 = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen
+                    from calidad_almacen_detalle as kad join kardex_almacen as k on kad.id_transaccion=k.id_transaccion left join almacen as alm on kad.id_almacen_salida=alm.cod_almacen LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id left join item as ite on kad.id_item=ite.id_item WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+            }
+            else if ($_GET["id_tipo_movimiento_almacen"] == '9') 
+            {
+                $operacion = " Ajuste +";
+                $campos = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                    FROM calidad_almacen_detalle AS kad
+                    LEFT JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
+                    LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
+                    LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
+                    LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+                    LEFT JOIN marca m ON m.id = ite.id_marca
+                    LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+                $campos1 = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen
+                    from calidad_almacen_detalle as kad join calidad_almacen as k on kad.id_transaccion=k.id_transaccion left join almacen as alm on kad.id_almacen_salida=alm.cod_almacen LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id left join item as ite on kad.id_item=ite.id_item WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+            }
+            else if ($_GET["id_tipo_movimiento_almacen"] == '10') 
+            {
+                $operacion = " Ajuste -";
+                $campos = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                    FROM calidad_almacen_detalle AS kad
+                    LEFT JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
+                    LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
+                    LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
+                    LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+                    LEFT JOIN marca m ON m.id = ite.id_marca
+                    LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+                $campos1 = $conn->ObtenerFilasBySqlSelect
+                (
+                    "SELECT *, kad.id_transaccion_detalle, kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen
+                    from calidad_almacen_detalle as kad join calidad_almacen as k on kad.id_transaccion=k.id_transaccion left join almacen as alm on kad.id_almacen_salida=alm.cod_almacen LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id left join item as ite on kad.id_item=ite.id_item WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+            }
+            if (count($campos) == 0) 
+            {
+                exit;
+            }
+            if ($_GET["id_tipo_movimiento_almacen"] == '5') 
+            {
+                echo 
+                '
+                    <tr class="detalle_items">
+                        <input type="hidden" name="desplegado" value="true"/>
+                        <td colspan="8">
+                            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px;padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+                                <table >
+                                    <thead>
+                                        <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
+                                        <th style="width:150px; font-weight: bold;">Almac&eacute;n Entrada</th>
+                                        <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n Entrada</th>
+                                        <th style="width:150px; font-weight: bold;">Almac&eacute;n Salida</th>
+                                         <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n Salida</th>
+                                        <th style="width:300px; font-weight: bold;">Item</th>
+                                        <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+                                        <th style="width:110px; font-weight: bold; text-align: center;">Operación</th>
+                                    </thead>
+                                    <tbody>';
+            } 
+            else 
+            {
+                echo 
+                '
+                    <tr class="detalle_items">
+                        <input type="hidden" name="desplegado" value="true"/>
+                        <td colspan="8">
+                            <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
+                                <table >
+                                    <thead>
+                                        <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
+                                        <th style="width:150px; font-weight: bold;">Almac&eacute;n ' . $operacion . '</th>
+                                        <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n' . $operacion . '</th>
+                                        <th style="width:300px; font-weight: bold;">Item</th>
+                                        <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+                                        <th style="width:110px; font-weight: bold; text-align: center;">Operación</th>
+                                    </thead>
+                                    <tbody>';
+            }
+            foreach ($campos as $key => $item) 
+            {
+                if ($_GET["id_tipo_movimiento_almacen"] == '5') 
+                {
+                    echo '
+                        <tr>
+                            <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                            <td style="width:150px;">' . $campos1[0]["almacen"] . '</td>
+                            <td style="width:150px;">' . $campos1[0]["ubicacion"] . '</td>
+                            <td style="width:300px;">' . $item["descripcion1"] ." - ". $item["marca"]." ". $item["pesoxunidad"]."". $item["nombre_unidad"]. '</td>
+                            <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
+                            <td style="text-align: right; padding-right:10px;"><img id="'.$item['id_transaccion_detalle'].'" title="Realizar Entrada" src="../../../includes/imagenes/ico_last.gif"/ onclick=entradapaleta(this.id)></td>
+                            
+                        </tr>';
+                } else {
+                    echo '
+                        <tr>
+                            <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                            <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
+                            <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
+                            <td style="text-align: center; padding-right:10px;"><img id="'.$item['id_transaccion_detalle'].'" title="Realizar Entrada" src="../../../includes/imagenes/ico_last.gif" onclick="entradapaleta(this.id);"/></td>
+                        </tr>';
+                }
+            }
+
+            if ($campos[0]["estado"] == "Pendiente") 
+            {
+                echo 
+                '   
+                    <tr>
+                        <td colspan="6" style="text-align: left; border-bottom: 1px solid #949494;width:110px;">
+                            <br/>
+                            <!--form>
+                                <label for="fecha">Fecha</label><input type="text" name="fecha">
+                                <label for="control">Nro. Control</label><input type="text" name="control">
+                                <label for="factura">Nro. Factura</label><input type="text" name="factura"-->
+                                <table style="cursor: pointer;" align="right" class="btn_bg" onClick="javascript:window.location=\'?opt_menu=3&opt_seccion=109&opt_subseccion=add&cod=' . $_GET["id_transaccion"] . '&cod2=' . $_GET["cod_edocuenta"] . '\'" name="buscar" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <!--<td style="padding: 0px;" align="right"><img src="../../libs/imagenes/bt_left.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>
+                                        <td class="btn_bg"><img src="../../libs/imagenes/factu.png" width="16" height="16" /></td>
+                                         <td class="btn_bg" nowrap style="padding: 0px 1px;">Realizar Entrada</td> -->
+                                        <!-- <td style="padding: 0px;" align="left"><img  src="../../libs/imagenes/bt_right.gif" alt="" width="4" height="21" style="border-width: 0px;" /></td>-->
+                                    </tr>
+                                </table>
+                            <!--/form-->
+                        </td>
+                    </tr>';
+            }
+            echo
+            '</tbody>
+                    </table>
+                    </div>
+                    </td>
+                    </tr>';
+            break;
         case "ValidarCodigoBarrasItem":
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM item WHERE codigo_barras = '" . $_GET["v1"] . "'");
                         
