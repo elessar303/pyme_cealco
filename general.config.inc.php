@@ -1,12 +1,12 @@
 <?php
 error_reporting(0);
 define('DB_USUARIO','root', true);
-define('DB_CLAVE', 'admin.2040', true);
-define('DB_HOST', '192.168.22.45', true);
-define('DB_SELECTRA_CONF', 'selectra_conf_pyme_ceal', true);#sisalud_selectraconf
+define('DB_CLAVE', 'root', true);
+define('DB_HOST', 'localhost', true);
+define('DB_SELECTRA_CONF', 'selectra_conf_pyme', true);#sisalud_selectraconf
 define('DB_SELECTRA_CONT', 'pyme_contabilidad', true);
 define('DB_SELECTRA_NOM', 'pyme_nomina', true);
-define('DB_SELECTRA_FAC', 'pyme_prueba_standar_ceal', true);
+define('DB_SELECTRA_FAC', 'pyme_prueba_standar_cealco', true);
 define('SUGARCRM', 'sugarcrm',true);
 /* * CONSTANTES UTILIZADAS POR LA INTERFAZ DE REGISTRO DE EVENTOS (LOG) */
 define('REG_INFO',0, true);

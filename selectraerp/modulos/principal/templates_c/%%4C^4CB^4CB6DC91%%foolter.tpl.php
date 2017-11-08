@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-11-08 18:03:50
+<?php /* Smarty version 2.6.21, created on 2017-11-08 18:06:27
          compiled from foolter.tpl */ ?>
 <?php if ($_GET['msg'] != ""): ?>
     <?php echo '

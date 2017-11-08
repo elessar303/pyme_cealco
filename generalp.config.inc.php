@@ -6,11 +6,11 @@ if (!isset($_SESSION)) {
 error_reporting(0);
 define('impresora_serial','123456', true);
 define('DB_USUARIO','root', true);
-define('DB_CLAVE', 'admin.2040', true);
-define('DB_HOST', '192.168.22.45', true);
+define('DB_CLAVE', 'root', true);
+define('DB_HOST', 'localhost', true);
 define('DB_SELECTRA_BIE', '', true);
 define('DB_SELECTRA_DEFAULT', '', true);
-define('SELECTRA_CONF_PYME', 'selectra_conf_pyme_ceal',true);
+define('SELECTRA_CONF_PYME', 'selectra_conf_pyme',true);
 define('SUGARCRM', 'sugarcrm',true);
 define('POS', 'pos_prueba_standard',true);
 define('RESTRICCIONES', 'SI',true);
@@ -40,5 +40,5 @@ define('DB_USUARIOP','root', true);
 define('DB_CLAVEP', 'admin.2040', true);
 define('DB_HOSTP', '201.248.68.244', true);
 define('DB_SELECTRA_PYMEP', 'selectrapyme_central_ccs', true);
-define('DB_PYME', 'pyme_prueba_standar_ceal', true );
+define('DB_PYME', 'pyme_prueba_standar_cealco', true );
 ?>
