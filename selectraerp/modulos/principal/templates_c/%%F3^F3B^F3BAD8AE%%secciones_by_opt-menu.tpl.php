@@ -1,4 +1,4 @@
-<?php /* Smarty version 2.6.21, created on 2017-10-04 17:32:32
+<?php /* Smarty version 2.6.21, created on 2017-11-08 18:03:50
          compiled from secciones_by_opt-menu.tpl */ ?>
 <!DOCTYPE html>
 <html>

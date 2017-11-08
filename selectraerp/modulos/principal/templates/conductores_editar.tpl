@@ -16,7 +16,7 @@
             <script type="text/javascript">//<![CDATA[
                 $(document).ready(function(){
 
-                $("#cedula").blur(function()
+                $("#cedula").change(function()
                 {
                         valor = $(this).val();
                         if(valor!='')
@@ -127,7 +127,7 @@
                                 <tr>
                                     <td colspan="3" class="label">Cedula **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="cedula" placeholder="Cedula del Conductor" size="60" id="cedula" class="form-text" value="{$datos[0].cedula}"/>
+                                        <input type="text" name="cedula" placeholder="Cedula del Conductor" size="60" id="cedula" class="form-text" value="{$datos[0].cedula}" readonly="readonly" />
                                         <div id="notificacionVUsuario"></div>
                                     </td>
                                 </tr>
@@ -153,40 +153,6 @@
                                         <input type="hidden" name="id" size="60" id="id" class="form-text" value="{$id}"/>
                                     </td>
                                 </tr>
-
-                                <tr>
-                                    <td colspan="3" class="label">Flota Asiganada **</td>
-                                    <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <select name="flota_asignada_conductor" id="flota_asignada_conductor" class="form-text" style="width:205px" class="form-text">
-                                                    {html_options values=$option_values_estado output=$option_output_estado selected=$estado}
-                                        </select>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="3" class="label">Posee Vehiculo **</td>
-                                    <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <select name="posee_vehiculo" id="posee_vehiculo" class="form-text" style="width:205px" class="form-text" onchange="mostrarLista();">
-                                            {html_options values=$option_values_pvehiculo output=$option_output_pvehiculo selected=$respuesta}
-                                        </select>
-                                    </td>
-                                </tr>
-                                
-                                        <tr>
-                                        <td colspan="3" class="label">
-                                            <div id='lista' style="display:none;">
-                                                Seleccione Vehiculo **
-                                            </div>
-                                        </td>
-                                        <td style="padding-top:2px; padding-bottom: 2px;">
-                                            <div id='lista1' style="display:none;">
-                                                <select name="vehiculos" id="vehiculos" class="form-text" style="width:205px" class="form-text" >
-                                                    {html_options values=$option_values_flota output=$option_output_flota selected=$id_camion}
-                                                </select>
-                                            </div>
-                                        </td>
-
-                                    </tr>
 
                             </tbody>
                         </table>

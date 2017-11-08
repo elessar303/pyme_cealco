@@ -22,6 +22,26 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "eliminarConductor" :
+        $id=isset($_POST['id']) ? $_POST['id'] : '';
+        if($conn->Execute2("delete from transporte_conductores where id=".$id))
+        {
+            echo 1;
+        }
+        else
+        {
+            echo 2;
+        }
+
+        break;
+
+         case "ValidarCedulaConductor":
+        
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT cedula FROM transporte_conductores  WHERE cedula = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+        
+        break;
+
         case "ValidarTicketEntrada":
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM kardex_almacen WHERE ticket_entrada = '" . $_GET["v1"] . "'");
             echo (count($campos) == 0) ? "1" : "-1";

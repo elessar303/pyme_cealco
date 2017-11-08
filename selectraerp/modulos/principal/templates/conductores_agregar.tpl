@@ -146,41 +146,6 @@
                                     </td>
                                 </tr>
 
-                                <tr>
-                                    <td colspan="3" class="label">Flota Asiganada **</td>
-                                    <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <select name="flota_asignada_conductor" id="flota_asignada_conductor" class="form-text" style="width:205px" class="form-text">
-                                                    {html_options values=$option_values_estado output=$option_output_estado selected=$estado}
-                                        </select>
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <td colspan="3" class="label">Posee Vehiculo **</td>
-                                    <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <select name="posee_vehiculo" id="posee_vehiculo" class="form-text" style="width:205px" class="form-text" onchange="mostrarLista();">
-                                            <option value="0">No</option>
-                                            <option value="1">Si</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                                
-                                        <tr>
-                                        <td colspan="3" class="label">
-                                            <div id='lista' style="display:none;">
-                                                Seleccione Vehiculo **
-                                            </div>
-                                        </td>
-                                        <td style="padding-top:2px; padding-bottom: 2px;">
-                                            <div id='lista1' style="display:none;">
-                                                <select name="vehiculos" id="vehiculos" class="form-text" style="width:205px" class="form-text" >
-                                                    {html_options values=$option_values_flota output=$option_output_flota}
-                                                </select>
-                                            </div>
-                                        </td>
-
-                                    </tr>
-
                             </tbody>
                         </table>
                     </div>

@@ -56,10 +56,6 @@ $smarty->assign("option_output_pvehiculo", $arraySelection);
 
 if(isset($_POST["nombres"]))
 {
-	if($_POST['posee_vehiculo']!=1)
-	{
-		$_POST['vehiculos']=NULL;
-	}
 
 	$instruccion = "
 	update  
@@ -68,13 +64,13 @@ if(isset($_POST["nombres"]))
 	`cedula`='".$_POST["cedula"]."',
 	`nombres`='".$_POST["nombres"]."',
 	`apellidos`='".$_POST["apellidos"]."',
-	`telefono`='".$_POST["telefono"]."',
-	`flota_asignado`='".$_POST["flota_asignada_conductor"]."',
-	`id_camion`='".$_POST['vehiculos']."'
+	`telefono`='".$_POST["telefono"]."'
 	where 
 	id=".$_POST['id'];
 	$comunes->Execute2($instruccion);
 	header("Location: ?opt_menu=".$_POST["opt_menu"]."&opt_seccion=".$_POST["opt_seccion"]);
 }
 
+$campos = $menu->ObtenerFilasBySqlSelect("select * from modulos where cod_modulo= ".$_GET["opt_seccion"]);
+$smarty->assign("campo_seccion",$campos);
 ?>
