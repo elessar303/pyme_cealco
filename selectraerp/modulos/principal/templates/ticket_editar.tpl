@@ -35,24 +35,24 @@
                         }
 
                         if($("#fecha_entrada").val()==''){
-                            Ext.Msg.alert("Alerta","Debe Colocar la Fecha de entrada");
-                            $("#fecha_entrada").focus();
+                            Ext.Msg.alert("Alerta","Debe Colocar la Fecha de salida");
+                            $("#fecha_salida").focus();
                             return false;
                         }
 
                         if($("#peso_entrada").val()==''){
-                            Ext.Msg.alert("Alerta","Debe Colocar el Peso de entrada");
-                            $("#peso_entrada").focus();
+                            Ext.Msg.alert("Alerta","Debe Colocar el Peso de salida");
+                            $("#peso_salida").focus();
                             return false;
                         }
 
                     });
 
                     $("#fecha_entrada").datetimepicker({
-                    changeMonth: true,
-                    changeYear: true,
-                    showOtherMonths:true,
-                    selectOtherMonths: true,
+                    changeMonth: false,
+                    changeYear: false,
+                    showOtherMonths:false,
+                    selectOtherMonths: false,
                     //numberOfMonths: 1,
                     //yearRange: "-100:+100",
                     dateFormat: "yy-mm-dd",
@@ -113,6 +113,7 @@
             <div id="datosGral">
                 {include file = "snippets/regresar_boton.tpl"}
                 <input type="hidden" name="cod_empresa" value="{$DatosGenerales[0].cod_empresa}"/>
+                <input type="hidden" name="id_ticket" value="{$datos_ticket[0].id}"/>
                 <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>
                 <input type="hidden" name="opt_seccion" value="{$smarty.get.opt_seccion}"/>
                 <input type="hidden" name="opt_subseccion" value="{$smarty.get.opt_subseccion}"/>
@@ -130,9 +131,8 @@
                                 <tr>
                                     <td class="label">Seleccione el Conductor **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <select name="conductores" id="conductores" class="form-text" style="width:205px" class="form-text" >
-                                            <option value="" disabled="disabled" selected="selected"></option>
-                                            {html_options values=$option_values_conductores output=$option_output_conductores}
+                                        <select name="conductores" id="conductores" class="form-text" style="width:205px" class="form-text" disabled="disabled">
+                                            {html_options values=$option_values_conductores output=$option_output_conductores selected=$datos_ticket[0].id_conductor}
                                         </select>
                                     </td>
                                 </tr>
@@ -140,12 +140,23 @@
                                 <tr>
                                     <td class="label">Hora Entrada **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="fecha_entrada" id="fecha_entrada" size="20" value='{$smarty.now|date_format:"%Y-%m-%d %H:%M"}' class="form-text" />
+                                        <input type="text" name="fecha_entrada" id="fecha_entrada" size="20" value='{$datos_ticket[0].hora_entrada|date_format:"%Y-%m-%d %H:%M"}' class="form-text" readonly="readonly" disabled="disabled" />
                                     </td>
 
                                     <td class="label">Peso Entrada **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="peso_entrada" id="peso_entrada" size="20" value='' class="form-text" />
+                                        <input type="text" name="peso_entrada" id="peso_entrada" size="20" value='{$datos_ticket[0].peso_entrada}' class="form-text" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Hora Salida **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <input type="text" name="fecha_salida" id="fecha_salida" size="20" value='' class="form-text" />
+                                    </td>
+
+                                    <td class="label">Peso Salida **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <input type="text" name="peso_salida" id="peso_salida" size="20" value='' class="form-text"/>
                                     </td>
                                 </tr>
                             </tbody>

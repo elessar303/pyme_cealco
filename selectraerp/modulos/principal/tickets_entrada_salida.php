@@ -1,12 +1,14 @@
 <?php
 
 $comunes = new Comunes();
-$tabla = $name_form = "tickets_entrada_salida";
+$tabla = $name_form = "tickets_entrada_salida a, transporte_conductores b";
 $tipob=@$_GET['tipo'];
 $des=@$_GET['des'];
 $pagina=@$_GET['pagina'];
 $busqueda = @$_GET['busqueda'];
-
+$where= " and a.id_conductor=b.id";
+$cols="a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*";
+$order=$where." ORDER BY a.id DESC";
 if(isset($_POST['buscar']) || $tipob!=NULL){
 	if(!$tipob){
 		$tipob=$_POST['palabra'];
@@ -19,24 +21,26 @@ if(isset($_POST['buscar']) || $tipob!=NULL){
 			$instruccion=$comunes->buscar_exacta($tabla,$des,$busqueda);
 			break;
 		case "todas":
-			$instruccion=$comunes->buscar_todas($tabla,$des,$busqueda);
+			$instruccion=$comunes->buscar_todas($tabla,$des,$busqueda,$order,$cols);
 			break;
 		case "cualquiera":
 			$instruccion=$comunes->buscar_cualquiera($tabla,$des,$busqueda);
 			break;
+
+		
 	}
+
 }else{
-    $instruccion = "SELECT * FROM ".$tabla;
+    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.* FROM ".$tabla." WHERE a.hora_entrada<>'' ".$where." ORDER BY a.id DESC";
+
 }
-
-
 
 $num_paginas=$comunes->obtener_num_paginas($instruccion);
 $pagina=$comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos=$comunes->paginacion($pagina, $instruccion);
 
 $smarty->assign("registros",$campos);
-$smarty->assign("cabecera",array("Ticket","Nombre", "Apellido", "Telefono", "Cedula", "Hora Entrada", "Hora Salida"));
+$smarty->assign("cabecera",array("Ticket","Cedula Conductor", "Nombre y Apellido", "Hora Entrada", "Peso Entrada", "Hora Salida", "Peso Salida"));
 $smarty->assign("limitePaginacion",$comunes->LimitePaginaciones);
 $smarty->assign("num_paginas",$num_paginas);
 $smarty->assign("pagina",$pagina);
@@ -53,8 +57,8 @@ $smarty->assign("campo_seccion",$campos);
 //**************************************************************************
 //Criterios de Busqueda ****************************************************
 //**************************************************************************
-$smarty->assign("option_values", array("cedula","nombres", "apellidos"));
-$smarty->assign("option_output", array("Cedula","Nombre", "Apellido"));
+$smarty->assign("option_values", array("a.id","b.cedula", "b.nombres"));
+$smarty->assign("option_output", array("Ticket","Cedula Conductor", "Nombre Conductor"));
 $smarty->assign("option_selected", $busqueda);
 //**************************************************************************
 //**************************************************************************
