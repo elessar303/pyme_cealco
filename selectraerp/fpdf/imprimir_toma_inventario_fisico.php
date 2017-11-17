@@ -38,8 +38,8 @@ class PDF extends FPDFSelectra {
             $ubi=" AND v.id_ubicacion=".$ubicacion;
         }
        
-        // $rs = query("SELECT * FROM item i, item_existencia_almacen a WHERE i.id_item = a.id_item AND i.cod_item_forma = 1 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' ORDER BY descripcion1", $conexion);
-        $rs = query("select v.*,i.coniva1,i.codigo_barras FROM vw_existenciabyalmacen v, item i where i.id_item=v.id_item AND i.cod_departamento = '" . $dpto["cod_departamento"]."'".$ubi." ORDER BY ubicacion,descripcion1", $conexion); 
+         $rs = query("SELECT * FROM item i, item_existencia_almacen a WHERE i.id_item = a.id_item AND i.cod_item_forma = 1 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' ORDER BY descripcion1", $conexion);
+        //$rs = query("select v.*,i.coniva1,i.codigo_barras FROM vw_existenciabyalmacen v, item i where i.id_item=v.id_item AND i.cod_departamento = '" . $dpto["cod_departamento"]."' ".$ubi." ORDER BY ubicacion, descripcion1", $conexion); 
         // echo "select v.*,i.coniva1,i.codigo_barras FROM vw_existenciabyalmacen v, item i where i.id_item=v.id_item AND i.cod_departamento = '" . $dpto["cod_departamento"]."'".$ubi." ORDER BY ubicacion,descripcion1"; exit;
         $totalwhile = num_rows($rs);
         if ($totalwhile == 0) {
