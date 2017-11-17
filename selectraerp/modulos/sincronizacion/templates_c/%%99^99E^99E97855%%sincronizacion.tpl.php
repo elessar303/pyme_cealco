@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 <?php /* Smarty version 2.6.21, created on 2017-11-17 14:02:14
+=======
+<?php /* Smarty version 2.6.21, created on 2017-11-08 14:31:45
+>>>>>>> 2844054589a283338ecb66179667d34d374b9812
          compiled from sincronizacion.tpl */ ?>
 <!DOCTYPE html>
 <html>

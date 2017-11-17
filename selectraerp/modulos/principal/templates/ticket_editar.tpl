@@ -7,78 +7,81 @@
         <script type="text/javascript" src="../../../includes/js/jquery-ui-1.10.0/js/jquery-1.9.0.js"></script>
         <script type="text/javascript" src="../../../includes/js/jquery-ui-1.10.0/js/jquery-ui-1.10.0.custom.min.js"></script>
         <script type="text/javascript" src="../../../includes/js/jquery-ui-1.10.0/development-bundle/ui/i18n/jquery.ui.datepicker-es.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
         <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
         
 
         {assign var=name_form value="vendedor_nuevo"}
         {include file="snippets/header_form.tpl"}
         {literal}
+            <script type="text/javascript" src="../../../includes/js/jquery-ui-timepicker-addon.js"></script>
             <script type="text/javascript">//<![CDATA[
                 $(document).ready(function(){
 
-                $("#cedula").change(function()
-                {
-                        valor = $(this).val();
-                        if(valor!='')
-                        {
-                            $.ajax({
-                                type: "GET",
-                                url:  "../../libs/php/ajax/ajax.php",
-                                data: "opt=ValidarCedulaConductor&v1="+valor,
-                                beforeSend: function()
-                                {
-                                    $("#notificacionVCodCliente").html(MensajeEspera("<b>Veficando Nro de Documento..</b>"));
-                                },
-                                success: function(data)
-                                {
-                                    resultado = data
-                                    if(resultado=="-1")
-                                    {
-                                        $("#cedula").val("").focus();
-                                        $("#notificacionVUsuario").html("<img align=\"absmiddle\" src=\"../../../includes/imagenes/ico_note.gif\"><span style=\"color:red;\"> <b>Disculpe, este Nro. de Cedula Ya Existe.</b></span>");
-                                    }
-                                    if(resultado=="1")
-                                    {//cod de item disponble
-                                        $("#notificacionVUsuario").html("<img align=\"absmiddle\" src=\"../../../includes/imagenes/ok.gif\"><span style=\"color:#0c880c;\"><b> Nro. de Cedula Disponible</b></span>");
-                                    }
-                                }
-                            });
-                        }
+                    $('#conductores').select2(
+                    {
+                        placeholder: "Seleccione ...",
+                        allowClear: true
                     });
 
-
-                    valor=$("#posee_vehiculo").val();
-                    if(valor==1)
-                    {
-                        document.getElementById('lista').style.display='block';
-                        document.getElementById('lista1').style.display='block';
-                    }
                     $("input[name='cancelar']").button();//Coloca estilo JQuery
                     $("input[name='aceptar']").button().click(function(){
-                        if($("#nombres").val()=='' || $("#apellidos").val()=='' || $("#cedula").val()=='' || $("#telefono").val()=='' || $("#flota_asignada_conductor").val()=='')
-                        {
-                            Ext.Msg.alert("Alerta","Debe llenar los campos obligatorios");
-                            $("#nombre").focus();
+
+                        if($("#conductores option:selected").val()==''){
+                            Ext.Msg.alert("Alerta","Debe Seleccionar el conductor");
+                            $("#conductores").focus();
                             return false;
                         }
-                    });
-                    
-                });
 
-                function mostrarLista()
-                {
-                    valor=$("#posee_vehiculo").val();
-                    if(valor==0)
-                    {
-                        document.getElementById('lista').style.display='none';
-                        document.getElementById('lista1').style.display='none';
+                        if($("#fecha_entrada").val()==''){
+                            Ext.Msg.alert("Alerta","Debe Colocar la Fecha de salida");
+                            $("#fecha_salida").focus();
+                            return false;
+                        }
+
+                        if($("#peso_entrada").val()==''){
+                            Ext.Msg.alert("Alerta","Debe Colocar el Peso de salida");
+                            $("#peso_salida").focus();
+                            return false;
+                        }
+
+                    });
+
+                    $("#fecha_entrada").datetimepicker({
+                    changeMonth: false,
+                    changeYear: false,
+                    showOtherMonths:false,
+                    selectOtherMonths: false,
+                    //numberOfMonths: 1,
+                    //yearRange: "-100:+100",
+                    dateFormat: "yy-mm-dd",
+                    showOn: "both",//button,
+                    onClose: function( selectedDate) {
+                        //$( "#fecha2" ).datepicker( "option", "minDate", selectedDate );
+                        $( "#fecha_salida" ).datetimepicker("option", "minDate", selectedDate);
+                        $( "#fecha_salida" ).datetimepicker("option", "minTime", selectedDate);
                     }
-                    else
-                    {
-                        document.getElementById('lista').style.display='block';
-                        document.getElementById('lista1').style.display='block';
+                    });
+
+
+                    $("#fecha_salida").datetimepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    showOtherMonths:true,
+                    selectOtherMonths: true,
+                    //numberOfMonths: 1,
+                    //yearRange: "-100:+100",
+                    dateFormat: "yy-mm-dd",
+                    showOn: "both",//button,
+                    onClose: function( selectedDate) {
+                        //$( "#fecha2" ).datepicker( "option", "minDate", selectedDate );
+                        $( "#fecha_entrada" ).datetimepicker("option", "maxDate", selectedDate);
+                        $( "#fecha_entrada" ).datetimepicker("option", "maxTime", selectedDate);
                     }
-                }
+                    });
+
+                });
                 //Panel
                 Ext.ns('Selectra.pyme.vendedores');
                 Selectra.pyme.vendedores.TabPanelVendedores = {
@@ -110,6 +113,7 @@
             <div id="datosGral">
                 {include file = "snippets/regresar_boton.tpl"}
                 <input type="hidden" name="cod_empresa" value="{$DatosGenerales[0].cod_empresa}"/>
+                <input type="hidden" name="id_ticket" value="{$datos_ticket[0].id}"/>
                 <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>
                 <input type="hidden" name="opt_seccion" value="{$smarty.get.opt_seccion}"/>
                 <input type="hidden" name="opt_subseccion" value="{$smarty.get.opt_subseccion}"/>
@@ -125,35 +129,36 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td colspan="3" class="label">Cedula **</td>
+                                    <td class="label">Seleccione el Conductor **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="cedula" placeholder="Cedula del Conductor" size="60" id="cedula" class="form-text" value="{$datos[0].cedula}" readonly="readonly" />
-                                        <div id="notificacionVUsuario"></div>
+                                        <select name="conductores" id="conductores" class="form-text" style="width:205px" class="form-text" disabled="disabled">
+                                            {html_options values=$option_values_conductores output=$option_output_conductores selected=$datos_ticket[0].id_conductor}
+                                        </select>
                                     </td>
                                 </tr>
 
                                 <tr>
-                                    <td colspan="3" class="label">Nombres **</td>
+                                    <td class="label">Hora Entrada **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="nombres" placeholder="Nombre Del Conductor" size="60" id="nombres" class="form-text" value="{$datos[0].nombres}"/>
+                                        <input type="text" name="fecha_entrada" id="fecha_entrada" size="20" value='{$datos_ticket[0].hora_entrada|date_format:"%Y-%m-%d %H:%M"}' class="form-text" readonly="readonly" disabled="disabled" />
+                                    </td>
+
+                                    <td class="label">Peso Entrada **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <input type="text" name="peso_entrada" id="peso_entrada" size="20" value='{$datos_ticket[0].peso_entrada}' class="form-text" />
                                     </td>
                                 </tr>
-
                                 <tr>
-                                    <td colspan="3" class="label">Apellidos **</td>
+                                    <td class="label">Hora Salida **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="apellidos" placeholder="Apellido Del Conductor" size="60" id="apellidos" class="form-text" value="{$datos[0].apellidos}"/>
+                                        <input type="text" name="fecha_salida" id="fecha_salida" size="20" value='' class="form-text" />
+                                    </td>
+
+                                    <td class="label">Peso Salida **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <input type="text" name="peso_salida" id="peso_salida" size="20" value='' class="form-text"/>
                                     </td>
                                 </tr>
-
-                                <tr>
-                                    <td colspan="3" class="label">Telefonos **</td>
-                                    <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="telefono" placeholder="Telefonos Del Conductor" size="60" id="Telefono" class="form-text" value="{$datos[0].telefono}"/>
-                                        <input type="hidden" name="id" size="60" id="id" class="form-text" value="{$id}"/>
-                                    </td>
-                                </tr>
-
                             </tbody>
                         </table>
                     </div>
