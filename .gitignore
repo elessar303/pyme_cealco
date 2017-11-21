@@ -7,6 +7,6 @@ selectraerp/modulos/principal/templates_c
 selectraerp/uploads/inventario
 =======
 # assets
-selectraerp/modulos/principal/templates_c/
+#selectraerp/modulos/principal/templates_c/
 selectraerp/modulos/sesion/templates_c/
 >>>>>>> 2844054589a283338ecb66179667d34d374b9812

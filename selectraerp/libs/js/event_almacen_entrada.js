@@ -384,6 +384,7 @@ $("#cantidaddeberia").change(function(){
                 */
                 //se obtiene el valor del unidad_paleta
                 unidad_paleta=$("#unidad_paleta").val();
+                unidad_paleta=-1;
                 if(unidad_paleta>0 || (unidad_paleta>0 && $("#cantidadunitaria").val()>unidad_paleta))
                 {
                     //obtengo la cantida de paletas necesarias para procesar la petición
