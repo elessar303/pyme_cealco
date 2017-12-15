@@ -101,7 +101,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
                         '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
-                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contandor'] .");
+                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .");
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
                     //actualizo correlativo
