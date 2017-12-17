@@ -33,9 +33,8 @@ if(isset($_POST["aceptar"]))
 			";
 		exit();
 	}
-	$sql="select id_item from item where cod_item='".$_POST['filtro_codigo']."' limit 1";
+	$sql="select id_item from item where codigo_barras='".$_POST['filtro_codigo']."' limit 1";
 	$obtenerid=$almacen->ObtenerFilasBySqlSelect($sql);
-	
 	$sql="select id from ubicacion_servicio where id_ubicacion='".$_POST['id_ubicacion']."' and id_servicio='".$obtenerid[0]['id_item']."'";
 	$unico=$almacen->ObtenerFilasBySqlSelect($sql);
     if($unico!=null)

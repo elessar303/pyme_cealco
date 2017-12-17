@@ -38,10 +38,10 @@ $smarty->assign("nombre_usuario", $login->getNombreApellidoUSuario());
 //cargando select de proveedores
 $arraySelectOption = "";
 $arraySelectoutPut = "";
-$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT * FROM proveedores order by descripcion");
+$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes order by nombre");
 foreach ($campos_comunes as $key => $item) {
-    $arraySelectOption[] = $item["id_proveedor"];
-    $nombre_proveedor=$item["descripcion"]."-".$item["rif"];
+    $arraySelectOption[] = $item["id_cliente"];
+    $nombre_proveedor=$item["nombre"]."-".$item["rif"];
     $arraySelectoutPut[] = utf8_encode($nombre_proveedor);
 }
 $smarty->assign("option_values_proveedor", $arraySelectOption);

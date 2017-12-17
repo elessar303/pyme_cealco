@@ -195,6 +195,10 @@ if (isset($_POST["aceptar"]))
 
     	}
     }
+    else
+    {
+    	$_POST['impresion']="NULL";
+    }
     $instruccion = "
         INSERT INTO `item`(
         `cod_item`, `codigo_barras`, `codigo_cpe`, `costo_actual`, `descripcion1`, `descripcion2`, `descripcion3`, `referencia`,
