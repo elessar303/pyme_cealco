@@ -145,7 +145,7 @@
 
                                     <td class="label">Peso Entrada **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <input type="text" name="peso_entrada" id="peso_entrada" size="20" value='{$datos_ticket[0].peso_entrada}' class="form-text" />
+                                        <input type="text" name="peso_entrada" id="peso_entrada" size="20" value='{$datos_ticket[0].peso_entrada}' class="form-text" readonly="readonly" />
                                     </td>
                                 </tr>
                                 <tr>
