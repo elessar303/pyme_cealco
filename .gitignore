@@ -2,7 +2,6 @@
 .c9/metadata/tab0
 /home/ubuntu/workspace/general.config.inc.php
 generalp.config.inc.php
-generalp.config.inc.php
 selectraerp/modulos/principal/templates_c
 selectraerp/uploads/inventario
 =======
@@ -10,3 +9,4 @@ selectraerp/uploads/inventario
 #selectraerp/modulos/principal/templates_c/
 selectraerp/modulos/sesion/templates_c/
 >>>>>>> 2844054589a283338ecb66179667d34d374b9812
+/general.config.inc.php
