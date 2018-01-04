@@ -243,66 +243,7 @@
                     </tr>
                     <!--Cierre de la Seccion nueva-->
 
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Empresa Transporte (*)</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="empresa_transporte" maxlength="100" id="empresa_transporte" size="30" maxlength="70" class="form-text" value="" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>C&eacute;dula del Conductor</b></span>
-                        </td>
-                        <td>
-                            <select name="nacionalidad_conductor" id="nacionalidad_conductor" class="form-text">
-                              <option value="">..</option>
-                              <option value="V">V</option>
-                              <option value="E">E</option>
-                            </select>
-                            <input type="text" name="cedula_conductor" maxlength="8" id="cedula_conductor" size="21"  class="form-text" onBlur="comprobarconductor(this.id)" onKeyPress="return soloNumeros(event)"/>
-                        </td>
-                    </tr>
-                    <tr>
-                    <td style="font-family:'Verdana';font-weight:bold;">
-                    <span style="font-family:Verdana"><b>Nombre del Conductor</b></span>
-                    </td>
-                    <td>
-                    <div id="resultado" style="font-family:'Verdana';font-weight:bold;">
                     
-                    </div>
-                    </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Placa</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="placa" maxlength="100" id="placa" size="30" maxlength="70" class="form-text"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Nro Gu&iacute;a SUNAGRO</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="codigo_sica" id="codigo_sica" maxlength="100" size="30" maxlength="70" class="form-text"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Orden Despacho Vehicular</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="orden_despacho" id="orden_despacho" maxlength="100" size="30" maxlength="70" class="form-text"/>
-                        </td>
-                    </tr>
                     <!--
                     Codigo fuente añadido para cubrir la funcionalidad de registrar los
                     datos de una compra: fecha, nro. de factura y nro de control. Esto

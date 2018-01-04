@@ -114,11 +114,11 @@ if (isset($_POST["input_cantidad_items"])) {
         $kardex_almacen_instruccion = "INSERT INTO calidad_almacen (
             `id_transaccion` , `tipo_movimiento_almacen`, `autorizado_por`,
             `observacion`, `fecha`, `usuario_creacion`,
-            `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`)
+            `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`)
         VALUES (
             NULL , '3', '{$_POST["autorizado_por"]}',
             '{$_POST["observaciones"]}', '{$_POST["input_fechacompra"]}', '{$login->getUsuario()}', 
-            CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_POST["nro_documento"]}', '{$_POST["empresa_transporte"]}', '{$id_conductor[0]["id_conductor"]}', '{$_POST["placa"]}', '{$_POST["codigo_sica"]}', '{$_POST["orden_despacho"]}', '{$_POST["puntodeventa"]}');";
+            CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_POST["nro_documento"]}', '{$_POST["empresa_transporte"]}', '{$id_conductor[0]["id_conductor"]}', '{$_POST["placa"]}', '{$_POST["codigo_sica"]}', '{$_POST["orden_despacho"]}', '{$_POST["puntodeventa"]}', '{$_POST["id_proveedor"]}');";
         
         $almacen->ExecuteTrans($kardex_almacen_instruccion);
         
