@@ -17,7 +17,7 @@ Objetivos:
     <body>
         <form id="form-{$name_form}" name="form-{$name_form}" action="?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}" method="post">
             <div id="datosGral" class="x-hide-display">
-            {include file = "snippets/regresar_solo.tpl"}
+            {include file = "snippets/regresar_boton.tpl"}
             {include file = "snippets/tb_head.tpl"}
                 <br/>
                 <table class="seleccionLista">
