@@ -1020,14 +1020,14 @@ $(function(){
                     var cod_almacen = parseFloat(resultado[0].cod_almacen);
 
                     var pregunta_valida_contra_stock = $("select[name='validar_stock'] :selected").val();
-                    if(pregunta_valida_contra_stock=="si"){
+                    /*if(pregunta_valida_contra_stock=="si"){
                         if(cantidad_solicitada>cantidad_existente){
                             $.mensajeNotificacion({
                                 mensaje: "El producto actual no posee la cantidad solicitada, disponibilidad actual: "+cantidad_existente
                             });
                             return false;
                         }
-                    }
+                    }*/
                     
                     $.calculoImporte();
                     $("input[name='filtro_descuento']").focus();
@@ -1088,7 +1088,8 @@ $(function(){
             },
             success: function(data){
                 var resultado = eval(data);
-                if(resultado[0].id=="-1"){
+                parametros.fcallback(resultado);
+                /*if(resultado[0].id=="-1"){
                     Ext.MessageBox.show({
                         title: 'Notificaci&oacute;n',
                         msg: "Verifique existencia.",
@@ -1099,7 +1100,7 @@ $(function(){
                     return false;
                 }else{
                     parametros.fcallback(resultado);
-                }//Fin de if(resultado[0].id=="-1")
+                }//Fin de if(resultado[0].id=="-1")*/
             }
         });
     }

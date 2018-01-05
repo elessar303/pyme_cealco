@@ -47,7 +47,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             echo (count($campos) == 0) ? "1" : "-1";
         break;
         case "EntradaNuevaAlmacen" :
-            //buscamos los datos básicos en calidad y a su ves nos aseguramos no que se ha registrado en kardex almacen
+            //buscamos los datos básicos en calidad y a su vez nos aseguramos  que no se ha registrado en kardex almacen
             $sql=
             "
                 Select 
@@ -73,8 +73,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion 
                     from kardex_almacen as a
                     inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
-                    where b.id_transaccion=".$_POST['id_movimiento'];
-                
+                    where b.id_transaccion_detalle=".$_POST['id_movimiento'];
                 $maestro=$conn->ObtenerFilasBySqlSelect($sql);
                 if($maestro==null)
                 {
@@ -5468,6 +5467,17 @@ where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateen
         break;
         case "precomprometeritem":
 
+            if(SERVICIO=="si")
+            {
+                $sql = "INSERT INTO item_precompromiso (
+                        `id_item_precomiso`, `cod_item_precompromiso`, `id_item`, `cantidad`, `usuario_creacion`,
+                        `fecha_creacion`, `idSessionActualphp`, `almacen`,`ubicacion`)
+                        VALUES (
+                        NULL , '" . $_GET["codprecompromiso"] . "','" . $_GET["v1"] . "', '" . $_GET["cpedido"] . "', '" . $login->getUsuario() . "',
+                        CURRENT_TIMESTAMP , '" . $login->getIdSessionActual() . "','" . $_GET["codalmacen"] . "','" . $_GET["ubicacion"] . "');";
+                $conn->Execute2($sql);
+                echo "[{'id':'1','observacion':''}]"; exit();   
+            }
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT cod_grupo from item WHERE id_item='" . $_GET["v1"] . "'");
             if($campos[0]['cod_grupo']==172){
                  echo "[{'id':'1','observacion':''}]";

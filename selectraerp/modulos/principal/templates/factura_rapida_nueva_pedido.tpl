@@ -297,17 +297,17 @@
                     </select>
                 </div>
                 <div class="contenedor_factura" style="width:45%; height:10%; float:right;">
-                    <div class="subcontenedor_factura" id="cotizaciones">
+                    <!--<div class="subcontenedor_factura" id="cotizaciones">
                         <img src="../../../includes/imagenes/4.png" title="Facturar Cotizaciones"/>
                         <br/>
                         <span style="font-family:'Verdana';"><b>Cotizaciones</b></span>
-                    </div>
+                    </div>-->
                     <!--<div class="subcontenedor_factura" id="notas_entrega">
                         <img src="../../../includes/imagenes/9.png" title="Facturar Notas de Entrega"/>
                         <br/>
                         <span style="font-family:'Verdana';"><b>Notas de Entrega</b></span>
                     </div>-->
-                    <div class="subcontenedor_factura" id="cestaclap">
+                    <!--<div class="subcontenedor_factura" id="cestaclap">
                         <img src="../../libs/imagenes/foodClap.png"  width="30" height="30" title="Facturar Pedido"/>
                         <br/>
                         <span style="font-family:'Verdana';"><b>Agregar Cesta Clap</b></span>
@@ -316,7 +316,7 @@
                         <img src="../../../includes/imagenes/02.png" title="Facturar Pedido"/>
                         <br/>
                         <span style="font-family:'Verdana';"><b>Pedidos</b></span>
-                    </div>
+                    </div>-->
                     {if $espera eq 1}
                     <div class="subcontenedor_factura" id="factura_espera">
                         <img src="../../../includes/imagenes/65.png" title="Facturas en espera"/><!--save_f2.png-->
