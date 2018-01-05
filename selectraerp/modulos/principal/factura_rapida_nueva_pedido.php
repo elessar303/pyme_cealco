@@ -54,7 +54,7 @@ if (isset($_POST["transaccion"])) {
         $cod_estatus = "1"; // cod_estatus = 1 indicada que esta en Proceso.
     }
     # obtenemos el correlativo de la factura
-    $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 0, "si");
+    $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
     $formateo_nro_factura = $nro_factura;
     #obtenemos el money actual
     $money=$clientes->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");

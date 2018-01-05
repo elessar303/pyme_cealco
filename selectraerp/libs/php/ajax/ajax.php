@@ -58,7 +58,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 from calidad_almacen as a 
                 inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
                 where b.id_transaccion_detalle=".$_POST['id_movimiento']." 
-                AND  a.id_transaccion not in (select id_transaccion from kardex_almacen)
+                AND  a.id_transaccion not in (select id_transaccion_calidad from kardex_almacen where tipo_movimiento_almacen=3)
             ";
             $datospadre=$conn->ObtenerFilasBySqlSelect($sql);
             if($datospadre==null)
@@ -72,8 +72,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
                     a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion 
                     from kardex_almacen as a
-                    inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
-                    where b.id_transaccion_detalle=".$_POST['id_movimiento'];
+                    inner join calidad_almacen_detalle as b on a.id_transaccion_calidad=b.id_transaccion
+                    where b.id_transaccion_detalle=".$_POST['id_movimiento']." and a.tipo_movimiento_almacen=3";
                 $maestro=$conn->ObtenerFilasBySqlSelect($sql);
                 if($maestro==null)
                 {
@@ -96,10 +96,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     "
                         INSERT INTO kardex_almacen_detalle (
                         `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                        `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
-                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
                         '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .");
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -165,7 +165,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 $kardex_almacen_instruccion = 
                 "
                     INSERT INTO kardex_almacen (
-                    `id_transaccion` , `tipo_movimiento_almacen`, `autorizado_por`,
+                    `id_transaccion_calidad` , `tipo_movimiento_almacen`, `autorizado_por`,
                     `observacion`, `fecha`, `usuario_creacion`,
                     `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, 
                     `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,  `id_seguridad`, `id_aprobado`,
@@ -183,7 +183,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 
                 //print_r($kardex_almacen_instruccion); exit();
                 $conn->ExecuteTrans($kardex_almacen_instruccion);
-                //el id de calidad y de kardex siempre serán lo mismo por lo que no es necesario recuperar el id de este insert
+                $id_transaccion = $conn->getInsertID();
                 //Se consulta el precio actual para dejar el historico en kardex (Junior)
                 $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$datospadre[0]['id_item']}'";
                 $precio_actual=$conn->ObtenerFilasBySqlSelect($sql);
@@ -196,10 +196,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 "
                     INSERT INTO kardex_almacen_detalle (
                     `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
+                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
                     VALUES (
-                    NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
-                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                    NULL, '{$id_transaccion}', '{$_POST["ubicacion_principal"]}',
+                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
                     '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].");
                 ";
                 $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -255,8 +255,6 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     ";
                     $conn->ExecuteTrans($instruccion);
                 }
-                
-                
             }
             //se procede a realizar el commit(quedaría pendiente realizar el pedido por entrada)
             //se comienza hacer la facturacion
@@ -311,7 +309,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             //obtener correlativo:
             //obtenemos el correlativo de la factura
             $correlativos = new Correlativos();
-            $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 0, "si");
+            $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "si");
             $formateo_nro_factura = $nro_pedido;
             $subtotal=0;
             $ivatotal=0;
@@ -348,7 +346,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             //echo $sql_cabecera; exit();
             $conn->ExecuteTrans($sql_cabecera);
             $id_facturaTrans = $conn->getInsertID();*/
-            $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 0, "si");
+            $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
             $formateo_nro_factura = $nro_factura;
             #obtenemos el money actual
             $money=$conn->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
@@ -489,6 +487,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 $nro_facturaOLD = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
                 $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
                 $conn->ExecuteTrans("update correlativos set contador = '" . $nro_pedido . "' where campo = 'cod_pedido'");
+                $conn->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_factura}' WHERE campo = 'cod_factura';");
             //Fin pedido
             if ($conn->errorTransaccion == 1)
             {    

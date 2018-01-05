@@ -101,6 +101,7 @@
                         var principal = $('#ubicacion_principal').val();
                         var detalle = $('#ubicacion_detalle').val();
                         var cantidad = $('#peso_unidad').val();
+                        var peso = $('#peso').val();
                         var movimiento = $('#movimiento').val();
                         var ticketestatus = $('#ticketestatus').val();
                         if(ticketestatus ==1)
@@ -117,7 +118,7 @@
                             ticket="";
                         }
                         
-                        if(principal=="" || detalle=="" || principal=="0" || detalle=="0" || cantidad=="" || cantidad<1)
+                        if(principal=="" || detalle=="" || principal=="0" || detalle=="0" || cantidad=="" || cantidad<1 || peso=="" || peso<1)
                         {
                             Ext.Msg.alert("Alerta","Debe llenar todos los campos");
                             return false;
@@ -134,6 +135,7 @@
                         'ubicacion_principal' : principal,
                         'ubicacion_detalle' : detalle,
                         'cantidad' : cantidad,
+                        'peso' : peso,
                         'ticket' : ticket,
                         
                       };
@@ -205,22 +207,30 @@
                             $(this).val("");
                             return false;
                         }
-                        valorpaleta = $('#valorpaleta').val();
                         valortotal = $('#valortotal').val();
-                        if(valor > valorpaleta)
-                        {
-                            Ext.Msg.alert("Alerta","El producto no debe superar el limite de paleta");
-                            $(this).val(0);
-                            return false;
-                        }
                         if(valor > valortotal)
                         {
                             Ext.Msg.alert("Alerta","El producto no debe superar el limite total");
                             $(this).val(0);
                             return false;
                         }
-                        
-                        
+                    });
+                    $("#peso").keyup(function()
+                    {
+                        peso = parseFloat($(this).val());
+                        if(isNaN(peso))
+                        {
+                            Ext.Msg.alert("Alerta","El Peso debe ser un número válido");
+                            $(this).val("");
+                            return false;
+                        }
+                        valorpaleta = $('#valorpaleta').val();
+                        if(peso > valorpaleta)
+                        {
+                            Ext.Msg.alert("Alerta","El producto no debe superar el limite de paleta");
+                            $(this).val(0);
+                            return false;
+                        }
                     });
                 });/*end of document.ready*/
             //]]>
@@ -238,11 +248,15 @@
                             <table width=500px; align='center'>
                                 <thead>
                                     <tr>
+                                        <th class="tb-head" ><b>Producto</b></th>
                                         <th class="tb-head" ><b>Total Cantidad</b></th>
                                         <th class="tb-head" ><b>Unidad Paleta</b></th>
                                     </tr>
                                 </thead>
                                 <tr>
+                                    <td align="center">
+                                        <b>{$nombre_producto}</b>
+                                    </td>
                                     <td align="center">
                                         <b>{$total}</b>
                                         <input type='hidden' value = '{$total}' name='valortotal' id='valortotal'/>
@@ -285,10 +299,19 @@
                     </tr>
                     <tr>
                         <td colspan="3" class="label">
-                            Peso - Unidad **
+                            Unidad **
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
                             <input type="text" name="peso_unidad" placeholder="Peso - Unidad" size="60" id="peso_unidad" class="form-text"/>
+                            <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="label">
+                            Peso **
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="text" name="peso" placeholder="Peso - Unidad" size="60" id="peso" class="form-text"/>
                             <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}" />
                         </td>
                     </tr>

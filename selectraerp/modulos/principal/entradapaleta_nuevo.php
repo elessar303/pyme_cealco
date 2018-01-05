@@ -13,19 +13,19 @@ $sql="SELECT *,a.id_transaccion as id FROM
     inner join  
     kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
     inner join item as c on b.id_item=c.id_item
-    where a.id_transaccion=
+    where a.id_transaccion_calidad=
     (select a.id_transaccion 
     from calidad_almacen as a 
     inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion 
     where b.id_transaccion_detalle=".$id_transaccion.")";
-
+//print_r($sql); exit();
 $datos=$usuarios->ObtenerFilasBySqlSelect($sql);
 if($datos==null)
 {
     //no existen transacciones todavia, buscar la cantidad total y mandar mensaje no hay datos
     $sql=
     "   
-        select b.cantidad, c.unidad_paleta from
+        select b.cantidad, c.unidad_paleta, c.descripcion1 as nombre_producto from
         calidad_almacen as a
         inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
         inner join item as c on b.id_item=c.id_item
@@ -34,6 +34,7 @@ if($datos==null)
     $total=$usuarios->ObtenerFilasBySqlSelect($sql);
     $smarty->assign("total", $total[0]['cantidad']);
     $smarty->assign("paleta", $total[0]['unidad_paleta']);
+    $smarty->assign("nombre_producto", $total[0]['nombre_producto']);
     $smarty->assign("ticket", 1);
     $datostabla="<tr><td colspan='10' align='center'> <b>No Hay Entradas Registradas</b> </td></tr>";
     $smarty->assign("datostabla", $datostabla);
@@ -63,6 +64,12 @@ else
         
     ";
     $total=$usuarios->ObtenerFilasBySqlSelect($sql);
+    $sql=
+    "
+        select descripcion1 from item where id_item=".$id_item[0]['id_item']."
+    ";
+    $nombre=$usuarios->ObtenerFilasBySqlSelect($sql);
+    $smarty->assign("nombre_producto", $nombre[0]['descripcion1']);
     $smarty->assign("total", $total[0]['total']);
     $smarty->assign("paleta", $datos[0]['unidad_paleta']);
     //construir tabla de datos 
@@ -76,11 +83,11 @@ else
         inner join ubicacion as d on b.id_ubi_entrada=d.id
         inner join clientes as e on a.id_proveedor=e.id_cliente
         inner join almacen as f on b.id_almacen_entrada=f.cod_almacen
-        where a.id_transaccion=
+        where a.id_transaccion_calidad=
         (select a.id_transaccion 
         from calidad_almacen as a 
         inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion 
-        where b.id_transaccion_detalle=".$id_transaccion.")
+        where b.id_transaccion_detalle=".$id_transaccion." and c.id_item=".$id_item[0]['id_item'].")
     ";
     $datostabla=$usuarios->ObtenerFilasBySqlSelect($sql);
     //print_r($sql); exit();
