@@ -55,7 +55,7 @@ else
             inner join item as c on b.id_item=c.id_item
             where b.id_transaccion_detalle=".$id_transaccion.") 
             - 
-            (select sum(b.cantidad) from
+            (select  COALESCE(sum(b.cantidad), 0) from
             kardex_almacen as a
             inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
             where a.id_transaccion=".$datos[0]['id']." and b.id_item=".$id_item[0]['id_item'].")
@@ -68,22 +68,20 @@ else
     //construir tabla de datos 
     $sql=
     "
-        select b.id_transaccion_detalle as detalle_movimiento,  e.descripcion as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen  
+        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen  
         from 
         kardex_almacen as a
         inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
         inner join item as c on b.id_item=c.id_item
         inner join ubicacion as d on b.id_ubi_entrada=d.id
-        inner join proveedores as e on a.id_proveedor=e.id_proveedor
+        inner join clientes as e on a.id_proveedor=e.id_cliente
         inner join almacen as f on b.id_almacen_entrada=f.cod_almacen
         where a.id_transaccion=
         (select a.id_transaccion 
         from calidad_almacen as a 
         inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion 
         where b.id_transaccion_detalle=".$id_transaccion.")
-        
     ";
-    
     $datostabla=$usuarios->ObtenerFilasBySqlSelect($sql);
     //print_r($sql); exit();
     foreach($datostabla as $clave => $valor)

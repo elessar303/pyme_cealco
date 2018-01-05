@@ -159,22 +159,18 @@ $datosgenerales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_ge
 
 $sql = 
 "
-    select c.codigo_barras, c.descripcion1, b.etiqueta,  d.descripcion as proveedor, date_format(a.fecha_creacion, '%d/%m/%Y') as fecha_recepcion,
+    select c.codigo_barras, c.descripcion1, b.etiqueta,  d.nombre as proveedor, date_format(a.fecha_creacion, '%d/%m/%Y') as fecha_recepcion,
     b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.cantidad*pesoxunidad as peso, b.observacion
     from kardex_almacen as a
     inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
     inner join item as c on b.id_item=b.id_item
-    inner join proveedores as d  on a.id_proveedor=d.id_proveedor
+    inner join clientes as d  on a.id_proveedor=d.id_cliente
     where b.id_transaccion_detalle=".$nro;
 //echo $sql; exit();
 $datoscampos=$comunes->ObtenerFilasBySqlSelect($sql);
-//$datoscamposingresos=$comunes->ObtenerFilasBySqlSelect("select sum(b.monto) as monto, c.descripcion as tipo_venta from comprobante as a inner join ingresos_detalles as b on a.id=b.id_comprobante inner join departamentos as c on b.tipo_ingreso=cod_departamento where   (a.banco is null || a.banco='0.00')  ".$inicio." ".$nro." group by cod_departamento");
-//$datoscomprobante=$comunes->ObtenerFilasBySqlSelect($consulta);
 $pdf = new PDF();
 $pdf->DatosGenerales($datosgenerales);
 $pdf->DatosCampos($datoscampos);
-//$pdf->DatosCamposIngresos($datoscamposingresos);
-//$pdf->DatosDetalle($datosdetalle);
 $pdf->SetTitle('Comprobante Contable'); 
 $pdf->AliasNbPages();
 $pdf->PrintChapter();
