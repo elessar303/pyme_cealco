@@ -165,7 +165,7 @@
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Proveedor (*)</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Cliente (*)</b></span>
                         </td>
                         <td>
                             <!--input type="text" maxlength="100" name="autorizado_por" id="autorizado_por" value="{$detalles_pendiente[0].autorizado_por}"/-->
@@ -237,6 +237,19 @@
                                 <select name="puntodeventa" id="puntodeventa" class="form-text" style="width:205px">
                                     <option value="">Seleccione...</option>                               
                                 {html_options values=$option_values_punto output=$option_output_punto selected=$puntodeventa}
+                                
+                                </select>
+                            </td>                     
+                    </tr>
+                    <tr>
+                        <td>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Ticket Entrada</b></span>
+                        </td>
+                             <!-- PUNTOS -->
+                            <td>
+                                <select name="id_ticket" id="id_ticket" class="form-text" style="width:350px">
+                                    <option value="">Seleccione...</option>                               
+                                {html_options values=$option_values_ticket output=$option_output_ticket selected=$puntodeventa}
                                 
                                 </select>
                             </td>                     

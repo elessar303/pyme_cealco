@@ -73,6 +73,20 @@ foreach ($punto as $key => $puntos) {
 $smarty->assign("option_values_punto", $arraySelectOption);
 $smarty->assign("option_output_punto", $arraySelectOutPut1);
 
+// Tickets pendientes por entradas
+$arraySelectOption2 = "";
+$arraySelectoutPut2 = "";
+$tickets = new Almacen();
+mysql_set_charset('utf8');
+$punto = $tickets->ObtenerFilasBySqlSelect("SELECT *, a.id as id_ticket from tickets_entrada_salida a, transporte_conductores b where a.id_conductor=b.id and a.hora_salida='0000-00-00 00:00:00' and a.id not in (select distinct(id_ticket_entrada) from calidad_almacen)");
+foreach ($punto as $key => $puntos) {
+    $arraySelectOption2[] = $puntos["id_ticket"];
+    $arraySelectoutPut2[] = "Ticket N°: ".$puntos["id_ticket"]." Conductor: ".$puntos["nombres"]." ".$puntos["apellidos"];
+}
+
+$smarty->assign("option_values_ticket", $arraySelectOption2);
+$smarty->assign("option_output_ticket", $arraySelectoutPut2);
+
 //Fin de los SELECTS para la nueva seccion
 
 #################################################################################
@@ -114,11 +128,11 @@ if (isset($_POST["input_cantidad_items"])) {
         $kardex_almacen_instruccion = "INSERT INTO calidad_almacen (
             `id_transaccion` , `tipo_movimiento_almacen`, `autorizado_por`,
             `observacion`, `fecha`, `usuario_creacion`,
-            `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`)
+            `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,`id_ticket_entrada` )
         VALUES (
             NULL , '3', '{$_POST["autorizado_por"]}',
             '{$_POST["observaciones"]}', '{$_POST["input_fechacompra"]}', '{$login->getUsuario()}', 
-            CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_POST["nro_documento"]}', '{$_POST["empresa_transporte"]}', '{$id_conductor[0]["id_conductor"]}', '{$_POST["placa"]}', '{$_POST["codigo_sica"]}', '{$_POST["orden_despacho"]}', '{$_POST["puntodeventa"]}', '{$_POST["id_proveedor"]}');";
+            CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_POST["nro_documento"]}', '{$_POST["empresa_transporte"]}', '{$id_conductor[0]["id_conductor"]}', '{$_POST["placa"]}', '{$_POST["codigo_sica"]}', '{$_POST["orden_despacho"]}', '{$_POST["puntodeventa"]}', '{$_POST["id_proveedor"]}','{$_POST["id_ticket"]}');";
         
         $almacen->ExecuteTrans($kardex_almacen_instruccion);
         

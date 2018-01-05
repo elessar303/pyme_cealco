@@ -111,7 +111,7 @@
     <body>
         <form id="form-{$name_form}" name="formulario" action="" method="post">
             <div id="datosGral">
-                {include file = "snippets/regresar_boton.tpl"}
+                {include file = "snippets/regresar.tpl"}
                 <input type="hidden" name="cod_empresa" value="{$DatosGenerales[0].cod_empresa}"/>
                 <input type="hidden" name="id_ticket" value="{$datos_ticket[0].id}"/>
                 <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>

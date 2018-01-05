@@ -58,7 +58,7 @@
                         {foreach from=$cabecera key=i item=campos}
                             <td><b>{$campos}</b></td>
                         {/foreach}
-                            <td colspan="2" style="text-align:center;"><b>Opciones</b></td>
+                            <td  style="text-align:center;"><b>Opciones</b></td>
                         </tr>
                         {if $cantidadFilas == 0}
                         <tr>
@@ -83,12 +83,17 @@
                                 <td align="center">{$campos.hora_salida|date_format:"%d-%m-%Y %I:%M %p"}</td>
                                 {/if}
                             <td align="center">{$campos.peso_salida}</td>
+
+                            {if $campos.hora_salida == "0000-00-00 00:00:00"}
                             <td style="cursor:pointer; width:30px; text-align:center;">
                                 <img class="editar"  onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=edit&amp;cod={$campos.id_ticket}&amp;pagina={$pagina}'" title="Editar" src="../../libs/imagenes/edit.gif"/>
                             </td>
+                            {/if}
+                            {if $campos.hora_salida != "0000-00-00 00:00:00"}
                             <td style="cursor:pointer; width:30px; text-align:center;">
-                                <img class="eliminar" onclick="eliminar(this)" id="{$campos.id_ticket}" title="Eliminar" src="../../libs/imagenes/delete.gif"/>
+                                <img class="ver" onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=view&amp;cod={$campos.id_ticket}&amp;pagina={$pagina}'" title="Ver" src="../../libs/imagenes/view.gif"/>
                             </td>
+                            {/if}
                         </tr>
                             {assign var = ultimo_cod_valor value=$campos.cod_especialidad}
                             {/foreach}
