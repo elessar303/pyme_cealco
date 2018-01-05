@@ -640,7 +640,7 @@ if($credito3_factura=='')
             </table>
             <?php
             //se coloca aqui los datos del cliente, los movimientos que no han sido facturado
-            $sql="SELECT id_transaccion, nro_factura from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0  and clientes.id_cliente=".$despacho."";
+            $sql="SELECT id_transaccion, nro_factura from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0  and kardex_almacen.nro_factura<>'' and clientes.id_cliente=".$despacho."";
             $id_transaccion=$almacen->ObtenerFilasBySqlSelect($sql);
             $facturas="";
             foreach ($id_transaccion as $key => $value) 
@@ -664,7 +664,8 @@ if($credito3_factura=='')
                 where nro_pedido=".$value['id_trasaccion']."";
                 $rs4=$almacen->ObtenerFilasBySqlSelect($sql);
 
-                $sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0 and id_transaccion=".$value['id_transaccion']."";
+                //nr pedido
+                $sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0 and id_transaccion=".$value['id_transaccion']." and kardex_almacen.nro_factura<>''";
                 $datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
 
                 $sql="SELECT * from despacho_new WHERE cod_factura=".$datos_cliente[0]['nro_factura']."";

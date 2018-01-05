@@ -197,6 +197,19 @@
             <tr>
                 <td>
                     <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"-->
+                    <span style="font-family:'Verdana';"><b>Cliente:</b></span>
+                </td>
+                <td>
+                    <select  name="cliente" id="cliente" class="form-text">
+                        <option value="">Seleccione...</option>
+                        {html_options output=$option_output_nombre_cliente values=$option_values_id_cliente}
+                    </select>
+                </td>
+            </tr>
+
+            <!--<tr>
+                <td>
+                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"
                     <span style="font-family:'Verdana';"><b>Estado Destino:</b></span>
                 </td>
                 <td>
@@ -209,7 +222,7 @@
 
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"-->
+                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"
                     <span style="font-family:'Verdana';"><b>Almacen de Destino:</b></span>
                 </td>
                 <td>
@@ -218,7 +231,7 @@
                         {html_options output=$option_output_punto values=$option_values_punto}
                     </select>
                 </td>
-            </tr>
+            </tr>-->
 
             <tr>
                 <td>
@@ -245,9 +258,9 @@
                     <input class="form-text" type="text" maxlength="100"  size="30" name="prescintos" id="prescintos"/>
                 </td>
             </tr>
-            <tr>
+            <!--<tr>
                         <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"
                             <span style="font-family:'Verdana';font-weight:bold;"><b>C&eacute;dula del Conductor:</b></span>
                         </td>
                         <td>
@@ -271,7 +284,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-
                             <span style="font-family:'Verdana';font-weight:bold;"><b>Placa:</b></span>
                         </td>
                         <td>
@@ -280,7 +293,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-
                             <span style="font-family:'Verdana';font-weight:bold;"><b>Marca:</b></span>
                         </td>
                         <td>
@@ -289,13 +302,14 @@
                     </tr>
                     <tr>
                         <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-
                             <span style="font-family:'Verdana';font-weight:bold;"><b>Color:</b></span>
                         </td>
                         <td>
                             <input type="text" name="color" maxlength="100" id="color" size="30" maxlength="70" class="form-text"/>
                         </td>
                     </tr>
+                -->
                      <!-- Firmas Casillas-->
                     <tr>
                         <td colspan="2" align="center"><span style="font-family:'Verdana';font-weight:bold;"><b>CASILLA DE FIRMAS:</b></span></td>
@@ -425,7 +439,7 @@
     <label>
         <p><b>Productos</b></p>
         <p><input type="hidden" name="items" id="items">
-                 <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
+            <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
         <!--<p><select style="width:100%" id="items" name="items"></select></p>-->
     </label>
         <label>

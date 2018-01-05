@@ -41,10 +41,19 @@ Ext.onReady(function(){
         $("#cantidad_existente").val("");         
         codAlmacen = $("select[name='almacen']").val();
         ubicacion = $("#ubicacion").val(); 
+        //cliente
+        cliente = $("#cliente").val();
         nombre_ubi = $("#ubicacion option:selected").html();
         item=$("#items").val();
         lote = $("#nlote").val();
         id_proveedor=$("#id_proveedor").val();
+        id_proveedor=cliente;
+        if(cliente=="" || cliente==null)
+        {
+            
+            alert("Seleccione cliente");
+            $("#cliente").focus();
+        }
         if(item!='' && codAlmacen!='0' && ubicacion!="" && nombre_ubi!='PISO DE VENTA'){
             $.ajax({
                 type: "GET",
@@ -68,7 +77,7 @@ Ext.onReady(function(){
             $.ajax({
                 type: "GET",
                 url:  "../../libs/php/ajax/ajax.php",
-                data: "opt=verificarExistenciaItemByAlmacen2&v1="+codAlmacen+"&v2="+item+"&ubicacion="+ubicacion,
+                data: "opt=verificarExistenciaItemByAlmacen&v1="+codAlmacen+"&v2="+item+"&ubicacion="+ubicacion+"&cliente="+cliente,
                 beforeSend: function(){
                 // $("#descripcion_item").html(MensajeEspera("<b>Veficando Cod. item..<b>"));
                 },
@@ -88,8 +97,6 @@ Ext.onReady(function(){
     //mia
     function consultar_ubicacion(){        
         //reseteo el campo      
-    
-             
         codAlmacen = $("select[name='almacen']").val();
         ubicacion = $("#ubicacion").val(); 
         item=$("#items").val();         
@@ -113,6 +120,7 @@ Ext.onReady(function(){
                             bandera=0;
                         //no es piso de venta
                         }
+                        
                       /* alert(cantidad_pos);
                         var newdiv = document.createElement('div');
                         newdiv.innerHTML = "Cantidad POS "  + " <br><input type='text' name='pos_cantidad' id='pos_cantidad'>";
@@ -124,8 +132,56 @@ Ext.onReady(function(){
         }
 
     }
-    
-    
+    //walter
+    function traerdatos()
+    {
+        codAlmacen = $("select[name='almacen']").val();
+        id = $("#ubicacion").val(); 
+        cliente = $("#cliente").val(); 
+        if(id!=null && isNaN(id)==false)
+        {
+            $.ajax({
+                    type: "GET",
+                    url:  "../../libs/php/ajax/ajax.php",
+                    data: "opt=DatosExistenciaItemByAlmacen&v1="+codAlmacen+"&ubicacion="+id+"&cliente="+cliente,
+                    success: function(data)
+                    {
+                        resultado = eval(data)
+                        if(resultado[0].id=="-1"){ 
+                            alert("No se Encontro relación ubicación - cliente")
+                        }else
+                        { 
+                            $("#items").val(resultado[0].id_item);
+                            $("#items").change();
+                            $("#cantidad_existente").val(resultado[0].cantidad);
+                            $("#nlote").val(resultado[0].lote);
+                            cargarproductoitem(resultado[0].id_item);
+
+                        }
+                    }
+                });
+        }
+    }
+
+    function cargarproductoitem(id)
+    {
+        $.ajax({
+                    type: "GET",
+                    url:  "../../libs/php/ajax/ajax.php",
+                    data: "opt=productoiddescripcion&v1="+id,
+                    success: function(data)
+                    {
+                        resultado = eval(data)
+                        if(resultado[0].id=="-1"){ 
+                            alert("Error, No se Encontro")
+                        }else
+                        { 
+                         $("#codigoBarra").val(resultado[0].codigo_barras);
+                         $("#items_descripcion").val(resultado[0].descripcion1);
+                        }
+                    }
+                });
+    } //fin walter
     
     function cargarCantidadPOS(){        
         //reseteo el campo      
@@ -272,6 +328,7 @@ $("#codigoBarra").keypress(function(e){
     });
     $("#ubicacion").change(function(){
        cargarCantidad();
+       traerdatos();
     });
      $("#almacen").change(function(){
        cargarCantidad();

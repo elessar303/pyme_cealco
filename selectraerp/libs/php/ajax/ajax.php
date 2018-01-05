@@ -5427,11 +5427,13 @@ where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateen
             $sql="SELECT descripcion FROM ubicacion WHERE id=".$_GET["ubicacion"]."";
             $ubicacion_pro=$conn->ObtenerFilasBySqlSelect($sql);
 
-            if($ubicacion_pro[0]['descripcion']!='PISO DE VENTA'){
+            if($ubicacion_pro[0]['descripcion']!='PISO DE VENTA')
+            {
 
-            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."' and lote='". $_GET["lote"]."' and id_proveedor='". $_GET["id_proveedor"]."'");
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."' and lote='". $_GET["lote"]."' and id_proveedor='". $_GET["id_proveedor"]."'");
             
-           }elseif($ubicacion_pro[0]['descripcion']=='PISO DE VENTA'){
+           }elseif($ubicacion_pro[0]['descripcion']=='PISO DE VENTA')
+           {
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_item_pisoventa WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'");
            }
             
@@ -5440,6 +5442,44 @@ where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateen
             } else {
                 echo json_encode($campos);
             }
+        break;
+
+        case "DatosExistenciaItemByAlmacen":
+            //echo $var ="SELECT * FROM vw_existenciabyalmacen WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'";
+            $sql="SELECT descripcion FROM ubicacion WHERE id=".$_GET["ubicacion"]."";
+            $ubicacion_pro=$conn->ObtenerFilasBySqlSelect($sql);
+
+            if($ubicacion_pro[0]['descripcion']!='PISO DE VENTA')
+            {
+
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen  WHERE cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'  and id_proveedor='". $_GET["cliente"]."'");
+
+            
+           }elseif($ubicacion_pro[0]['descripcion']=='PISO DE VENTA')
+           {
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_item_pisoventa WHERE id_item = '" . $_GET["v2"] . "' and cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'");
+           }
+            
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                $sql="select codigo_barras, descripcion1 from item where id_item=".$campos[0]["id_item"];
+                        $producto=$conn->ObtenerFilasBySqlSelect($sql);
+                echo json_encode($campos);
+            }
+        break;
+        case "productoiddescripcion":
+            $sql="select * from item where id_item=".$_GET["v1"];
+            $producto=$conn->ObtenerFilasBySqlSelect($sql);
+            if (count($producto) == 0) 
+            {
+                echo "[{id:'-1'}]";
+            }
+            else
+            {
+                echo json_encode($producto);
+            }
+            
         break;
         case "verificarExistenciaItemByAlmacen2":
             /*$campos = $conn->ObtenerFilasBySqlSelect("SELECT `st`.`PRODUCT` AS `Producto`,`i`.`cod_item` AS `cod_item`,`i`.`descripcion1` AS `descripcion1`,(`st`.`UNITS` - (select ifnull(sum(`item_precompromiso`.`cantidad`),0) AS `ifnull(sum(cantidad),0)`

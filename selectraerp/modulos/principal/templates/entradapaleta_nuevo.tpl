@@ -302,7 +302,7 @@
                             Unidad **
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
-                            <input type="text" name="peso_unidad" placeholder="Peso - Unidad" size="60" id="peso_unidad" class="form-text"/>
+                            <input type="text" name="peso_unidad" placeholder="Unidad" size="60" id="peso_unidad" class="form-text"/>
                             <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}" />
                         </td>
                     </tr>
@@ -311,7 +311,7 @@
                             Peso **
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
-                            <input type="text" name="peso" placeholder="Peso - Unidad" size="60" id="peso" class="form-text"/>
+                            <input type="text" name="peso" placeholder="Peso" size="60" id="peso" class="form-text"/>
                             <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}" />
                         </td>
                     </tr>
