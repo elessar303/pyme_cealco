@@ -1,11 +1,11 @@
-﻿-- phpMyAdmin SQL Dump
--- version 4.0.10deb1
+-- phpMyAdmin SQL Dump
+-- version 4.1.14
 -- http://www.phpmyadmin.net
 --
--- Servidor: localhost
--- Tiempo de generación: 04-01-2018 a las 21:43:33
--- Versión del servidor: 5.6.33-0ubuntu0.14.04.1
--- Versión de PHP: 5.5.9-1ubuntu4.22
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 06-01-2018 a las 13:52:03
+-- Versión del servidor: 5.6.17
+-- Versión de PHP: 5.5.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Base de datos: `pyme_prueba_standar_ceal`
+-- Base de datos: `pyme_prueba_standar_cealco`
 --
 
 -- --------------------------------------------------------
@@ -526,7 +526,7 @@ CREATE TABLE IF NOT EXISTS `apertura_tienda` (
   `id_user_cierre` varchar(255) NOT NULL COMMENT 'Usuario que realiza el Cierre',
   `fecha` datetime NOT NULL COMMENT 'Fecha de Finalizacion del Proceso',
   PRIMARY KEY (`id_apertura`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Almacena la informacion del proceso de Apertura y Cierre de Tienda' AUTO_INCREMENT=72 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 COMMENT='Almacena la informacion del proceso de Apertura y Cierre de Tienda' AUTO_INCREMENT=74 ;
 
 --
 -- Volcado de datos para la tabla `apertura_tienda`
@@ -578,7 +578,9 @@ INSERT INTO `apertura_tienda` (`id_apertura`, `apertura`, `apertura_date`, `cier
 (68, '2017-12-17 01:23:55', '2017-12-17', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00'),
 (69, '2017-12-22 13:56:10', '2017-12-22', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00'),
 (70, '2018-01-03 16:56:10', '2018-01-03', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00'),
-(71, '2018-01-04 19:40:27', '2018-01-04', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00');
+(71, '2018-01-04 19:40:27', '2018-01-04', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00'),
+(72, '2018-01-05 12:49:09', '2018-01-05', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00'),
+(73, '2018-01-06 01:04:36', '2018-01-06', '0000-00-00 00:00:00', '0000-00-00', '4', '', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -1101,31 +1103,17 @@ CREATE TABLE IF NOT EXISTS `calidad_almacen` (
   `id_aprobado` int(11) NOT NULL,
   `id_receptor` int(11) NOT NULL,
   `nro_contenedor` varchar(50) NOT NULL,
+  `id_ticket_entrada` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_transaccion`),
   KEY `fk_id_tipo_movimiento_almacen` (`tipo_movimiento_almacen`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=27 ;
 
 --
 -- Volcado de datos para la tabla `calidad_almacen`
 --
 
-INSERT INTO `calidad_almacen` (`id_transaccion`, `tipo_movimiento_almacen`, `autorizado_por`, `observacion`, `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `id_proveedor`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `almacen_destino`, `tipo_acta`, `cod_acta_calidad`, `prescintos`, `id_seguridad`, `id_aprobado`, `id_receptor`, `nro_contenedor`) VALUES
-(2, 3, 'Administrador', 'awdasd', '2016-06-30', 'asys', '2016-06-30 14:20:35', 'Entregado', '2016-06-30 14:20:35', '123132', 0, 'asdasd', 12, 'sdasdasd', 'asdasd', 'asdasd', '000696', '', 1, NULL, NULL, 0, 0, 0, ''),
-(3, 3, 'Administrador', 'asdasd', '2016-06-30', 'asys', '2016-06-30 14:22:53', 'Entregado', '2016-06-30 14:22:53', 'asasd', 0, 'awdadas', 12, 'asdasd', 'asdads', 'asdasd', '0', '', 1, NULL, NULL, 0, 0, 0, ''),
-(4, 3, 'Administrador', 'hola', '2016-06-30', 'asys', '2016-06-30 14:55:46', 'Entregado', '2016-06-30 14:55:46', '1', 0, 'mia', 10, 'fad14n', '1', '1', '000287', '', 1, NULL, NULL, 0, 0, 0, ''),
-(5, 3, 'Administrador', '234', '2016-07-06', 'asys', '2016-07-06 14:36:16', 'Entregado', '2016-07-06 14:36:16', '234', 0, '234', 13, '2e', 'qwe', 'qe', '000999', '', 1, NULL, NULL, 0, 0, 0, ''),
-(6, 3, 'Administrador', '234', '2016-07-06', 'asys', '2016-07-06 14:38:02', 'Entregado', '2016-07-06 14:38:02', '234', 0, '234', 14, '234', '24', '24', '000287', '', 1, NULL, NULL, 0, 0, 0, ''),
-(7, 3, 'Administrador', '234234', '2016-07-07', 'asys', '2016-07-07 13:40:45', 'Entregado', '2016-07-07 13:40:45', '2342', 0, '234234', 11, '3234', 'wwre', 'wer', '000183', '', 1, NULL, NULL, 0, 0, 0, ''),
-(10, 3, 'Administrador', 'wer', '2016-07-18', 'asys', '2016-07-18 16:05:00', 'Entregado', '2016-07-18 16:05:00', 'qwer', 0, 'qwerds', 1, 'werwer', '646w', 'werwe', '000099', '', 1, 'C-999-10', NULL, 0, 0, 0, ''),
-(11, 3, 'Administrador', 'ert', '2016-07-18', 'asys', '2016-07-18 16:06:45', 'Entregado', '2016-07-18 16:06:45', 'ert', 0, 'ert', 1, 'qwe', 'qwe', 'qwer', '000099', '', 1, 'C-999-11', NULL, 0, 0, 0, ''),
-(12, 3, 'Administrador', 'werwer', '2016-07-18', 'asys', '2016-07-18 16:09:13', 'Entregado', '2016-07-18 16:09:13', 'erwer', 0, 'wer', 1, 'qwe', 'qwe', 'qwe', '000099', '', 0, 'C-999-12', NULL, 0, 0, 0, ''),
-(13, 3, 'Administrador', 'prueba', '2016-07-18', 'asys', '2016-07-18 18:14:02', 'Entregado', '2016-07-18 18:14:02', 'prueba', 0, 'qwe', 1, '0', '0', '0', '000287', '', 1, 'C-999-13', NULL, 0, 0, 0, ''),
-(14, 3, 'Administrador', 'final', '2016-07-18', 'asys', '2016-07-18 18:57:44', 'Entregado', '2016-07-18 18:57:44', 'final', 0, 'qwe234', 1, 'werw', 'werwer', 'werw', '000292', '', 1, 'C-999-14', NULL, 0, 0, 0, ''),
-(15, 3, 'Administrador', 'werw', '2016-07-18', 'asys', '2016-07-18 19:04:47', 'Entregado', '2016-07-18 19:04:47', '', 0, '', 17, '', '', '', '', '', 2, 'C-999-15', NULL, 0, 0, 0, ''),
-(16, 5, 'Administrador', 'final 3', '2016-07-18', 'asys', '2016-07-18 19:13:08', '', '0000-00-00 00:00:00', '', 0, '', 0, '', '', '', '', '', 2, 'CR-999-16', NULL, 0, 0, 0, ''),
-(17, 3, 'Junior Ayala', 'wer234', '2016-08-11', 'jayala', '2016-08-11 12:58:44', 'Entregado', '2016-08-11 12:58:44', 'qwerq23', 0, 'qw34wer', 1, '2343', 'qwe', '3123', '000287', '', 1, 'C-999-17', NULL, 0, 0, 0, ''),
-(18, 5, 'Junior Ayala', 'w234523', '2016-08-11', 'jayala', '2016-08-11 13:01:25', '', '0000-00-00 00:00:00', '', 0, '', 0, '', '', '', '', '', 2, 'CR-999-18', NULL, 0, 0, 0, ''),
-(19, 3, 'Walter Jimenez', 'probado', '2017-12-17', 'wjimenez', '2017-12-17 05:29:36', 'Entregado', '2017-12-17 05:29:36', '123123', 1, '23234324', 12, '123123', '12312', '131231', '000287', '', 1, 'C-890-19', NULL, 0, 0, 0, '');
+INSERT INTO `calidad_almacen` (`id_transaccion`, `tipo_movimiento_almacen`, `autorizado_por`, `observacion`, `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `id_proveedor`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `almacen_destino`, `tipo_acta`, `cod_acta_calidad`, `prescintos`, `id_seguridad`, `id_aprobado`, `id_receptor`, `nro_contenedor`, `id_ticket_entrada`) VALUES
+(26, 3, 'Walter Jimenez', 'asdasdas', '2018-01-05', 'wjimenez', '2018-01-06 04:19:59', 'Entregado', '2018-01-06 04:19:59', '12312', 12, '', 17, '', '', '', '000287', '', 1, 'C-890-26', NULL, 0, 0, 0, '', 0);
 
 -- --------------------------------------------------------
 
@@ -1152,31 +1140,15 @@ CREATE TABLE IF NOT EXISTS `calidad_almacen_detalle` (
   `tipo_uso` int(11) NOT NULL COMMENT 'relacion_tipo_usos',
   PRIMARY KEY (`id_transaccion_detalle`),
   KEY `fk_id_transaccion` (`id_transaccion`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=20 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=3 ;
 
 --
 -- Volcado de datos para la tabla `calidad_almacen_detalle`
 --
 
 INSERT INTO `calidad_almacen_detalle` (`id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`, `id_ubi_entrada`, `id_ubi_salida`, `vencimiento`, `elaboracion`, `lote`, `c_esperada`, `observacion`, `precio`, `estatus`, `tipo_uso`) VALUES
-(2, 2, 1, 0, 9400, '200.00', 'CALIDAD', 0, '2019-06-21', NULL, 100, 0, 'probando', '0.00', 1, 1),
-(3, 3, 1, 0, 9400, '300.00', 'CALIDAD', 0, '2019-06-15', NULL, 10101, 0, 'caracas', '0.00', 1, 1),
-(4, 4, 1, 0, 1, '10.00', 'CALIDAD', 0, '2016-07-31', NULL, 1, 0, 'prueba aprobado', '0.00', 1, 1),
-(5, 5, 1, 0, 1, '12.00', 'CALIDAD', 0, '2016-07-29', NULL, 1, 0, 'observacion', '0.00', 1, 1),
-(6, 5, 1, 0, 2, '12.00', 'CALIDAD', 0, '2016-07-22', NULL, 2, 0, 'no aprob', '0.00', 0, 1),
-(7, 6, 1, 0, 1, '12.00', 'CALIDAD', 0, '2016-07-22', NULL, 1, 0, '123', '0.00', 1, 1),
-(8, 6, 1, 0, 2, '23.00', 'CALIDAD', 0, '2016-07-15', NULL, 1, 0, '123', '0.00', 0, 1),
-(9, 7, 1, 0, 1, '10.00', 'CALIDAD', 0, '2016-07-22', NULL, 2, 0, 'aprobado', '0.00', 1, 1),
-(10, 10, 1, 0, 1, '11.00', 'CALIDAD', 0, '2016-08-06', NULL, 0, 0, 'wer', '0.00', 1, 1),
-(11, 11, 1, 0, 1, '1.00', 'CALIDAD', 0, '2016-07-22', NULL, 1, 0, 'qwe', '0.00', 1, 1),
-(12, 12, 1, 0, 2, '1.00', 'CALIDAD', 0, '2016-07-30', NULL, 1, 0, 'qweqwe', '0.00', 1, 1),
-(13, 13, 1, 0, 3, '1.00', 'CALIDAD', 0, '2016-07-29', NULL, 1, 0, 'qw', '0.00', 1, 1),
-(14, 14, 1, 0, 2, '1.00', 'CALIDAD', 0, '2016-07-29', NULL, 1, 0, 'qwerwer', '0.00', 1, 1),
-(15, 15, 1, 0, 124, '9.00', '', 0, '0000-00-00', NULL, 2, 0, 'final', '0.00', 1, 1),
-(16, 16, 0, 1, 124, '1.00', '', 1, '2016-07-29', NULL, 0, 0, '123', '0.00', 1, 0),
-(17, 17, 1, 0, 1, '10.00', 'CALIDAD', 0, '2016-08-26', NULL, 1, 0, '234234', '0.00', 1, 1),
-(18, 18, 0, 1, 39, '84.00', '', 1, '2016-08-19', NULL, 1, 0, 'qweqwe', '0.00', 0, 1),
-(19, 19, 1, 0, 9399, '100.00', 'CALIDAD', 0, '2017-12-01', NULL, 1, 0, 'probando', '0.00', 1, 1);
+(1, 26, 1, 0, 9399, '1231.00', 'CALIDAD', 0, '2018-01-21', NULL, 22, 0, 'asdas', '0.00', 1, 1),
+(2, 26, 1, 0, 9400, '222.00', 'CALIDAD', 0, '2019-01-13', NULL, 2, 0, 'asdasd', '0.00', 1, 1);
 
 -- --------------------------------------------------------
 
@@ -15060,7 +15032,7 @@ CREATE TABLE IF NOT EXISTS `correlativos` (
 --
 
 INSERT INTO `correlativos` (`campo`, `formato`, `contador`, `descripcion`) VALUES
-('cod_factura', '00000', 255, 'Correlativo de Factura'),
+('cod_factura', '00000', 292, 'Correlativo de Factura'),
 ('cod_boleto', '00000', 0, 'Correlativo de Boleto'),
 ('cod_producto', '00000', 12641, 'Correlativo de Producto'),
 ('cod_servicio', '00000', 0, 'Correlativo de Servicio'),
@@ -15076,18 +15048,18 @@ INSERT INTO `correlativos` (`campo`, `formato`, `contador`, `descripcion`) VALUE
 ('cod_cotizacion', '00000', 1, 'Correlativo de Presupuesto/Cotizacion'),
 ('cod_devolucion', '00000000', 21, 'Correlativo de Devoluciones'),
 ('cod_nota_entrega', '000000', 3, 'cod_nota_entrega'),
-('cod_pedido', '000000', 22, 'cod_pedido'),
-('cod_despacho', '00000', 255, 'codigo de despacho'),
+('cod_pedido', '000000', 57, 'cod_pedido'),
+('cod_despacho', '00000', 263, 'codigo de despacho'),
 ('arqueocajero_xenviar', '000000', 0, 'control de los arqueos de cajeros por enviar'),
 ('libroventa_xenviar', '000000', 0, 'control de los libros de ventas que se envian a csv'),
 ('data_generada', '0000', 1, 'Contador de Archivo _data'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket'),
-('id_ticket', '000000000', 31, 'Correlativo de id de ticket');
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket'),
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket'),
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket'),
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket'),
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket'),
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket'),
+('id_ticket', '000000000', 45, 'Correlativo de id de ticket');
 
 -- --------------------------------------------------------
 
@@ -15394,7 +15366,7 @@ CREATE TABLE IF NOT EXISTS `cxc_edocuenta` (
   `fecha_registro` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`cod_edocuenta`),
   KEY `id_cliente` (`id_cliente`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=392 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=394 ;
 
 --
 -- Volcado de datos para la tabla `cxc_edocuenta`
@@ -15759,7 +15731,9 @@ INSERT INTO `cxc_edocuenta` (`cod_edocuenta`, `id_cliente`, `documento`, `numero
 (388, 22, 'FAC', '00251', 0, '56.00', 0.00, 0.00, '2017-12-22', '0000-00-00', 'FACTURA 00251', '0000-00-00', '', '', '', 'X', 'wjimenez', '2017-12-22 16:11:00', 0, '', '', '0000-00-00 00:00:00'),
 (389, 22, 'FAC', '00252', 0, '56.00', 0.00, 0.00, '2017-12-22', '0000-00-00', 'FACTURA 00252', '0000-00-00', '', '', '', 'X', 'wjimenez', '2017-12-22 16:12:15', 0, '', '', '0000-00-00 00:00:00'),
 (390, 22, 'FAC', '00253', 0, '56.00', 0.00, 0.00, '2017-12-22', '0000-00-00', 'FACTURA 00253', '0000-00-00', '', '', '', 'X', 'wjimenez', '2017-12-22 16:15:16', 0, '', '', '0000-00-00 00:00:00'),
-(391, 22, 'FAC', '00254', 0, '56.00', 0.00, 0.00, '2017-12-22', '0000-00-00', 'FACTURA 00254', '0000-00-00', '', '', '', 'X', 'wjimenez', '2017-12-22 16:30:48', 0, '', '', '0000-00-00 00:00:00');
+(391, 22, 'FAC', '00254', 0, '56.00', 0.00, 0.00, '2017-12-22', '0000-00-00', 'FACTURA 00254', '0000-00-00', '', '', '', 'X', 'wjimenez', '2017-12-22 16:30:48', 0, '', '', '0000-00-00 00:00:00'),
+(392, 12, 'FAC', '00258', 0, '56.00', 0.00, 0.00, '2018-01-05', '0000-00-00', 'FACTURA 00258', '0000-00-00', '', '', '', 'X', 'wjimenez', '2018-01-05 17:09:36', 0, '', '', '0000-00-00 00:00:00'),
+(393, 12, 'FAC', '00263', 0, '56.00', 0.00, 0.00, '2018-01-05', '0000-00-00', 'FACTURA 00263', '0000-00-00', '', '', '', 'X', 'wjimenez', '2018-01-05 18:59:46', 0, '', '', '0000-00-00 00:00:00');
 
 -- --------------------------------------------------------
 
@@ -15782,7 +15756,7 @@ CREATE TABLE IF NOT EXISTS `cxc_edocuenta_detalle` (
   `marca` varchar(1) NOT NULL COMMENT 'X: Pagada, P:Por Pagar',
   PRIMARY KEY (`cod_edocuenta_detalle`),
   KEY `cod_edocuenta` (`cod_edocuenta`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=783 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=787 ;
 
 --
 -- Volcado de datos para la tabla `cxc_edocuenta_detalle`
@@ -16505,7 +16479,11 @@ INSERT INTO `cxc_edocuenta_detalle` (`cod_edocuenta_detalle`, `cod_edocuenta`, `
 (779, 390, 'PAGOxFAC', '00253R', 'Factura 00253', '2017-12-22', 'd', '56.00', 1, 'wjimenez', '2017-12-22 16:15:16', ''),
 (780, 390, 'PAGOxFAC', '00253R', 'Pago Factura 00253', '2017-12-22', 'c', '56.00', 1, 'wjimenez', '2017-12-22 16:15:16', ''),
 (781, 391, 'PAGOxFAC', '00254R', 'Factura 00254', '2017-12-22', 'd', '56.00', 1, 'wjimenez', '2017-12-22 16:30:48', ''),
-(782, 391, 'PAGOxFAC', '00254R', 'Pago Factura 00254', '2017-12-22', 'c', '56.00', 1, 'wjimenez', '2017-12-22 16:30:48', '');
+(782, 391, 'PAGOxFAC', '00254R', 'Pago Factura 00254', '2017-12-22', 'c', '56.00', 1, 'wjimenez', '2017-12-22 16:30:48', ''),
+(783, 392, 'PAGOxFAC', '00258R', 'Factura 00258', '2018-01-05', 'd', '56.00', 1, 'wjimenez', '2018-01-05 17:09:36', ''),
+(784, 392, 'PAGOxFAC', '00258R', 'Pago Factura 00258', '2018-01-05', 'c', '56.00', 1, 'wjimenez', '2018-01-05 17:09:36', ''),
+(785, 393, 'PAGOxFAC', '00263R', 'Factura 00263', '2018-01-05', 'd', '56.00', 1, 'wjimenez', '2018-01-05 18:59:46', ''),
+(786, 393, 'PAGOxFAC', '00263R', 'Pago Factura 00263', '2018-01-05', 'c', '56.00', 1, 'wjimenez', '2018-01-05 18:59:46', '');
 
 -- --------------------------------------------------------
 
@@ -16541,7 +16519,7 @@ CREATE TABLE IF NOT EXISTS `cxc_edocuenta_formapago` (
   `usuario_creacion` varchar(90) NOT NULL,
   PRIMARY KEY (`cod_cxc_edocuenta_formapago`),
   KEY `cod_edocuenta_detalle` (`cod_edocuenta_detalle`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=393 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=395 ;
 
 --
 -- Volcado de datos para la tabla `cxc_edocuenta_formapago`
@@ -16907,7 +16885,9 @@ INSERT INTO `cxc_edocuenta_formapago` (`cod_cxc_edocuenta_formapago`, `cod_edocu
 (389, 775, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2017-12-22 16:11:00', 'wjimenez'),
 (390, 777, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2017-12-22 16:12:15', 'wjimenez'),
 (391, 779, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2017-12-22 16:15:16', 'wjimenez'),
-(392, 781, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2017-12-22 16:30:48', 'wjimenez');
+(392, 781, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2017-12-22 16:30:48', 'wjimenez'),
+(393, 783, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2018-01-05 17:09:36', 'wjimenez'),
+(394, 785, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, 0, '0.00', 0, 0, '2018-01-05 18:59:46', 'wjimenez');
 
 -- --------------------------------------------------------
 
@@ -17292,19 +17272,20 @@ CREATE TABLE IF NOT EXISTS `despacho_new` (
   KEY `fk_usuario` (`usuario_creacion`),
   KEY `fk_id_cliente` (`id_cliente`),
   KEY `fk_cod_estatus` (`cod_estatus`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=7 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
 
 --
 -- Volcado de datos para la tabla `despacho_new`
 --
 
 INSERT INTO `despacho_new` (`id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion`, `id_pagos_consolidados`) VALUES
-(1, '00254', '', '', '123456', 22, 4, '2017-12-22', '50.00', '0.00', '50.00', '6.00', '56.00', 1, '50.00', '0.00', '50.00', '0.00', '0.00', '50.00', '6.00', '56.00', '0.00', 'contado', 2, '0000-00-00', '2017-12-22 16:30:48', 'wjimenez', 0, '2017-08-09_19:55:10', 'siscol', NULL),
-(2, '00255', '', '', '123456', 22, 4, '2017-12-22', '150.00', '0.00', '150.00', '18.00', '168.00', 2, '150.00', '0.00', '168.00', '0.00', '0.00', '150.00', '18.00', '168.00', '0.00', 'contado', 1, '0000-00-00', '2017-12-22 16:32:02', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
-(3, '00255', '', '', '123456', 1, 0, '2018-01-03', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-03 16:56:37', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
-(4, '00255', '', '', '123456', 1, 0, '2018-01-03', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-03 16:57:39', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
-(5, '00255', '', '', '123456', 1, 0, '2018-01-03', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-03 16:59:59', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
-(6, '00255', '', '', '123456', 1, 0, '2018-01-04', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-04 19:41:03', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL);
+(1, '00288', '', '', '123456', 12, 0, '2018-01-06', '150.00', '0.00', '150.00', '18.00', '168.00', 2, '150.00', '0.00', '168.00', '0.00', '0.00', '150.00', '18.00', '168.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 04:29:54', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
+(2, '00289', '', '', '123456', 12, 0, '2018-01-06', '150.00', '0.00', '150.00', '18.00', '168.00', 2, '150.00', '0.00', '168.00', '0.00', '0.00', '150.00', '18.00', '168.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 04:30:41', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
+(3, '00290', '', '', '123456', 12, 0, '2018-01-06', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 04:41:36', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
+(4, '00291', '', '', '123456', 12, 0, '2018-01-06', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 04:46:00', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
+(5, '00291', '', '', '123456', 12, 0, '2018-01-06', '100.00', '0.00', '100.00', '12.00', '112.00', 2, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 04:46:00', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
+(6, '00292', '', '', '123456', 12, 0, '2018-01-06', '100.00', '0.00', '100.00', '12.00', '112.00', 1, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 05:50:33', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL),
+(7, '00292', '', '', '123456', 12, 0, '2018-01-06', '100.00', '0.00', '100.00', '12.00', '112.00', 2, '100.00', '0.00', '112.00', '0.00', '0.00', '100.00', '12.00', '112.00', '0.00', 'contado', 1, '0000-00-00', '2018-01-06 05:50:33', 'wjimenez', 0, '2017-08-09_19:55:10', '', NULL);
 
 -- --------------------------------------------------------
 
@@ -17330,20 +17311,35 @@ CREATE TABLE IF NOT EXISTS `despacho_new_detalle` (
   PRIMARY KEY (`id_detalle_factura`),
   KEY `fk_id_factura` (`id_factura`),
   KEY `id_item` (`id_item`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=23 ;
 
 --
 -- Volcado de datos para la tabla `despacho_new_detalle`
 --
 
 INSERT INTO `despacho_new_detalle` (`id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion`) VALUES
-(1, 1, 9404, 2, 'Cobro por movimiento', '1.00', '50.00', '0.00', '0.00', '12.00', '50.00', '56.00', 'wjimenez', '2017-12-22 16:30:48'),
-(2, 2, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2017-12-22 16:32:02'),
-(3, 2, 0, 1, 'Cobro por movimiento', '1.00', '50.00', '0.00', '0.00', '12.00', '50.00', '56.00', '', '2017-12-22 16:32:02'),
-(4, 3, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-03 16:56:37'),
-(5, 4, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-03 16:57:39'),
-(6, 5, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-03 16:59:59'),
-(7, 6, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-04 19:41:03');
+(1, 1, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:15:43'),
+(2, 1, 0, 1, 'Cobro por movimiento', '1.00', '50.00', '0.00', '0.00', '12.00', '50.00', '56.00', '', '2018-01-06 03:15:43'),
+(3, 2, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:16:25'),
+(4, 2, 0, 1, 'Cobro por movimiento', '1.00', '50.00', '0.00', '0.00', '12.00', '50.00', '56.00', '', '2018-01-06 03:16:25'),
+(5, 3, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:18:59'),
+(6, 4, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:18:59'),
+(7, 5, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:45:36'),
+(8, 6, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:45:36'),
+(9, 7, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:53:39'),
+(10, 8, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:53:39'),
+(11, 9, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:53:39'),
+(12, 10, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:58:57'),
+(13, 11, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 03:58:57'),
+(14, 1, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 04:29:54'),
+(15, 1, 0, 1, 'Cobro por movimiento', '1.00', '50.00', '0.00', '0.00', '12.00', '50.00', '56.00', '', '2018-01-06 04:29:54'),
+(16, 2, 0, 1, 'Entrada Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 04:30:41'),
+(17, 2, 0, 1, 'Cobro por movimiento', '1.00', '50.00', '0.00', '0.00', '12.00', '50.00', '56.00', '', '2018-01-06 04:30:41'),
+(18, 3, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 04:41:36'),
+(19, 4, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 04:46:00'),
+(20, 5, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 04:46:00'),
+(21, 6, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 05:50:33'),
+(22, 7, 0, 1, 'Salida Paleta', '1.00', '100.00', '0.00', '0.00', '12.00', '100.00', '112.00', '', '2018-01-06 05:50:33');
 
 -- --------------------------------------------------------
 
@@ -17383,20 +17379,7 @@ CREATE TABLE IF NOT EXISTS `despacho_new_detalle_formapago` (
   `usuario_creacion` varchar(60) NOT NULL,
   PRIMARY KEY (`cod_factura_detalle_formapago`),
   KEY `id_factura` (`id_factura`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=8972806 ;
-
---
--- Volcado de datos para la tabla `despacho_new_detalle_formapago`
---
-
-INSERT INTO `despacho_new_detalle_formapago` (`cod_factura_detalle_formapago`, `id_factura`, `totalizar_monto_cancelar`, `totalizar_saldo_pendiente`, `totalizar_cambio`, `totalizar_monto_efectivo`, `opt_cheque`, `totalizar_monto_cheque`, `totalizar_nro_cheque`, `totalizar_nombre_banco`, `opt_tarjeta`, `totalizar_monto_tarjeta`, `totalizar_nro_tarjeta`, `totalizar_tipo_tarjeta`, `opt_deposito`, `totalizar_monto_deposito`, `totalizar_nro_deposito`, `totalizar_banco_deposito`, `fecha_vencimiento`, `observacion`, `persona_contacto`, `telefono`, `opt_otrodocumento`, `totalizar_tipo_otrodocumento`, `totalizar_monto_otrodocumento`, `totalizar_nro_otrodocumento`, `totalizar_banco_otrodocumento`, `fecha_creacion`, `usuario_creacion`) VALUES
-(8972799, 167, '0.00', '0.00', '100.00', '0.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-09-14 08:14:07', ''),
-(8972800, 174, '224.00', '0.00', '0.00', '224.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-12-17 01:32:48', 'wjimenez'),
-(8972801, 3, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-12-22 16:09:00', 'wjimenez'),
-(8972802, 4, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-12-22 16:11:00', 'wjimenez'),
-(8972803, 5, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-12-22 16:12:15', 'wjimenez'),
-(8972804, 6, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-12-22 16:15:16', 'wjimenez'),
-(8972805, 1, '56.00', '0.00', '0.00', '56.00', 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, 0, '0.00', '0.00', 0, '0000-00-00', '', '', '', 0, 0, '0.00', 0, 0, '2017-12-22 16:30:48', 'wjimenez');
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -17992,7 +17975,7 @@ CREATE TABLE IF NOT EXISTS `factura_impuestos` (
   `fecha_creacion` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id_factura_impuestos`),
   KEY `id_factura` (`id_factura`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=252 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=254 ;
 
 --
 -- Volcado de datos para la tabla `factura_impuestos`
@@ -18233,7 +18216,9 @@ INSERT INTO `factura_impuestos` (`id_factura_impuestos`, `id_factura`, `totaliza
 (248, 4, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2017-12-22 16:11:00'),
 (249, 5, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2017-12-22 16:12:15'),
 (250, 6, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2017-12-22 16:15:16'),
-(251, 1, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2017-12-22 16:30:48');
+(251, 1, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2017-12-22 16:30:48'),
+(252, 9, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2018-01-05 17:09:36'),
+(253, 2, '0.00', '0.00', 0, 0, '0.00', '0.00', 'wjimenez', '2018-01-05 18:59:46');
 
 -- --------------------------------------------------------
 
@@ -18838,27 +18823,22 @@ CREATE TABLE IF NOT EXISTS `item_existencia_almacen` (
   `cod_almacen` int(32) NOT NULL,
   `id_item` int(32) unsigned DEFAULT NULL,
   `cantidad` decimal(11,2) NOT NULL DEFAULT '0.00',
+  `peso` decimal(10,2) NOT NULL,
   `id_ubicacion` int(10) unsigned NOT NULL DEFAULT '0',
   `lote` int(11) DEFAULT NULL COMMENT 'lote del item',
   `id_proveedor` int(11) NOT NULL COMMENT 'Existencia del proveedor',
   PRIMARY KEY (`cod_item_existencia_almacen`),
   KEY `FK_item_existencia_almacen_1` (`cod_almacen`),
   KEY `FK_item_existencia_almacen_2` (`id_item`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=49 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
 
 --
 -- Volcado de datos para la tabla `item_existencia_almacen`
 --
 
-INSERT INTO `item_existencia_almacen` (`cod_item_existencia_almacen`, `cod_almacen`, `id_item`, `cantidad`, `id_ubicacion`, `lote`, `id_proveedor`) VALUES
-(40, 1, 9399, '10.00', 1, 1, 1),
-(41, 1, 9399, '5.00', 3, 1, 1),
-(42, 1, 9399, '5.00', 4, 1, 1),
-(43, 1, 9399, '5.00', 5, 1, 1),
-(44, 1, 9399, '5.00', 11, 1, 1),
-(46, 1, 9399, '1.00', 37, 1, 1),
-(47, 1, 9399, '3.00', 38, 1, 1),
-(48, 1, 9399, '2.00', 12, 1, 1);
+INSERT INTO `item_existencia_almacen` (`cod_item_existencia_almacen`, `cod_almacen`, `id_item`, `cantidad`, `peso`, `id_ubicacion`, `lote`, `id_proveedor`) VALUES
+(1, 1, 9399, '180.00', '9.98', 1, 22, 12),
+(2, 1, 9400, '18.00', '28.00', 37, 2, 12);
 
 -- --------------------------------------------------------
 
@@ -19121,6 +19101,7 @@ INSERT INTO `item_variacion_precio` (`id_var_precio`, `codigo_barra`, `precio_si
 
 CREATE TABLE IF NOT EXISTS `kardex_almacen` (
   `id_transaccion` int(11) NOT NULL AUTO_INCREMENT,
+  `id_transaccion_calidad` int(11) DEFAULT NULL,
   `tipo_movimiento_almacen` int(11) NOT NULL,
   `autorizado_por` varchar(100) NOT NULL,
   `observacion` varchar(200) NOT NULL,
@@ -19159,20 +19140,24 @@ CREATE TABLE IF NOT EXISTS `kardex_almacen` (
   `ticket_entrada` varchar(10) CHARACTER SET utf8 NOT NULL,
   PRIMARY KEY (`id_transaccion`,`guia_sunagro`),
   KEY `fk_id_tipo_movimiento_almacen` (`tipo_movimiento_almacen`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=25 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=12 ;
 
 --
 -- Volcado de datos para la tabla `kardex_almacen`
 --
 
-INSERT INTO `kardex_almacen` (`id_transaccion`, `tipo_movimiento_almacen`, `autorizado_por`, `observacion`, `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `id_proveedor`, `empresa_transporte`, `id_conductor`, `placa`, `color`, `marca`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `almacen_destino`, `prescintos`, `cod_movimiento`, `usuario_despacho`, `observacion_despacho`, `id_cliente`, `nro_factura`, `usuario_anulacion`, `id_seguridad`, `id_aprobado`, `id_receptor`, `id_despachador`, `id_tipo_despacho`, `id_jornada`, `referencia_salida`, `nro_contenedor`, `facturado`, `ticket_entrada`) VALUES
-(1, 8, 'wjimenez', 'Pedido', '2017-12-22', 'wjimenez', '2017-12-22 16:30:48', 'Pendiente', '2017-12-22 00:00:00', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 22, '00254', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
-(19, 3, 'Walter Jimenez', '', '2017-12-17', 'wjimenez', '2017-12-22 16:32:02', 'Entregado', '2017-12-22 16:32:02', '', 1, '23234324', 12, '123123', NULL, NULL, '12312', '131231', '000287', '', NULL, '', '', '', 1, '', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, '1'),
-(20, 8, 'wjimenez', 'Salida por Ventas', '2017-12-22', 'wjimenez', '2017-12-22 16:32:02', 'Pendiente', '2017-12-22 16:32:02', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 22, '00255', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
-(21, 8, 'wjimenez', 'Salida por Ventas', '2018-01-03', 'wjimenez', '2018-01-03 16:56:37', 'Pendiente', '2018-01-03 16:56:37', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 1, '00255', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
-(22, 8, 'wjimenez', 'Salida por Ventas', '2018-01-03', 'wjimenez', '2018-01-03 16:57:39', 'Pendiente', '2018-01-03 16:57:39', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 1, '00255', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
-(23, 8, 'wjimenez', 'Salida por Ventas', '2018-01-03', 'wjimenez', '2018-01-03 16:59:59', 'Pendiente', '2018-01-03 16:59:59', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 1, '00255', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
-(24, 8, 'wjimenez', 'Salida por Ventas', '2018-01-04', 'wjimenez', '2018-01-04 19:41:03', 'Pendiente', '2018-01-04 19:41:03', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 1, '00255', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, '');
+INSERT INTO `kardex_almacen` (`id_transaccion`, `id_transaccion_calidad`, `tipo_movimiento_almacen`, `autorizado_por`, `observacion`, `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `id_proveedor`, `empresa_transporte`, `id_conductor`, `placa`, `color`, `marca`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `almacen_destino`, `prescintos`, `cod_movimiento`, `usuario_despacho`, `observacion_despacho`, `id_cliente`, `nro_factura`, `usuario_anulacion`, `id_seguridad`, `id_aprobado`, `id_receptor`, `id_despachador`, `id_tipo_despacho`, `id_jornada`, `referencia_salida`, `nro_contenedor`, `facturado`, `ticket_entrada`) VALUES
+(1, 26, 3, 'Walter Jimenez', '', '2018-01-05', 'wjimenez', '2018-01-06 04:29:54', 'Entregado', '2018-01-06 04:29:54', '', 12, '', 17, '', NULL, NULL, '', '', '000287', '', NULL, '', '', '', 0, '', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, '1'),
+(2, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 04:29:54', 'Pendiente', '2018-01-06 04:29:54', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00288', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
+(3, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 04:30:41', 'Pendiente', '2018-01-06 04:30:41', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00289', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
+(4, NULL, 4, 'Walter Jimenez', 'sdfas', '2018-01-06', 'wjimenez', '2018-01-06 04:41:36', 'Entregado', '2018-01-06 04:00:00', '', 0, '', 0, '', '', '', '', '', '', '', 'sadas', 'S-890-4', '', '', 12, '', '', 2, 5, 0, 1, NULL, NULL, 0, '', 0, ''),
+(5, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 04:41:36', 'Pendiente', '2018-01-06 04:41:36', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00290', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
+(6, NULL, 4, 'Walter Jimenez', 'sdasda', '2018-01-06', 'wjimenez', '2018-01-06 04:46:00', 'Entregado', '2018-01-06 04:00:00', '', 0, '', 0, '', '', '', '', '', '', '', 'asdasd', 'S-890-6', '', '', 12, '', '', 2, 5, 0, 1, NULL, NULL, 0, '', 0, ''),
+(7, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 04:46:00', 'Pendiente', '2018-01-06 04:46:00', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00291', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
+(8, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 04:46:00', 'Pendiente', '2018-01-06 04:46:00', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00291', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
+(9, NULL, 4, 'Walter Jimenez', '', '2018-01-06', 'wjimenez', '2018-01-06 05:50:33', 'Entregado', '2018-01-06 04:00:00', '', 0, '', 0, '', '', '', '', '', '', '', '', 'S-890-9', '', '', 12, '', '', 2, 5, 0, 1, NULL, NULL, 0, '', 0, ''),
+(10, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 05:50:33', 'Pendiente', '2018-01-06 05:50:33', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00292', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, ''),
+(11, NULL, 8, 'wjimenez', 'Salida por Ventas', '2018-01-06', 'wjimenez', '2018-01-06 05:50:33', 'Pendiente', '2018-01-06 05:50:33', '', 0, '', 0, '', NULL, NULL, '', '', '', '', NULL, '', '', '', 12, '00292', '', 0, 0, 0, 0, NULL, NULL, 0, '', 0, '');
 
 -- --------------------------------------------------------
 
@@ -19234,6 +19219,7 @@ CREATE TABLE IF NOT EXISTS `kardex_almacen_detalle` (
   `id_almacen_salida` int(11) NOT NULL,
   `id_item` int(11) NOT NULL,
   `cantidad` decimal(11,2) NOT NULL,
+  `peso` decimal(10,2) NOT NULL,
   `id_ubi_entrada` int(10) unsigned NOT NULL DEFAULT '0',
   `id_ubi_salida` int(10) unsigned NOT NULL DEFAULT '0',
   `vencimiento` date DEFAULT NULL,
@@ -19245,25 +19231,29 @@ CREATE TABLE IF NOT EXISTS `kardex_almacen_detalle` (
   `etiqueta` int(11) DEFAULT NULL,
   PRIMARY KEY (`id_transaccion_detalle`),
   KEY `fk_id_transaccion` (`id_transaccion`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=13 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=18 ;
 
 --
 -- Volcado de datos para la tabla `kardex_almacen_detalle`
 --
 
-INSERT INTO `kardex_almacen_detalle` (`id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`, `id_ubi_entrada`, `id_ubi_salida`, `vencimiento`, `elaboracion`, `lote`, `c_esperada`, `observacion`, `precio`, `etiqueta`) VALUES
-(1, 1, 0, 2, 9404, '1.00', 0, 6, NULL, '0000-00-00', NULL, 0, '', '56.00', NULL),
-(2, 19, 1, 0, 9399, '10.00', 37, 0, '2017-12-01', '0000-00-00', 1, 0, 'probando', '112.00', 26),
-(3, 20, 1, 0, 9402, '1.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
-(4, 20, 1, 0, 9404, '1.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '50.00', NULL),
-(5, 19, 1, 0, 9399, '10.00', 4, 0, '2017-12-01', '0000-00-00', 1, 0, 'probando', '112.00', 27),
-(6, 21, 1, 0, 9402, '1.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
-(7, 19, 1, 0, 9399, '10.00', 5, 0, '2017-12-01', '0000-00-00', 1, 0, 'probando', '112.00', 28),
-(8, 22, 1, 0, 9402, '1.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
-(9, 19, 1, 0, 9399, '50.00', 11, 0, '2017-12-01', '0000-00-00', 1, 0, 'probando', '112.00', 29),
-(10, 23, 1, 0, 9402, '1.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
-(11, 19, 1, 0, 9399, '2.00', 12, 0, '2017-12-01', '0000-00-00', 1, 0, 'probando', '112.00', 30),
-(12, 24, 1, 0, 9402, '1.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL);
+INSERT INTO `kardex_almacen_detalle` (`id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `id_ubi_entrada`, `id_ubi_salida`, `vencimiento`, `elaboracion`, `lote`, `c_esperada`, `observacion`, `precio`, `etiqueta`) VALUES
+(1, 1, 1, 0, 9399, '231.00', '10.00', 1, 0, '2018-01-21', '0000-00-00', 22, 0, 'asdas', '112.00', 43),
+(2, 2, 1, 0, 9402, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
+(3, 2, 1, 0, 9404, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '50.00', NULL),
+(4, 1, 1, 0, 9400, '22.00', '30.00', 37, 0, '2019-01-13', '0000-00-00', 2, 0, 'asdasd', '560.00', 44),
+(5, 3, 1, 0, 9402, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
+(6, 3, 1, 0, 9404, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '50.00', NULL),
+(7, 4, 0, 1, 9399, '31.00', '0.00', 0, 1, NULL, '0000-00-00', 22, 0, '', '112.00', NULL),
+(8, 5, 0, 1, 9403, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
+(10, 6, 0, 1, 9399, '10.00', '0.00', 0, 1, NULL, '0000-00-00', 22, 0, '', '112.00', NULL),
+(11, 7, 0, 1, 9403, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
+(12, 6, 0, 1, 9400, '2.00', '0.00', 0, 37, NULL, '0000-00-00', 2, 0, '', '560.00', NULL),
+(13, 8, 0, 1, 9403, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
+(14, 9, 0, 1, 9399, '10.00', '9.98', 0, 1, NULL, '0000-00-00', 22, 0, '', '112.00', NULL),
+(15, 10, 0, 1, 9403, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL),
+(16, 9, 0, 1, 9400, '2.00', '28.00', 0, 37, NULL, '0000-00-00', 2, 0, '', '560.00', NULL),
+(17, 11, 0, 1, 9403, '1.00', '0.00', 0, 0, NULL, '0000-00-00', NULL, 0, '', '100.00', NULL);
 
 -- --------------------------------------------------------
 
@@ -21178,7 +21168,7 @@ CREATE TABLE IF NOT EXISTS `operaciones` (
   `libro_venta` tinyint(1) NOT NULL,
   `cierre_cajero` tinyint(1) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=49 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=51 ;
 
 --
 -- Volcado de datos para la tabla `operaciones`
@@ -21229,7 +21219,9 @@ INSERT INTO `operaciones` (`id`, `fecha`, `libro_venta`, `cierre_cajero`) VALUES
 (45, '2017-12-17', -1, 0),
 (46, '2017-12-22', -1, 0),
 (47, '2018-01-03', -1, 0),
-(48, '2018-01-04', -1, 0);
+(48, '2018-01-04', -1, 0),
+(49, '2018-01-05', -1, 0),
+(50, '2018-01-06', -1, 0);
 
 -- --------------------------------------------------------
 
@@ -32847,14 +32839,14 @@ INSERT INTO `ubicacion` (`id`, `descripcion`, `id_almacen`, `puede_vender`, `dev
 (1, 'SECO', 1, 0, 0, 1),
 (2, 'PISO DE VENTA', 1, 1, 0, 0),
 (3, 'DEVOLUCION', 1, 0, 1, 0),
-(4, 'FRIO', 1, 0, 0, 1),
-(5, 'PNC', 1, 0, 0, 1),
+(4, 'FRIO', 1, 0, 0, 0),
+(5, 'PNC', 1, 0, 0, 0),
 (6, 'SECO', 2, 0, 0, 0),
 (7, 'AJUSTE POR ANALIZAR', 0, 0, 0, 0),
-(11, 'NO ALIMENTO', 1, 0, 0, 1),
-(12, 'MCBE', 1, 0, 0, 1),
+(11, 'NO ALIMENTO', 1, 0, 0, 0),
+(12, 'MCBE', 1, 0, 0, 0),
 (37, 'SECO 2', 1, 0, 0, 1),
-(38, 'UBICACION 1', 1, 0, 0, 1);
+(38, 'UBICACION 1', 1, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -34131,7 +34123,7 @@ INSERT INTO `usuarios` (`cod_usuario`, `nombreyapellido`, `usuario`, `clave`, `d
 (1, 'Administrador', 'asys', '47c4550a9dfa8eee8fa9c7294c5432a5', '', '2017-10-10 09:59:50', 1, 1, 1, 1, 1),
 (2, 'Junior Ayala', 'jayala', '90e856a97cf784ba03c1722ecbf0f918', 'Asigne un Departamento', '2017-11-08 09:27:13', 1, 1, 1, 0, 0),
 (3, 'Humberto Zapata', 'hzapata', '010f295086d29524deacf73811ada6be', '', '', 0, 1, 0, 0, 0),
-(4, 'Walter Jimenez', 'wjimenez', 'e10adc3949ba59abbe56e057f20f883e', '', '2018-01-04 19:40:21', 1, 1, 1, 0, 1),
+(4, 'Walter Jimenez', 'wjimenez', 'e10adc3949ba59abbe56e057f20f883e', '', '2018-01-06 01:05:20', 1, 1, 1, 0, 1),
 (5, 'Oriana Romero', 'oromero', 'a685b81d642eb191c6724b3ae6d28f6f', '', '2017-08-21 14:05:05', 1, 1, 1, 1, 1),
 (6, 'Ayuramy Martinez', 'aymartinez', '60fd08c6dc8fc2e5a174688282cb0329', '', '2017-09-11 10:13:54', 0, 1, 1, 0, 0),
 (7, 'Alexandra Machado', 'Amachado', 'ae68e11b3cd02148a9a837c4732c59d9', 'Asigne un Departamento', '2017-08-24 14:01:49', 0, 1, 1, 0, 0),
@@ -34391,6 +34383,7 @@ CREATE TABLE IF NOT EXISTS `vw_existenciabyalmacen` (
 ,`cod_item` varchar(20)
 ,`descripcion1` varchar(225)
 ,`cantidad` decimal(11,2)
+,`peso` decimal(10,2)
 ,`descripcion` varchar(50)
 ,`ubicacion` varchar(45)
 );
@@ -34722,7 +34715,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `vw_existenciabyalmacen`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_existenciabyalmacen` AS select `e`.`cod_almacen` AS `cod_almacen`,`e`.`id_ubicacion` AS `id_ubicacion`,`e`.`lote` AS `lote`,`e`.`id_proveedor` AS `id_proveedor`,`i`.`id_item` AS `id_item`,`i`.`cod_item` AS `cod_item`,concat(`i`.`descripcion1`,' ',`m`.`marca`,' ',`i`.`pesoxunidad`,`um`.`nombre_unidad`) AS `descripcion1`,`e`.`cantidad` AS `cantidad`,`a`.`descripcion` AS `descripcion`,`u`.`descripcion` AS `ubicacion` from (((((`item_existencia_almacen` `e` join `item` `i` on((`i`.`id_item` = `e`.`id_item`))) join `marca` `m` on((`m`.`id` = `i`.`id_marca`))) join `unidad_medida` `um` on((`um`.`id` = `i`.`unidadxpeso`))) join `almacen` `a` on((`a`.`cod_almacen` = `e`.`cod_almacen`))) join `ubicacion` `u` on((`u`.`id` = `e`.`id_ubicacion`))) where (`i`.`cod_item_forma` = 1);
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_existenciabyalmacen` AS select `e`.`cod_almacen` AS `cod_almacen`,`e`.`id_ubicacion` AS `id_ubicacion`,`e`.`lote` AS `lote`,`e`.`id_proveedor` AS `id_proveedor`,`i`.`id_item` AS `id_item`,`i`.`cod_item` AS `cod_item`,concat(`i`.`descripcion1`,' ',`m`.`marca`,' ',`i`.`pesoxunidad`,`um`.`nombre_unidad`) AS `descripcion1`,`e`.`cantidad` AS `cantidad`,`e`.`peso` AS `peso`,`a`.`descripcion` AS `descripcion`,`u`.`descripcion` AS `ubicacion` from (((((`item_existencia_almacen` `e` join `item` `i` on((`i`.`id_item` = `e`.`id_item`))) join `marca` `m` on((`m`.`id` = `i`.`id_marca`))) join `unidad_medida` `um` on((`um`.`id` = `i`.`unidadxpeso`))) join `almacen` `a` on((`a`.`cod_almacen` = `e`.`cod_almacen`))) join `ubicacion` `u` on((`u`.`id` = `e`.`id_ubicacion`))) where (`i`.`cod_item_forma` = 1);
 
 -- --------------------------------------------------------
 
