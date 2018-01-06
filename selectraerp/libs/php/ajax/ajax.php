@@ -61,6 +61,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 AND  a.id_transaccion not in (select id_transaccion_calidad from kardex_almacen where tipo_movimiento_almacen=3)
             ";
             $datospadre=$conn->ObtenerFilasBySqlSelect($sql);
+            
             if($datospadre==null)
             {
                 //si es null es por que ya existe
@@ -134,10 +135,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     if (count($campos) > 0) 
                     {
                         $cantidadExistente = $campos[0]["cantidad"];
+                        $pesoExistente = $campos[0]["peso"];
                         $conn->ExecuteTrans(
                         "
                             UPDATE item_existencia_almacen 
-                            SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "'
+                            SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "', peso = '" . ($pesoExistente + $POST["peso"]) . "'
                             WHERE id_item  = '{$datospadre[0]['id_item']}' 
                             AND id_ubicacion = '{$_POST['ubicacion_detalle']}' 
                             AND lote='{$datospadre[0]['lote']}' 
@@ -148,10 +150,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     {
                         $instruccion = 
                         "
-                            INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, `lote`, `id_proveedor`)
+                            INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`, `peso`, `id_ubicacion`, `lote`, `id_proveedor`)
                             VALUES 
                             ('{$_POST['ubicacion_principal']}',
-                            '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['ubicacion_detalle']}',
+                            '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['peso']}',  '{$_POST['ubicacion_detalle']}',
                             '{$datospadre[0]['lote']}', '{$datospadre[0]['id_proveedor']}');
                         ";
                         $conn->ExecuteTrans($instruccion);
@@ -233,10 +235,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 if (count($campos) > 0) 
                 {
                     $cantidadExistente = $campos[0]["cantidad"];
+                    $pesoExistente = $campos[0]["peso"];
                     $conn->ExecuteTrans(
                     "
                         UPDATE item_existencia_almacen 
-                        SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "'
+                        SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "', peso = '" . ($pesoExistente + $POST["peso"]) . "'
                         WHERE id_item  = '{$datospadre[0]['id_item']}' 
                         AND id_ubicacion = '{$_POST['ubicacion_detalle']}' 
                         AND lote='{$datospadre[0]['lote']}' 
@@ -247,10 +250,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 {
                     $instruccion = 
                     "
-                        INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, `lote`, `id_proveedor`)
+                        INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`, `peso`, `id_ubicacion`, `lote`, `id_proveedor`)
                         VALUES 
                         ('{$_POST['ubicacion_principal']}',
-                        '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['ubicacion_detalle']}',
+                        '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['peso']}',  '{$_POST['ubicacion_detalle']}',
                         '{$datospadre[0]['lote']}', '{$datospadre[0]['id_proveedor']}');
                     ";
                     $conn->ExecuteTrans($instruccion);
@@ -775,7 +778,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             if ($_GET["id_tipo_movimiento_almacen"] == '8')
             {
                 $operacion = "Salida";
-                $sql="SELECT *,kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, kad.precio
+                $sql="SELECT *,kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, kad.precio, DATE_FORMAT(k.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
                 FROM kardex_almacen_detalle AS kad
                 join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
                 Inner Join clientes as cli on k.id_cliente=cli.id_cliente
@@ -788,7 +791,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 cli.id_cliente='".$_GET['id_cliente']."' 
                 and 
                 k.estado='".$_GET['estatus']."'
-                order by kad.id_transaccion desc
+                order by k.fecha_creacion, kad.id_transaccion asc
                 ";
                 //echo $sql; exit();
                 $campos = $conn->ObtenerFilasBySqlSelect($sql);
@@ -807,8 +810,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                             <table >
                                 <thead>
                                     <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
-                                    <th style="width:150px; font-weight: bold;">Almac&eacute;n ' . $operacion . '</th>
-                                    <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n' . $operacion . '</th>
+                                    <th style="width:150px; font-weight: bold;">Fecha Creación </th>
+                                    
                                     <th style="width:300px; font-weight: bold;">Item</th>
                                     <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
                                     <th style="width:110px; font-weight: bold; text-align: center;">Precio</th>
@@ -823,8 +826,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 '
                     <tr>
                         <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
-                        <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
-                        <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                        <td style="width:150px; padding-left:10px;">' . $item["fecha_creacion"] . '</td>
                         <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
                         <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
                         <td style="text-align: right; padding-right:10px;">' . number_format($item['precio'], '2', ',', '.') . '</td>
@@ -5464,7 +5466,7 @@ where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateen
                 echo "[{id:'-1'}]";
             } else {
                 $sql="select codigo_barras, descripcion1 from item where id_item=".$campos[0]["id_item"];
-                        $producto=$conn->ObtenerFilasBySqlSelect($sql);
+                $producto=$conn->ObtenerFilasBySqlSelect($sql);
                 echo json_encode($campos);
             }
         break;

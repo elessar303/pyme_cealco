@@ -87,7 +87,7 @@ var eventos_form = {
       
     },
     Limpiar: function() {
-        $("#cantidadunitaria, #items,#items_descripcion,#codigoBarra,#almacen,#ubicacion,#descripcionitem, #codigofabricante,#cantidadunitaria,#costounitario, #totalitem_tmp,#cantidaddeberia,#observacion,#cantidad_existente,#fecha_vence,#unidad_paleta,#fVencimiento,#fechaelaboracion,#nlote,#fecha_vencimiento").val("");
+        $("#cantidadunitaria, #items,#items_descripcion,#codigoBarra,#almacen,#ubicacion,#descripcionitem, #codigofabricante,#cantidadunitaria,#costounitario, #totalitem_tmp,#cantidaddeberia,#observacion,#cantidad_existente,#fecha_vence,#unidad_paleta,#fVencimiento,#fechaelaboracion,#nlote,#fecha_vencimiento,#peso,#peso_existente").val("");
     },
     IncluirRegistros: function(options) {
         var html = "";
@@ -101,6 +101,7 @@ var eventos_form = {
                 campos += $.inputHidden("_id_item", options.id_item, "[]");
                 campos += $.inputHidden("_id_almacen", options.id_almacen, "[]");
                 campos += $.inputHidden("_cantidad", options.cantidad, "[]");
+                campos += $.inputHidden("_peso", options.peso, "[]");
                 campos += $.inputHidden("_ubicacion", options.id_ubicacion, "[]");
                 campos += $.inputHidden("_vencimineto", options.vencimiento, "[]");
                 campos += $.inputHidden("_elaboracion", options.elaboracion, "[]");

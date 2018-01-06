@@ -85,7 +85,8 @@ $smarty->assign("option_values_seguridad", $arraySelectOption4);
 $smarty->assign("option_output_seguridad", $arraySelectOutPut4);
 
 
-if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
+if (isset($_POST["input_cantidad_items"])) 
+{ // si el usuario iso post
 
     $sql="SELECT codigo_siga from parametros_generales limit 1";
     $codigosiga= $almacen->ObtenerFilasBySqlSelect($sql);
@@ -116,23 +117,7 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
         exit();  
     }
 
-
-    /*//Validamos si el conductor existe en la BD, de no existir lo insertamos
-        $id_conductor = $almacen->ObtenerFilasBySqlSelect("SELECT id_conductor FROM conductores WHERE
-                    cedula_conductor  = '{$_POST["nacionalidad_conductor"]}{$_POST["cedula_conductor"]}';");
-        $conductor = $almacen->getFilas($id_conductor);
-
-        if ($conductor == 0) {
-            $instruccion = "INSERT INTO conductores ( `nombre_conductor`,`cedula_conductor`)
-                    VALUES ('{$_POST["conductor"]}','{$_POST["nacionalidad_conductor"]}{$_POST["cedula_conductor"]}');";
-            $almacen->ExecuteTrans($instruccion); 
-            //Luego de insertar el nuevo conductor en la BD capturo su ID par la tabla de Kardex Almacen
-            $id_conductor=$almacen->ObtenerFilasBySqlSelect("SELECT id_conductor FROM conductores WHERE
-                    cedula_conductor  = '{$_POST["nacionalidad_conductor"]}{$_POST["cedula_conductor"]}';");
-        }
-
-    $update_conductor=$almacen->ExecuteTrans("UPDATE conductores SET nombre_conductor='{$_POST["conductor"]}' WHERE cedula_conductor  = '{$_POST["nacionalidad_conductor"]}{$_POST["cedula_conductor"]}';");
-    */
+    $almacen->BeginTrans();
 
     $kardex_almacen_instruccion = "
         INSERT INTO kardex_almacen (
@@ -146,13 +131,15 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
 
     $almacen->ExecuteTrans($kardex_almacen_instruccion);
 
-    $id_transaccion = $almacen->getInsertID();
+    $id_transaccion2 = $almacen->getInsertID();
     
-    $update_codmov="UPDATE kardex_almacen SET cod_movimiento='S-".$sucursal."-".$id_transaccion."' WHERE `id_transaccion`=".$id_transaccion."";
-
+    $update_codmov="UPDATE kardex_almacen SET cod_movimiento='S-".$sucursal."-".$id_transaccion2."' WHERE `id_transaccion`=".$id_transaccion2."";
+    $correlativos = new Correlativos();
     $almacen->ExecuteTrans($update_codmov);
 
-    for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
+    
+    for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) 
+    {
       
         //Se consulta el precio actual para dejar el historico en kardex (Junior)
             $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$_POST["_id_item"][$i]}'";
@@ -162,9 +149,9 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
 
         $kardex_almacen_detalle_instruccion = "
         INSERT INTO kardex_almacen_detalle (
-        `id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_salida`, `precio`, lote)
+        `id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `id_ubi_salida`, `precio`, lote)
         VALUES (
-        NULL, '" . $id_transaccion . "', '', '" . $_POST["_id_almacen"][$i] . "', '" . $_POST["_id_item"][$i] . "', '" . $_POST["_cantidad"][$i] . "', '" . $_POST["_ubicacion"][$i] . "', ".$precioconiva.",  '" . $_POST["_nlote"][$i] . "');";
+        NULL, '" . $id_transaccion2 . "', '', '" . $_POST["_id_almacen"][$i] . "', '" . $_POST["_id_item"][$i] . "', '" . $_POST["_cantidad"][$i] . "', '" . $_POST["_peso"][$i] . "',  '" . $_POST["_ubicacion"][$i] . "', ".$precioconiva.",  '" . $_POST["_nlote"][$i] . "');";
 
         $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
          //REALIZAR LA DISMINUCION DEL POS EN ESTE BLOQUE EL SOLO REALIZA LA DEL PYME 
@@ -173,7 +160,7 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
         //PROCESO DE AGREGAR EL CODIGO DE SEGURIDAD DEL KARDEX
         if($i==0 && $_POST['codigo_kardex']!=NULL)
         {
-            $almacen->ExecuteTrans("INSERT INTO `codigo_kardex`( `codigo`, `id_movimiento`, `tipo_moviento`, `usuario`, `fecha`) VALUES ('".$_POST['codigo_kardex']."',".$id_transaccion.",'4','".$login->getUsuario()."', now());");
+            $almacen->ExecuteTrans("INSERT INTO `codigo_kardex`( `codigo`, `id_movimiento`, `tipo_moviento`, `usuario`, `fecha`) VALUES ('".$_POST['codigo_kardex']."',".$id_transaccion2.",'4','".$login->getUsuario()."', now());");
         }
     
         $pvender = $almacen->ObtenerFilasBySqlSelect("
@@ -181,18 +168,22 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                     where id  = '".$_POST["_ubicacion"][$i]."'");
         //si se puede vender entonces debemos restar en piso de venta esa salida
      
-        if($pvender[0]["puede_vender"]==1){
-            if(POS) {
+        if($pvender[0]["puede_vender"]==1)
+        {
+            if(POS) 
+            {
                 //obtenemos el itempos
                 $campoitempos = $almacen->ObtenerFilasBySqlSelect("
                            select itempos from item
                            where id_item  = '" . $_POST["_id_item"][$i] . "'");
-                if(count($campoitempos)>0){
+                if(count($campoitempos)>0)
+                {
                    // echo $campoitempos[0]["itempos"]; exit();
                     $campopos = $almacen->ObtenerFilasBySqlSelect("
                            select * from $pos.stockcurrent
                            where product  = '" .$campoitempos[0]["itempos"]. "'");
-                    if(count($campopos)>0){
+                    if(count($campopos)>0)
+                    {
                         $campomodpos= $almacen->ExecuteTrans("update $pos.stockcurrent set UNITS=UNITS-{$_POST["_cantidad"][$i]} where product='".$campoitempos[0]["itempos"]."'");
                         
                     }
@@ -200,26 +191,20 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                 }
             
             }
-            
         }
        
 
         //-------------------------------- FIN OJO---------------------
-        
-        
-        
         $campos = $almacen->ObtenerFilasBySqlSelect("
                     select * from item_existencia_almacen
                     where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion ='". $_POST["_ubicacion"][$i] . "'  and lote='" . $_POST["_nlote"][$i] . "'");
-        if (count($campos) > 0) {
-            
+        if (count($campos) > 0) 
+        {
             $cantidadExistente = $campos[0]["cantidad"];
-            
-            $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "'
+            $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "', peso = '" . ($_POST["_peso"][$i]) . "'
                                     where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "'");
 
             //si cantidad es 0 o negativo debe borrarse de item existencia
-            
             if($cantidadExistente - $_POST["_cantidad"][$i]<=0)
             {
                 $almacen->ExecuteTrans("
@@ -232,7 +217,7 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
             }
             //se comienza a cobrar
             //busco el id del movimiento cargo
-            $sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion= 'Descargo'";
+            $sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion='Descargo'";
             $id_movimiento=$almacen->ObtenerFilasBySqlSelect($sql);
             //primero se buscar el movimiento "descargo" y se agrega el costo de los servicios de dicho movimiento
             $iva[]="";
@@ -262,7 +247,7 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                 //echo $sql; exit();
             }
             //***********************PEDIDO
-            $correlativos = new Correlativos();
+            
             $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "si");
             $formateo_nro_factura = $nro_pedido;
             $subtotal=0;
@@ -270,11 +255,11 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
             $itemstotal=count($total);
             $totaltotal=0;
             //se guarda los totales del resultado de los arreglos
-            for($i=0; $i<count($total); $i++)
+            for($ii=0; $ii<count($total); $ii++)
             {
-                $subtotal+=$base[$i];
-                $ivatotal+=(($base[$i]*$iva[$i]) / 100);
-                $totaltotal+=$total[$i];
+                $subtotal+=$base[$ii];
+                $ivatotal+=(($base[$ii]*$iva[$ii]) / 100);
+                $totaltotal+=$total[$ii];
             }
             $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
             $formateo_nro_factura = $nro_factura;
@@ -332,11 +317,11 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
         
             $almacen->ExecuteTrans($kardex_almacen_instruccion);
             $id_transaccion = $almacen->getInsertID();
-            for($i=0; $i<count($total); $i++)
+            for($ii=0; $ii<count($total); $ii++)
             {
-                if($total[$i]!=null)
+                if($total[$ii]!=null)
                 {
-                    $descripcion =  $nombreservicio[$i];
+                    $descripcion =  $nombreservicio[$ii];
                     $detalle_item_instruccion = "
                     INSERT INTO despacho_new_detalle (
                     `id_factura`, `id_item`,
@@ -346,10 +331,10 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                     `fecha_creacion`, `_item_almacen`
                     )
                     VALUES (
-                    '{$id_facturaTrans}', '{$codservicio[$i]}',
-                    '{$descripcion}', '1', '{$base[$i]}',
-                    0, 0, '{$iva[$i]}',
-                    '{$base[$i]}', '{$total[$i]}', '{$usuario}',
+                    '{$id_facturaTrans}', '{$codservicio[$ii]}',
+                    '{$descripcion}', '1', '{$base[$ii]}',
+                    0, 0, '{$iva[$ii]}',
+                    '{$base[$ii]}', '{$total[$ii]}', '{$usuario}',
                     CURRENT_TIMESTAMP, '1'
                     );";
                     $almacen->ExecuteTrans($detalle_item_instruccion);
@@ -368,9 +353,9 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                     NULL ,
                     '" . $id_transaccion . "',
                     '',
-                    '{$_POST["_ubicacion"][$i]}',
-                    '" . $idservicios[$i] . "',
-                    '" . $base[$i] . "',
+                    '{$_POST["_ubicacion"][$ii]}',
+                    '" . $idservicios[$ii] . "',
+                    '" . $base[$ii] . "',
                     1
                     );";
                     $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -381,19 +366,11 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                 $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
                 $almacen->ExecuteTrans("update correlativos set contador = '" . $nro_pedido . "' where campo = 'cod_pedido'");
                 $almacen->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_factura}' WHERE campo = 'cod_factura';");
-            if ($almacen->errorTransaccion == 1)
-            {    
-                echo "1";
-            }
-            elseif($almacen->errorTransaccion == 0)
-            {
-                echo "-1";
-            }
-            $almacen->CommitTrans($almacen->errorTransaccion);
+            
             //Fin ********************+PEDIDO
-
-        
-        } else {
+        } 
+        else 
+        {
             $instruccion = "
 		INSERT INTO item_existencia_almacen(
 		`cod_almacen`, `id_item`, `cantidad`,`id_ubicacion`, lote)
@@ -401,9 +378,20 @@ if (isset($_POST["input_cantidad_items"])) { // si el usuario iso post
                     '" . $_POST["_id_almacen"][$i] . "', '" . $_POST["_id_item"][$i] . "', '" . $_POST["_cantidad"][$i] . "', '" . $_POST["_ubicacion"][$i] . "', '" . $_POST["_nlote"][$i] . "');";
             $almacen->ExecuteTrans($instruccion);
         }
-    } // Fin del For
-
+    } // Fin for
+    if ($almacen->errorTransaccion == 1)
+    {    
+        //echo "paso";   
+        Msg::setMessage("<span style=\"color:#62875f;\">Salida Generada Exitosamente </span>");
+    }
+    elseif($almacen->errorTransaccion == 0)
+    {
+        Msg::setMessage("<span style=\"color:red;\">Error al tratar de cargar la Salida, por favor intente nuevamente.</span>");
+    }
+    $almacen->CommitTrans($almacen->errorTransaccion);
     header("Location: ?opt_menu=" . $_POST["opt_menu"] . "&opt_seccion=" . $_POST["opt_seccion"]);
-    exit;
 }
 ?>
+
+
+

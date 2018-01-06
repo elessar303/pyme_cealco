@@ -154,6 +154,7 @@ Ext.onReady(function(){
                             $("#items").val(resultado[0].id_item);
                             $("#items").change();
                             $("#cantidad_existente").val(resultado[0].cantidad);
+                            $("#peso_existente").val(resultado[0].peso);
                             $("#nlote").val(resultado[0].lote);
                             cargarproductoitem(resultado[0].id_item);
 
@@ -351,6 +352,16 @@ $("#codigoBarra").keypress(function(e){
      $("#almacen").change(function(){
        consultar_ubicacion();
     });
+    $("#cantidadunitaria").keyup(function(){
+       if($('#cantidadunitaria').val()<=0 || ( parseFloat($('#cantidad_existente').val()) - parseFloat($('#cantidadunitaria').val()) ) <=0)
+       {
+            $("#peso").val(0);
+       }
+       else
+       {
+            $("#peso").val("");
+       }
+    });
     
     
 
@@ -441,12 +452,20 @@ $("#codigoBarra").keypress(function(e){
                 // solicitada=document.getElementById('cantidadunitaria').value;  
 
                             solicitada=$("#cantidadunitaria").val(); 
+                            pesoold=$("#peso").val(); 
                             existente=$("#cantidad_existente").val(); 
-                          solicitada=  parseInt(solicitada);
-                           existente=  parseInt(existente);
+                            solicitada=  parseInt(solicitada);
+                            existente=  parseInt(existente);
                            
                          
-                                                 
+                if(pesoold=="")
+                {
+                    Ext.Msg.alert("Alerta","El peso no puede ser vacio");
+                    return false;   
+                }
+
+
+
                 if( solicitada > existente ){
                     
                     Ext.Msg.alert("Alerta","La cantidad a descargar no puede ser mayor a la existente");
@@ -459,6 +478,26 @@ $("#codigoBarra").keypress(function(e){
                     return false;
                 }
                 }
+                
+                if(solicitada <=0 )
+                {
+                    Ext.Msg.alert("Alerta","La cantidad a descargar no puede ser igual o menor a 0");
+                    return false;
+                }
+                if( solicitada < existente && pesoold<=0 )
+                {
+                    
+                    Ext.Msg.alert("Alerta","El peso no puede ser 0 si existen unidades");
+                    return false;
+                }
+                if( solicitada == existente && pesoold!=0 )
+                {
+                    
+                    Ext.Msg.alert("Alerta","El peso debe ser 0 si no quedan unidades");
+                    return false;
+                }
+
+                
 
                 eventos_form.IncluirRegistros({
                     id_item:            $("#items").val(),
@@ -466,6 +505,7 @@ $("#codigoBarra").keypress(function(e){
                     id_almacen:         $("#almacen").val(),
                     id_ubicacion:         $("#ubicacion").val(),
                     cantidad:           $("#cantidadunitaria").val(),/*,*/
+                    peso:           $("#peso").val(),/*,*/
                     nlote:           $("#nlote").val()/*,*/
                 });
 

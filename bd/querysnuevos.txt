@@ -1,1 +1,11 @@
 ALTER TABLE `calidad_almacen` ADD `id_ticket_entrada` INT NOT NULL COMMENT 'FK tabla tickets_entrada_salida' AFTER `nro_contenedor`, ADD INDEX `id_ticket_entrada` (`id_ticket_entrada`);
+ALTER TABLE `kardex_almacen_detalle` ADD `peso` DECIMAL(10,2) NOT NULL AFTER `cantidad`; 
+ALTER TABLE `item_existencia_almacen` ADD `peso` DECIMAL(10,2) NOT NULL AFTER `cantidad`; 
+
+
+ALTER
+ ALGORITHM = UNDEFINED
+ DEFINER = root@localhost
+ SQL SECURITY DEFINER
+ VIEW `vw_existenciabyalmacen`
+ AS select `e`.`cod_almacen` AS `cod_almacen`,`e`.`id_ubicacion` AS `id_ubicacion`,`e`.`lote` AS `lote`,`e`.`id_proveedor` AS `id_proveedor`,`i`.`id_item` AS `id_item`,`i`.`cod_item` AS `cod_item`,concat(`i`.`descripcion1`,' ',`m`.`marca`,' ',`i`.`pesoxunidad`,`um`.`nombre_unidad`) AS `descripcion1`,`e`.`cantidad` AS `cantidad`, `e`.`peso` AS `peso`, `a`.`descripcion` AS `descripcion`,`u`.`descripcion` AS `ubicacion` from (((((`pyme_prueba_standar_cealco`.`item_existencia_almacen` `e` join `pyme_prueba_standar_cealco`.`item` `i` on((`i`.`id_item` = `e`.`id_item`))) join `pyme_prueba_standar_cealco`.`marca` `m` on((`m`.`id` = `i`.`id_marca`))) join `pyme_prueba_standar_cealco`.`unidad_medida` `um` on((`um`.`id` = `i`.`unidadxpeso`))) join `pyme_prueba_standar_cealco`.`almacen` `a` on((`a`.`cod_almacen` = `e`.`cod_almacen`))) join `pyme_prueba_standar_cealco`.`ubicacion` `u` on((`u`.`id` = `e`.`id_ubicacion`))) where (`i`.`cod_item_forma` = 1)

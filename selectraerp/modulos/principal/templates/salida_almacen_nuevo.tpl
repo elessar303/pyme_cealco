@@ -450,10 +450,17 @@
         <p><b>Cantidad Unitaria</b></p>
         <p><input type="text" name="cantidadunitaria" id="cantidadunitaria"></p>
     </label>
-
     <label>
         <p><b>Cantidad Existente en la Ubicacion</b></p>
         <p><input type="text" name="cantidad_existente" id="cantidad_existente" readonly ></p>
+    </label>
+    <label>
+        <p><b>Peso</b></p>
+        <p><input type="text" name="peso" id="peso"></p>
+    </label>
+    <label>
+        <p><b>Peso Existente en la Ubicacion</b></p>
+        <p><input type="text" name="peso_existente" id="peso_existente" readonly ></p>
     </label>
 
 </div>
