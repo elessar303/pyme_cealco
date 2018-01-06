@@ -75,7 +75,7 @@ else
     //construir tabla de datos 
     $sql=
     "
-        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen  
+        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, b.peso, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen  
         from 
         kardex_almacen as a
         inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
@@ -112,7 +112,9 @@ else
                 <td align='center'>
                     ".$valor['cantidad']."
                 </td>
-                
+                <td align='center'>
+                    ".$valor['peso']."
+                </td>
                 <td align='center'>
                     ".$valor['almacen']."
                 </td>

@@ -528,7 +528,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
                 $campos = $conn->ObtenerFilasBySqlSelect
                 (
-                    "SELECT ite.*,m.*, kad.id_transaccion_detalle, kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                    "SELECT ite.*,m.*, kad.id_transaccion_detalle, kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, date_format(k.fecha_creacion, '%d/%m/%Y %h:%i:%s ') as fecha_creacion
                     FROM calidad_almacen_detalle AS kad
                     JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
                     LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
@@ -536,7 +536,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     LEFT JOIN item AS ite ON kad.id_item=ite.id_item
                     LEFT JOIN marca m ON m.id = ite.id_marca
                     LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
-                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]
+                    WHERE kad.id_transaccion =" . $_GET["id_transaccion"]." order by k.fecha_creacion"
                 );
             } 
             else if ($_GET["id_tipo_movimiento_almacen"] == '4' || $_GET["id_tipo_movimiento_almacen"] == '2' || $_GET["id_tipo_movimiento_almacen"] == '8') 
@@ -649,8 +649,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                                 <table >
                                     <thead>
                                         <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
-                                        <th style="width:150px; font-weight: bold;">Almac&eacute;n ' . $operacion . '</th>
-                                        <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n' . $operacion . '</th>
+                                        <th style="width:150px; font-weight: bold;">Fecha Creaci&oacute;n</th>
+                                        
                                         <th style="width:300px; font-weight: bold;">Item</th>
                                         <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
                                         <th style="width:110px; font-weight: bold; text-align: center;">Operación</th>
@@ -677,8 +677,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     echo '
                         <tr>
                             <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
-                            <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
-                            <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                            <td style="width:150px; padding-left:10px;">' . $item["fecha_creacion"] . '</td>
+                            
                             <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
                             <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
                             <td style="text-align: center; padding-right:10px;"><img id="'.$item['id_transaccion_detalle'].'" title="Realizar Entrada" src="../../../includes/imagenes/ico_last.gif" onclick="entradapaleta(this.id);"/></td>
@@ -6031,7 +6031,7 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
         WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
             } else if ($_GET["id_tipo_movimiento_almacen"] == '4' || $_GET["id_tipo_movimiento_almacen"] == '2' || $_GET["id_tipo_movimiento_almacen"] == '8') {
                 $operacion = "Salida";
-                $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item, kad.peso, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
         FROM kardex_almacen_detalle AS kad
         join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
         LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
@@ -6111,10 +6111,10 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
                 <table >
                     <thead>
                         <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
-                        <th style="width:150px; font-weight: bold;">Almac&eacute;n ' . $operacion . '</th>
-                        <th style="width:150px; font-weight: bold;">Ubicaci&oacute;n' . $operacion . '</th>
+                        
                         <th style="width:300px; font-weight: bold;">Item</th>
                         <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+                        <th style="width:110px; font-weight: bold; text-align: center;">Peso</th>
                     </thead>
                     <tbody>';
             }
@@ -6135,10 +6135,10 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
                     echo '
                         <tr>
                             <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
-                            <td style="width:150px; padding-left:10px;">' . $item["almacen"] . '</td>
-                            <td style="width:150px; padding-left:10px;">' . $item["ubicacion"] . '</td>
+                            
                             <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
                             <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
+                            <td style="text-align: right; padding-right:10px;">' . $item['peso'] . '</td>
                         </tr>';
                 }
             }
@@ -7154,7 +7154,7 @@ order by mb.cod_movimiento_ban";
             break;
             case "cargaUbicacion":
                        $almacen=$_POST["idAlmacen"];
-                       $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."'");
+                       $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 1 ");
                         if (count($campos) == 0) {
                             echo "[{band:'-1'}]";
                         } else {

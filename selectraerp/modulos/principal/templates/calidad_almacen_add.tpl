@@ -363,7 +363,7 @@
             </p>
              <p>
                 <label for="ubicacion"><b>Ubicac&iacute;on</b></label>
-                <input name="ubicacion" id="ubicacion" type="text" value="CALIDAD"> 
+                <input name="ubicacion" id="ubicacion" type="text" value="ENTRADA"> 
             </p>
             <p>
                <label><b>Codigo de barra</b></label><br/>

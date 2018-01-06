@@ -353,13 +353,20 @@ $("#codigoBarra").keypress(function(e){
        consultar_ubicacion();
     });
     $("#cantidadunitaria").keyup(function(){
-       if($('#cantidadunitaria').val()<=0 || ( parseFloat($('#cantidad_existente').val()) - parseFloat($('#cantidadunitaria').val()) ) <=0)
+       if($('#cantidadunitaria').val()<=0 )
        {
             $("#peso").val(0);
        }
        else
        {
-            $("#peso").val("");
+            if( parseFloat($('#cantidad_existente').val()) - parseFloat($('#cantidadunitaria').val())  <=0 )
+            {
+                $("#peso").val($("#peso_existente").val());
+            }
+            else
+            {
+                $("#peso").val("");
+            }
        }
     });
     
@@ -452,13 +459,14 @@ $("#codigoBarra").keypress(function(e){
                 // solicitada=document.getElementById('cantidadunitaria').value;  
 
                             solicitada=$("#cantidadunitaria").val(); 
-                            pesoold=$("#peso").val(); 
+                            peso=$("#peso").val(); 
+                            pesoold=$("#peso_existente").val(); 
                             existente=$("#cantidad_existente").val(); 
                             solicitada=  parseInt(solicitada);
                             existente=  parseInt(existente);
                            
                          
-                if(pesoold=="")
+                if(peso=="")
                 {
                     Ext.Msg.alert("Alerta","El peso no puede ser vacio");
                     return false;   
@@ -484,16 +492,16 @@ $("#codigoBarra").keypress(function(e){
                     Ext.Msg.alert("Alerta","La cantidad a descargar no puede ser igual o menor a 0");
                     return false;
                 }
-                if( solicitada < existente && pesoold<=0 )
+                if( solicitada < existente && peso<=0 )
                 {
                     
                     Ext.Msg.alert("Alerta","El peso no puede ser 0 si existen unidades");
                     return false;
                 }
-                if( solicitada == existente && pesoold!=0 )
+                if( solicitada == existente && parseFloat(pesoold)!= parseFloat(peso))
                 {
                     
-                    Ext.Msg.alert("Alerta","El peso debe ser 0 si no quedan unidades");
+                    Ext.Msg.alert("Alerta","El peso debe ser igual al peso existente si se igualan las unidades");
                     return false;
                 }
 

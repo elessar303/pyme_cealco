@@ -201,7 +201,8 @@ if (isset($_POST["input_cantidad_items"]))
         if (count($campos) > 0) 
         {
             $cantidadExistente = $campos[0]["cantidad"];
-            $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "', peso = '" . ($_POST["_peso"][$i]) . "'
+            $pesoExistente = $campos[0]["peso"];
+            $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "', peso = '" . ($pesoExistente - $_POST["_peso"][$i]) . "'
                                     where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "'");
 
             //si cantidad es 0 o negativo debe borrarse de item existencia

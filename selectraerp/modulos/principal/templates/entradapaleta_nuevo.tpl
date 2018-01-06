@@ -158,7 +158,7 @@
                                 if(resultado!=-1)
                                 {
                                     //si se procesó correctamente se hace llamado a la tabla de movimiento
-                                    //location.reload();
+                                    location.reload();
                                     
                                 }
                             }
@@ -348,6 +348,7 @@
                         <th class="tb-head" ><b>Descripcion</b></th>
                         <th class="tb-head" ><b>Lote</b></th>
                         <th class="tb-head" ><b>Cantidad</b></th>
+                        <th class="tb-head" ><b>Peso</b></th>
                         <th class="tb-head" ><b>Ubicación Principal</b></th>
                         <th class="tb-head" ><b>Ubicación Detalle</b></th>
                         <th class="tb-head" ><b>Nro. Recepcion</b></th>

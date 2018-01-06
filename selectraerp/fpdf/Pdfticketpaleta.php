@@ -156,11 +156,11 @@ $nro=isset($_GET["id"]) ? $_GET["id"] : null;
 
 $comunes = new ConexionComun();
 $datosgenerales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_generales");
-
+//b.cantidad*pesoxunidad
 $sql = 
 "
     select c.codigo_barras, c.descripcion1, b.etiqueta,  d.nombre as proveedor, date_format(a.fecha_creacion, '%d/%m/%Y') as fecha_recepcion,
-    b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.cantidad*pesoxunidad as peso, b.observacion
+    b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.peso, b.observacion
     from kardex_almacen as a
     inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
     inner join item as c on b.id_item=b.id_item
