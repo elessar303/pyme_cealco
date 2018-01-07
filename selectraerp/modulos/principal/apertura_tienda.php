@@ -440,7 +440,7 @@ if($filas==0){
         fclose($pf);
         chmod($path_ventas."/".$nomb,  0777);
 }
-$instruccion2="UPDATE ".$pos.".ticket_control SET ticket_id=".$ultimo_ticket."";
+$instruccion2="UPDATE ".$pos.".ticket_control SET ticket_id='".$ultimo_ticket."'";
 $almacen->Execute2($instruccion2);
 
 //VENTAS PYME

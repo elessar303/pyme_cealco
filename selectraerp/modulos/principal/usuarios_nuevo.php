@@ -21,6 +21,9 @@ $arrayNomModulo = array();
 $modulos = $usuarios->ObtenerFilasBySqlSelect("SELECT cod_modulo, nom_menu FROM modulos WHERE cod_modulo_padre IS NULL AND visible = 1 AND cod_modulo != 54 ORDER BY orden");
 $smarty->assign("modulos", $modulos);
 
+$campos = $menu->ObtenerFilasBySqlSelect("select * from modulos where cod_modulo= ".$_GET["opt_seccion"]);
+$smarty->assign("campo_seccion",$campos);
+
 if (isset($_POST["aceptar"])) {
 
 /////////////////////////////////////////////////////////////////////////

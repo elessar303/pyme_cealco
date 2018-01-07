@@ -65,4 +65,6 @@ $ajuste_inventario=1;
     //////////////////////////////////////////////////////////////////////////////////////////////////////////
     header("Location: ?opt_menu=" . $_POST["opt_menu"] . "&opt_seccion=" . $_POST["opt_seccion"]);
 }
+$campos = $menu->ObtenerFilasBySqlSelect("select * from modulos where cod_modulo= ".$_GET["opt_seccion"]);
+$smarty->assign("campo_seccion",$campos);
 ?>
