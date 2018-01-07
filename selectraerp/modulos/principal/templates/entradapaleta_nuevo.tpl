@@ -324,7 +324,7 @@
                             Ticket Entrada **
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
-                            <input type="text" name="ticket" placeholder="Ticket Entrada" size="60" id="ticket" class="form-text"/>
+                            <input type="text" name="ticket" placeholder="Ticket Entrada" size="60" id="ticket" class="form-text" value="{$id_ticket_entrada}" readonly="true" />
                         </td>
                     </tr>
                     <tr  style="text-align: center;">

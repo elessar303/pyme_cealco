@@ -25,7 +25,7 @@ if($datos==null)
     //no existen transacciones todavia, buscar la cantidad total y mandar mensaje no hay datos
     $sql=
     "   
-        select b.cantidad, c.unidad_paleta, c.descripcion1 as nombre_producto from
+        select a.id_ticket_entrada, b.cantidad, c.unidad_paleta, c.descripcion1 as nombre_producto from
         calidad_almacen as a
         inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
         inner join item as c on b.id_item=c.id_item
@@ -35,6 +35,7 @@ if($datos==null)
     $smarty->assign("total", $total[0]['cantidad']);
     $smarty->assign("paleta", $total[0]['unidad_paleta']);
     $smarty->assign("nombre_producto", $total[0]['nombre_producto']);
+    $smarty->assign("id_ticket_entrada", $total[0]['id_ticket_entrada']);
     $smarty->assign("ticket", 1);
     $datostabla="<tr><td colspan='10' align='center'> <b>No Hay Entradas Registradas</b> </td></tr>";
     $smarty->assign("datostabla", $datostabla);
@@ -72,10 +73,11 @@ else
     $smarty->assign("nombre_producto", $nombre[0]['descripcion1']);
     $smarty->assign("total", $total[0]['total']);
     $smarty->assign("paleta", $datos[0]['unidad_paleta']);
+    $smarty->assign("id_ticket_entrada", "");
     //construir tabla de datos 
     $sql=
     "
-        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, b.peso, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen  
+        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, b.peso, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen, a.ticket_entrada
         from 
         kardex_almacen as a
         inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
@@ -122,7 +124,7 @@ else
                     ".$valor['ubicacion']."
                 </td>
                 <td align='center'>
-                    ".$valor['id_documento']."
+                    ".$valor['ticket_entrada']."
                 </td>
                 <td align='center'>
                     <button id='".$valor['detalle_movimiento']."' value='Generar Ticket' onclick='llamarPdf(this.id)'>Generar Ticket </button>
