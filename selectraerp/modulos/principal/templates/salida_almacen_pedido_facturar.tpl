@@ -19,7 +19,7 @@
                             {foreach from=$cabecera key=i item=campos}
                                 <td>{$campos}</td>
                             {/foreach}
-                            <td colspan="2" style="text-align:center;">Opciones</td>
+                            <td colspan="3" style="text-align:center;">Opciones</td>
                         </tr>
                         {if $cantidadFilas eq 0}
                             <tr><td colspan="6">{$mensaje}</td></tr>
@@ -49,9 +49,12 @@
                                         <input type="hidden" name="id_cliente" value="{$campos.id_cliente}"/>
                                         <input type="hidden" name="id_tipo_movimiento_almacen" value="{$campos.id_tipo_movimiento_almacen}"/>
                                     </td>
-                                     <td style="cursor:pointer; width:30px; text-align:center" colspan="2">
+                                    <td style="cursor:pointer; width:30px; text-align:center" >
                                        <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('pagos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Nueva Factura Rapida" src="../../../includes/imagenes/factu.png"/>
-                                </td>
+                                    </td>
+                                    <td style="cursor:pointer; width:30px; text-align:center" >
+                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('cron_cargosautomaticos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Cerrar Pedido" src="../../../includes/imagenes/factu.png"/>
+                                    </td>
                                 </tr>
                             {/foreach}
                         {/if}

@@ -1,3 +1,4 @@
+
 <?php
 ini_set("memory_limit","512M");
 session_start();
@@ -16,68 +17,158 @@ include("../../libs/php/clases/almacen.php");
 $conex1=$conn = new ConexionComun();
 $correlativos = new Correlativos();
 $factura = new Factura();
-$clientes = new Almacen();
-//se buscan los servicios pendientes
-
-$sql="select * from cliente_cargos where  estatus=0 and fecha_fin<> '0000-00-00 00:00:00' and fecha_fin >= now()  group by id_servicio_material order by id_servicio_material";
-$pendientes=$conn->ObtenerFilasBySqlSelect($sql);
-
-//recorremos para generarr los cargos automaticos
-if($pendientes!=null)
+$almacen = new Almacen();
+$login = new Login();
+//cliente
+$despacho=$_GET['despacho'];
+//impresora
+$impresora_serial=impresora_serial;
+//usuario que la realiza
+$id_usuario=$login->getIdUsuario();
+//money
+$money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
+if (empty($money)) 
 {
-    $factura->BeginTrans();
-    $conn->BeginTrans();
-    foreach($pendientes as $key => $value)
+
+    $sql="INSERT INTO closedcash_pyme(serial_caja, money, fecha_inicio, fecha_fin) VALUES ('".impresora_serial."', '".$_POST['serial'].date('Y-m-d_H:i:s')."',  now(), null)";
+    $insert_money=$almacen->Execute2($sql);
+}
+
+$money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
+
+//primero vemos que sea un cliente o todos
+if($despacho!='all') //proceso para un solo cliente
+{
+    //obtenemos lo pedidos pendientes por el cliente
+    $sql="SELECT *,kardex_almacen.estado as estatus from kardex_almacen, clientes WHERE kardex_almacen.id_cliente=clientes.id_cliente and kardex_almacen.facturado=0 and kardex_almacen.nro_factura is not null and kardex_almacen.nro_factura<>'' and clientes.id_cliente=".$despacho."";
+    $datos_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
+    //obtenemos todas las facturas asociadas
+    $facturas="";
+    if($datos_cliente==NULL)
+    {
+        echo 
+        "
+            <script type='text/javascript'>
+            alert('El cliente no tiene Cargos pendientes');
+            window.close();
+            </script>
+        ";
+        exit();
+    }
+    foreach ($datos_cliente as $key => $value) 
+    {
+        if($value['nro_factura']!="")
+        {
+            $facturas.="'".$value['nro_factura']."', ";
+        }
+    }
+    $facturas=substr($facturas, 0, -2);
+    //
+    $sql="SELECT * FROM kardex_almacen a, despacho_new b,  despacho_new_detalle c where a.nro_factura=b.cod_factura and b.id_factura=c.id_factura and b.cod_factura in (".$facturas.")";
+    
+    //pedidos 
+    $regs_pedido=$almacen->ObtenerFilasBySqlSelect($sql);
+
+    $sql="SELECT clientes.nombre, clientes.rif, clientes.direccion , clientes.telefonos  FROM  clientes where id_cliente=".$despacho;
+    //cliente
+    $array_cliente=$almacen->ObtenerFilasBySqlSelect($sql);
+    $almacen->BeginTrans();
+    
+    $sql =
+    "
+        SELECT id_factura, cod_factura, cod_factura, nroz, '".$impresora_serial."', id_cliente, ".$id_usuario.", `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, `usuario_creacion`, '".$money[0]['money']."', `cesta_clap`, `facturacion`  FROM `despacho_new`
+            WHERE fecha_pago='0000-00-00' and  id_cliente={$despacho} and cod_factura in (".$facturas.");
+    ";
+    $arraymaestro=$almacen->ObtenerFilasBySqlSelect($sql);
+    //cambiamos el estatus de las facturas
+    $sql="UPDATE kardex_almacen SET estado='Facturado', facturado=1  where nro_factura in (".$facturas.")";
+    $array_pago_ticket=$almacen->ExecuteTrans($sql);
+    foreach ($arraymaestro as $key => $maestro) 
     {
         
-        //comenzamos a generar el pedido
-        # obtenemos el correlativo de la factura
-        
-        $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 0, "si");
-        $formateo_nro_factura = $nro_factura;
-        #obtenemos el money actual
-        $money=$clientes->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
-        
-        $sql="INSERT INTO kardex_almacen (
-            `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
-            `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, id_cliente, nro_factura)
-            (select `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
-            `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, id_cliente, '".$nro_factura."' from kardex_almacen
-            where id_transaccion='".$value['id_servicio_material']."'
-            )";
-        
-        $conn->ExecuteTrans($sql);
-        $id_facturaTrans = $conn->getInsertID();
-        
-        $sql="select * from kardex_almacen_detalle where id_transaccion='".$value['id_servicio_material']."'";
-        $detalle_kardex=$conn->ObtenerFilasBySqlSelect($sql);
-            foreach($detalle_kardex as $key2 => $value2)
+        $sql=
+        "
+            INSERT INTO `factura`(`cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `money`, `cesta_clap`, `facturacion`) 
+            values
+            (
+                 '{$maestro['cod_factura']}', '{$maestro['cod_factura']}',  '', '".$impresora_serial."',  {$maestro['id_cliente']},  ".$id_usuario.", '{$maestro['fechaFactura']}',  {$maestro['subtotal']},  {$maestro['descuentosItemFactura']},   {$maestro['montoItemsFactura']},  {$maestro['ivaTotalFactura']},  {$maestro['TotalTotalFactura']},  {$maestro['cantidad_items']},  {$maestro['totalizar_sub_total']},  {$maestro['totalizar_descuento_parcial']},  {$maestro['totalizar_total_operacion']},  {$maestro['totalizar_pdescuento_global']},  {$maestro['totalizar_descuento_global']},  {$maestro['totalizar_base_imponible']},   {$maestro['totalizar_monto_iva']},  {$maestro['totalizar_total_general']},  {$maestro['totalizar_total_retencion']},  '{$maestro['formapago']}',  {$maestro['cod_estatus']},  CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, '{$maestro['usuario_creacion']}', '".$money[0]['money']."', '{$maestro['cesta_clap']}', ''
+            );
+        ";
+        //se procede a guardar en factura los pedidos que no se han facturado. fecha_pago=0000-00-00
+        $insertar_factura=$almacen->ExecuteTrans($sql);
+        $id_facturaTrans = $almacen->getInsertID();
+        $sql=
+        "
+            SELECT ".$id_facturaTrans.", `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, ".$id_usuario.", c.fecha_creacion FROM `despacho_new_detalle` c, `despacho_new` b
+            WHERE b.id_factura=c.id_factura and b.id_factura={$maestro['id_factura']};
+            
+        ";
+        $detalles=$almacen->ObtenerFilasBySqlSelect($sql);
+        foreach ($detalles as $key => $value) 
+        {
+            $sql=
+            "
+                INSERT INTO `factura_detalle`(`id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion`) 
+                values ( ".$id_facturaTrans.", ".$value['id_item'].", ".$value['_item_almacen'].", '".$value['_item_descripcion']."', ".$value['_item_cantidad'].", ".$value['_item_preciosiniva'].", ".$value['_item_descuento'].", ".$value['_item_montodescuento'].", ".$value['_item_piva'].", ".$value['_item_totalsiniva'].", ".$value['_item_totalconiva'].", ".$id_usuario.", '".$value['fecha_creacion']."')
+            ";
+            $insertar_factura_detalle=$almacen->ExecuteTrans($sql);
+        }
+    }
+    //se busca las ubicaciones de este cliente que esten ocupadas
+    $sql=
+    "
+        select a.*, c.id as ubicacion from kardex_almacen a inner join kardex_almacen_detalle b on a.id_transaccion=b.id_transaccion
+        inner join ubicacion c on b.id_ubi_entrada=c.id where c.ocupado=1 and id_cliente='".$despacho."'
+    ";
+    $ubicaciones=$almacen->ObtenerFilasBySqlSelect($sql);
+    if($ubicaciones!=NULL)
+    {
+        foreach ($ubicaciones as $key => $value3)
+        {
+            $iva="";
+            $base="";
+            $total="";
+            $idservicios="";
+            $codservicio="";
+            $nombreservicio="";
+            $contador=0;
+            $sql="select id_servicio from ubicacion_servicio where id_ubicacion=".$value3['ubicacion'];
+            $buscarserviciosubicacion=$almacen->ObtenerFilasBySqlSelect($sql);
+            foreach($buscarserviciosubicacion as $key => $servicios)
             {
-                $sql="insert into kardex_almacen_detalle (`id_transaccion` , `id_almacen_entrada` ,
-                `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`, precio)
-                (select '".$id_facturaTrans."' , `id_almacen_entrada` ,
-                `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`,
-                precio from kardex_almacen_detalle where id_transaccion_detalle='".$value2['id_transaccion_detalle']."')
-                ";
-                
-                $conn->ExecuteTrans($sql);
+                $sql="select id_item, cod_item, precio1, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                $contarservicio=$almacen->ObtenerFilasBySqlSelect($sql);
+                $iva[$contador] = $contarservicio[0]['iva'];
+                $base[$contador] = $contarservicio[0]['precio1'];
+                $total[$contador] = $contarservicio[0]['precio1']+(($contarservicio[0]['precio1']*$contarservicio[0]['iva']) / 100);
+                $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                $idservicios[$contador]= $contarservicio[0]['id_item'];
+                $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                $contador++;
+            }
+
+            $sql="Select concat(formato, (contador + 1)) as cod_factura from correlativos where campo='cod_factura'";
+            $correlativo=$almacen->ObtenerFilasBySqlSelect($sql);
+            $nro_factura4 = $correlativo[0]['cod_factura'];//$correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+            $sql="UPDATE correlativos SET contador = ({$nro_factura4}) WHERE campo = 'cod_factura';";
+            $almacen->ExecuteTrans($sql);
+            $subtotal=0;
+            $ivatotal=0;
+            $itemstotal=count($total);
+            $totaltotal=0;
+            //se guarda los totales del resultado de los arreglos
+            for($i=0; $i<count($total); $i++)
+            {
+                $subtotal+=$base[$i];
+                $ivatotal+=(($base[$i]*$iva[$i]) / 100);
+                $totaltotal+=$total[$i];
             }
             
-        $sql = "select nro_factura from kardex_almacen where id_transaccion='".$value['id_servicio_material']."'";
-        $nro_factura2=$conn->ObtenerFilasBySqlSelect($sql);
-        $sql = "INSERT INTO `despacho_new` (
-            `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
-            `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
-            `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
-            `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
-            `totalizar_pdescuento_global`,`totalizar_descuento_global`,
-            `totalizar_base_imponible`,`totalizar_monto_iva`,
-            `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
-            `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
-            )
-            (
-            select 
-                `id_cliente`, '".$nro_factura."',`cod_vendedor`,`fechaFactura`,
+            #obtenemos el money actual
+            $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
+
+            $sql = "INSERT INTO `despacho_new` (
+                `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
                 `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
                 `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
                 `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
@@ -85,90 +176,117 @@ if($pendientes!=null)
                 `totalizar_base_imponible`,`totalizar_monto_iva`,
                 `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
                 `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
-                from despacho_new
-                where cod_factura='".$nro_factura2[0]['nro_factura']."')"
-            ;
-        $factura->ExecuteTrans($sql);
-        $id_facturadespachoTrans = $factura->getInsertID();
-        $sql="select b.*  from despacho_new as a inner join despacho_new_detalle as b on a.id_factura=b.id_factura  where cod_factura='".$nro_factura2[0]['nro_factura']."'";
-        //echo $sql; exit();
-        $despachoDetalle=$conn->ObtenerFilasBySqlSelect($sql);
-        foreach($despachoDetalle as $key3 => $value3)
-        {
-            $sql=
+                )
+            VALUES(
+                {$despacho}, '{$nro_factura4}', '{$login->getUsuario()}', now(),
+                ". $subtotal . ", 0 ," . $subtotal . ","
+                    . $ivatotal . "," . $totaltotal . "," . $itemstotal . ","
+                    . $subtotal . ", 0," . $totaltotal . ", 0 ,  
+                    0," . $subtotal . ","
+                    . $ivatotal . ", " . $totaltotal . ",0 ,CURRENT_TIMESTAMP,'" . $login->getUsuario() . "',
+                    '1', 'contado', '".impresora_serial."' , '".$money[0]['money']."',''
+                );";
+            $almacen->ExecuteTrans($sql);
+            $id_facturaTrans2 = $almacen->getInsertID();
+            $kardex_almacen_instruccion = 
             "
-                insert into despacho_new_detalle (`id_factura`, `id_item`,
-                `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
-                `_item_descuento`, `_item_montodescuento`, `_item_piva`,
-                `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
-                `fecha_creacion`, `_item_almacen`) 
-                
-                (select  '".$id_facturadespachoTrans."',  `id_item`,
-                `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
-                `_item_descuento`, `_item_montodescuento`, `_item_piva`,
-                `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
-                `fecha_creacion`, `_item_almacen` 
-                from despacho_new_detalle where id_detalle_factura=".$value3['id_detalle_factura'].") 
-                ";
-            //echo $sql; exit();
-            $conn->ExecuteTrans($sql);
-            
-            $SQLdetalle_formapago = "INSERT INTO despacho_new_detalle_formapago (
-            `id_factura` ,`totalizar_monto_cancelar` ,
-            `totalizar_saldo_pendiente` ,`totalizar_cambio` ,`totalizar_monto_efectivo` ,
-            `opt_cheque` ,`totalizar_monto_cheque` ,`totalizar_nro_cheque` ,
-            `totalizar_nombre_banco` ,`opt_tarjeta` ,`totalizar_monto_tarjeta` ,
-            `totalizar_nro_tarjeta` ,`totalizar_tipo_tarjeta` ,`opt_deposito` ,
-            `totalizar_monto_deposito` ,`totalizar_nro_deposito` ,
-            `totalizar_banco_deposito` ,`opt_otrodocumento` ,`totalizar_monto_otrodocumento` ,
-            `totalizar_nro_otrodocumento` ,`totalizar_banco_otrodocumento` ,`fecha_vencimiento` ,
-            `observacion` ,`persona_contacto` ,`telefono` ,`fecha_creacion` ,`usuario_creacion`)
-            (select `id_factura` ,`totalizar_monto_cancelar` ,
-            `totalizar_saldo_pendiente` ,`totalizar_cambio` ,`totalizar_monto_efectivo` ,
-            `opt_cheque` ,`totalizar_monto_cheque` ,`totalizar_nro_cheque` ,
-            `totalizar_nombre_banco` ,`opt_tarjeta` ,`totalizar_monto_tarjeta` ,
-            `totalizar_nro_tarjeta` ,`totalizar_tipo_tarjeta` ,`opt_deposito` ,
-            `totalizar_monto_deposito` ,`totalizar_nro_deposito` ,
-            `totalizar_banco_deposito` ,`opt_otrodocumento` ,`totalizar_monto_otrodocumento` ,
-            `totalizar_nro_otrodocumento` ,`totalizar_banco_otrodocumento` ,`fecha_vencimiento` ,
-            `observacion` ,`persona_contacto` ,`telefono` ,`fecha_creacion` ,`usuario_creacion`
-            from despacho_new_detalle_formapago where id_factura='".$value3['id_factura']."'
-            );";
-            //echo $SQLdetalle_formapago; exit();
-            $conn->ExecuteTrans($SQLdetalle_formapago);
-            
-            $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "no");
-            $factura->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_factura}' WHERE campo = 'cod_factura';");
-            
-            $nro_despacho1 = $correlativos->getUltimoCorrelativo("cod_factura", 1, "no");
-            $factura->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_despacho1}' WHERE campo = 'cod_despacho';");
-        
-            if ($factura->errorTransaccion != null) 
+                INSERT INTO kardex_almacen (
+                `id_transaccion` ,
+                `tipo_movimiento_almacen` ,
+                `autorizado_por` ,
+                `observacion` ,
+                `fecha` ,
+                `usuario_creacion`,
+                `fecha_creacion`,
+                `estado`,
+                `fecha_ejecucion`,
+                id_cliente, 
+                nro_factura
+                )
+                VALUES (
+                NULL ,
+                '8',
+                '" . $login->getUsuario() . "',
+                'Salida por Ventas',
+                now(),
+                '" . $login->getUsuario() . "',
+                CURRENT_TIMESTAMP,
+                'Pendiente',
+                now(),
+                {$despacho},
+                '{$nro_factura4}'
+                );
+            ";
+            $almacen->ExecuteTrans($kardex_almacen_instruccion);
+            $id_transaccion3 = $almacen->getInsertID();
+            for($i=0; $i<count($total); $i++)
             {
-                
-                //Msg::setMessage("<span style=\"color:red;\">Error al tratar de crear la factura.</span>");
-                //Msg::setMessage("<span style=\"color:#62875f;\">Entrada Generada Exitosamente </span>");
-                //header("Location: ?opt_menu=" . $_POST["opt_menu"] . "&opt_seccion=" . $_POST["opt_seccion"]);
+                if($total[$i]!=null)
+                {
+                    $descripcion =  $nombreservicio[$i];
+                    
+                    $detalle_item_instruccion = 
+                    "
+                        INSERT INTO despacho_new_detalle (
+                        `id_factura`, `id_item`,
+                        `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                        `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                        `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                        `fecha_creacion`, `_item_almacen`
+                        )
+                        VALUES (
+                        '{$id_facturaTrans2}', '{$idservicios[$i]}',
+                        '{$descripcion}', '1', '{$base[$i]}',
+                        0, 0, '{$iva[$i]}',
+                        '{$base[$i]}', '{$total[$i]}', '{$login->getUsuario()}',
+                        CURRENT_TIMESTAMP, '1'
+                        );
+                    ";
+                    $almacen->ExecuteTrans($detalle_item_instruccion);
+                    $kardex_almacen_detalle_instruccion = 
+                    "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` ,
+                        `id_transaccion` ,
+                        `id_almacen_entrada` ,
+                        `id_almacen_salida` ,
+                        `id_item` ,
+                        `precio` ,
+                        `cantidad`
+                        )
+                        VALUES (
+                        NULL ,
+                        '" . $id_transaccion3 . "',
+                        '{$value3['ubicacion']}',
+                        '',
+                        '" . $idservicios[$i] . "',
+                        '" . $base[$i] . "',
+                        1);
+                    ";
+                    $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                }
             }
+                
+                
         }
-        
     }
-}
-
-//cambiando los estatus
-$sql="select id from cliente_cargos where  estatus=0 and fecha_fin<> '0000-00-00 00:00:00' and fecha_fin < now()  group by id_servicio_material order by id_servicio_material";
-$pendientes=$conn->ObtenerFilasBySqlSelect($sql);
-
-//recorremos para generarr los cargos automaticos
-if($pendientes!=null)
-{
-    foreach($pendientes as $key => $value)
+    if ($almacen->errorTransaccion == 1)
+    {    
+        echo "asdasd"; 
+        //echo "paso";   
+        //Msg::setMessage("<span style=\"color:#62875f;\">Salida Generada Exitosamente </span>");
+    }
+    elseif($almacen->errorTransaccion == 0)
     {
-        $sql="update cliente_cargos set estatus=1 where id=".$value['id'];
-        $conn->ExecuteTrans($sql);
+        //Msg::setMessage("<span style=\"color:red;\">Error al tratar de cargar la Salida, por favor intente nuevamente.</span>");
     }
+    $almacen->CommitTrans($almacen->errorTransaccion);
+    //header("Location: ?opt_menu=" . $_POST["opt_menu"] . "&opt_seccion=" . $_POST["opt_seccion"]);
+}
+else
+{
+
 }
 
-$factura->CommitTrans($factura->errorTransaccion);
-$conn->CommitTrans($factura->errorTransaccion);
+
 ?>

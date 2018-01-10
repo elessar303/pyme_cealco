@@ -171,7 +171,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     `observacion`, `fecha`, `usuario_creacion`,
                     `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, 
                     `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,  `id_seguridad`, `id_aprobado`,
-                    `id_receptor`, `nro_contenedor`, `ticket_entrada`)
+                    `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`)
                     VALUES (
                     {$datospadre[0]['id_transaccion']} , '3', '{$datospadre[0]['autorizado_por']}',
                     '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
@@ -180,7 +180,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     '{$datospadre[0]['orden_despacho']}',
                     '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
                     '{$datospadre[0]['id_aprobado']}',
-                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}');
+                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}', '{$datospadre[0]['id_proveedor']}');
                 ";
                 
                 //print_r($kardex_almacen_instruccion); exit();
@@ -456,7 +456,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     `fecha_creacion`, `_item_almacen`
                     )
                     VALUES (
-                    '{$id_facturaTrans}', '{$codservicio[$i]}',
+                    '{$id_facturaTrans}', '{$idservicios[$i]}',
                     '{$descripcion}', '1', '{$base[$i]}',
                     0, 0, '{$iva[$i]}',
                     '{$base[$i]}', '{$total[$i]}', '{$usuario}',
