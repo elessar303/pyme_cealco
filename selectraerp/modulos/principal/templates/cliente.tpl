@@ -49,7 +49,7 @@ Objetivos:
                                         <img style="cursor: pointer;" class="eliminar" onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=delete&amp;cod={$campos.id_cliente}'" title="Eliminar"  src="../../../includes/imagenes/delete.gif"/>
                                     </td>
                                     <td style="text-align: center; cursor: pointer; width: 30px;">
-                                        <img style="cursor: pointer;" class="editar" onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=addcargo&amp;cod={$campos.id_cliente}'" title="Agregar Cargo"  src="../../../includes/imagenes/factu.png"/>
+                                        <img style="cursor: pointer;" class="editar" onclick="javascript: window.open('?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=addcargo&amp;cod={$campos.id_cliente}&amp;layout=2','window','menubar=1,resizable=1,fullscreen=yes');" title="Agregar Cargo2"  src="../../../includes/imagenes/factu.png"/>
                                     </td>
                                 </tr>
                                 {assign var=ultimo_cod_valor value=$campos.id_cliente}

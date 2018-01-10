@@ -13,7 +13,7 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
         $des = $_POST['buscar'];
         $busqueda = $_POST['busqueda'];
     }
-    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen";
+    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen inner join clientes as cli on k.id_cliente=cli.id_cliente";
     switch ($tipob) {
         case "exacta":
             $instruccion = $comunes->buscar_exacta_join($tabla, $des, $busqueda, $join, $orden);
@@ -27,6 +27,7 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     }
     $instruccion = $instruccion . " and operacion='-' and (k.estado='Despachado'
     or k.estado='Facturado' or k.estado='Pendiente') and k.id_cliente<>0  group by  k.estado, cli.id_cliente  order by fecha desc";
+    //echo $instruccion; exit();
     //exit(0);
 } else {
     $instruccion = "SELECT *, k.estado as estatus FROM $tabla AS k 
@@ -64,8 +65,8 @@ $smarty->assign("campo_seccion", $campos);
 //**************************************************************************
 //Criterios de Busqueda ****************************************************
 //**************************************************************************
-$smarty->assign("option_values", array("id_transaccion", "observacion", "id_almacen"));
-$smarty->assign("option_output", array("Transaccion", "Observacion", "Almacen"));
+$smarty->assign("option_values", array("id_transaccion", "observacion", "id_almacen", "cli.nombre"));
+$smarty->assign("option_output", array("Transaccion", "Observacion", "Almacen", "NOMBRE"));
 $smarty->assign("option_selected", $busqueda);
 //**************************************************************************
 //**************************************************************************

@@ -1,0 +1,1 @@
+UPDATE `subseccion` SET `opt_subseccion`='addcargo', `archivo_tpl`='factura_rapida_nueva_pedido.tpl',`archivo_php`='factura_rapida_nueva_pedido.php',`cod_seccion`=8,`descripcion`='Agregar Cargo Cliente' WHERE opt_subseccion='addcargo' and archivo_tpl='add_cargo_cliente.tpl' and archivo_php='add_cargo_cliente.php' and cod_seccion='8' and descripcion='Agregar Cargo Al Cliente'

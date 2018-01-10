@@ -10,8 +10,8 @@
     <body>
         <form id="form-{$name_form}" name="form-{$name_form}" action="?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}" method="post">
             <div id="datosGral" class="x-hide-display">
-                {include file = "snippets/regresar_buscar_botones.tpl"}
-                {include file = "snippets/tb_head.tpl"}
+                {include file = "snippets/regresar_solo.tpl"}
+                {include file = "snippets/tb_head_botoncargo.tpl"}
                 <br/>
                 <table class="seleccionLista">
                     <tbody>
@@ -38,10 +38,12 @@
                                     <td style="padding-left: 20px;">{$campos.descripcion}</td>
                                     <td style="padding-left: 20px;">{$campos.observacion}</td>
                                     <td style="text-align: center;">
-                                    {if $campos.facturado eq 0}<img src="../../../includes/imagenes/ico_cancel.gif"/>{else}<img src="../../../includes/imagenes/ico_ok.gif"/>
-                                    {/if}
+                                        {if $campos.facturado eq 0}
+                                            <img src="../../../includes/imagenes/ico_cancel.gif"/>
+                                        {else}
+                                            <img src="../../../includes/imagenes/ico_ok.gif"/>
+                                        {/if}
                                     </td>
-                                    
                                     <td style="width:50px; text-align: center;">
                                         <img class="boton_detalle" src="../../../includes/imagenes/drop-add.gif"/>
                                         <input type="hidden" name="id_transaccion" value="{$campos.id_transaccion}"/>
@@ -50,10 +52,9 @@
                                         <input type="hidden" name="id_tipo_movimiento_almacen" value="{$campos.id_tipo_movimiento_almacen}"/>
                                     </td>
                                     <td style="cursor:pointer; width:30px; text-align:center" >
-                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('pagos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Nueva Factura Rapida" src="../../../includes/imagenes/factu.png"/>
-                                    </td>
-                                    <td style="cursor:pointer; width:30px; text-align:center" >
-                                       <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('cron_cargosautomaticos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Cerrar Pedido" src="../../../includes/imagenes/factu.png"/>
+                                        {if $campos.facturado eq 0}
+                                           <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('cron_cargosautomaticos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Cerrar Pedido" src="../../../includes/imagenes/factu.png"/>
+                                        {/if}
                                     </td>
                                 </tr>
                             {/foreach}
