@@ -6193,7 +6193,7 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
            }
             break;
 
-             case "getPuntos":
+            case "getPuntos":
             $estado=$_GET["estados"];
             $sql="SELECT nombre_punto,codigo_siga_punto as siga  from puntos_venta where estatus='A'";
             if($estado!=9999){
@@ -6207,6 +6207,23 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
                 echo json_encode($campos);
             }
 
+            break;
+
+            case "getInstalaciones":
+            $estado=$_GET["estados"];
+            $id_cliente=$_GET["cliente"];
+            $sql="SELECT direccion as nombre_punto,codigo_sica as siga  from instalacion_clientes where id_cliente='".$id_cliente."'";
+            if($estado!=9999){
+                $sql.=" AND estado=$estado";
+            } 
+            $campos = $conn->ObtenerFilasBySqlSelect($sql);
+
+            if (count($campos) == 0) {
+                echo "[{id:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+            //echo $sql; 
             break;
 
         case 'listaCXPpendientes':

@@ -50,11 +50,11 @@ $smarty->assign("option_output_proveedor", $arraySelectoutPut);
 //Ingreso de SELECT para la nueva seccion
 //Estados
 $ubicacion=new Almacen();
-$ubica=$ubicacion->ObtenerFilasBySqlSelect("select * from estados_puntos");
+$ubica=$ubicacion->ObtenerFilasBySqlSelect("select * from estados");
 
 foreach ($ubica as $key => $item) {
-    $arrayubiN[] = $item["nombre_estado"];
-    $arrayubi[] = $item["codigo_estado"];
+    $arrayubiN[] = utf8_encode($item["nombre"]);
+    $arrayubi[] = $item["id"];
 }
 $smarty->assign("option_values_nombre_estado", $arrayubiN);
 $smarty->assign("option_values_id_estado", $arrayubi);

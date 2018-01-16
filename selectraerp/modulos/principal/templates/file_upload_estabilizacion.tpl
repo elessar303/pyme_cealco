@@ -55,14 +55,14 @@
                     <thead>
                         <tr>
                             <th colspan="6" class="tb-head" style="text-align:center;">
-                                MODULO PARA ESTABILIZACION DE PRODUCTOS SEGUN SEDE CENTRAL
+                                MODULO PARA ESTABILIZACION DE DATA SEGUN SEDE CENTRAL
                             </th>
                         </tr>
                     </thead>
                     <tbody>                        
                         <tr>
                             
-                            <td class="label">Archivo de Productos</td>
+                            <td class="label">Archivo de Data</td>
                             <td colspan="5" style="padding-top:2px; padding-bottom: 2px;">
                                     <input class="form-text" type="file" name="archivo_productos" id="archivo_productos"></input>
                             </td>

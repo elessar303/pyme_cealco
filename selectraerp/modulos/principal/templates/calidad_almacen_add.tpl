@@ -78,10 +78,20 @@
         $(document).ready(function(){
         //funcion para cargar los puntos 
                   $("#estado").change(function() {
+                    cargarInstalacion()
+                  });
+
+                  $("#id_proveedor").change(function() {
+                    cargarInstalacion()
+                  });
+
+                  function cargarInstalacion() {
+
                     estados = $("#estado").val();
+                    cliente = $("#id_proveedor").val();
                         $.ajax({
                             type: 'GET',
-                            data: 'opt=getPuntos&'+'estados='+estados,
+                            data: 'opt=getInstalaciones&'+'estados='+estados+'&cliente='+cliente,
                             url: '../../libs/php/ajax/ajax.php',
                             beforeSend: function() {
                                 $("#puntodeventa").find("option").remove();
@@ -92,12 +102,15 @@
                                 this.vcampos = eval(data);
                                      $("#puntodeventa").append("<option value=''>Seleccione...</option>");
                                 for (i = 0; i <= this.vcampos.length; i++) {
-                                    $("#puntodeventa").append("<option value='" + this.vcampos[i].siga+ "'>" + this.vcampos[i].nombre_punto + "</option>");
+                                    $("#puntodeventa").append("<option value='" + this.vcampos[i].siga+ "'>Nombre: " + this.vcampos[i].nombre_punto + " Sica: "+this.vcampos[i].siga+"</option>");
                                 }
                             }
                         }); 
                         $("#puntodeventa").val(0);
-                  });
+
+                  }
+
+
         });
 
         </script>
@@ -236,7 +249,7 @@
                             <td>
                                 <select name="puntodeventa" id="puntodeventa" class="form-text" style="width:205px">
                                     <option value="">Seleccione...</option>                               
-                                {html_options values=$option_values_punto output=$option_output_punto selected=$puntodeventa}
+                                
                                 
                                 </select>
                             </td>                     
