@@ -29,10 +29,10 @@
                         return false;
                    }    
                   tamano= archivo.length;   
-                  principio=tamano - 3;                  
+                  principio=tamano - 4;                  
                   tipo=archivo.substring(principio,tamano); 
-                  if(tipo!="csv"){
-                     alert("Extencion no valida! Extencion permitida: CSV");
+                  if(tipo!="json"){
+                     alert("Extencion no valida! Extencion permitida: JSON");
                     return false;  
                    }                   
                 });

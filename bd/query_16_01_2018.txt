@@ -1,0 +1,13 @@
+
+
+CREATE TABLE IF NOT EXISTS `instalacion_clientes` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_cliente` int(11) NOT NULL,
+  `estado` int(11) NOT NULL,
+  `direccion` text NOT NULL,
+  `codigo_sica` varchar(60) NOT NULL,
+  `responsable` varchar(150) NOT NULL,
+  `telefono_responsable` varchar(35) NOT NULL,
+  `correo_responsable` varchar(35) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
