@@ -316,6 +316,15 @@ $("#cantidaddeberia").change(function(){
                     Ext.Msg.alert("Alerta","Debe especificar todos los campos.");
                     return false;
                 }
+                if( ( parseInt($("#costo_declarado").val()) < 1 && parseInt($("#costo_referencial").val()) < 1) )
+                {
+                    Ext.Msg.alert("Alerta","Error, El costo declarado y referencial no pueden ser 0.");
+                    return false;
+                }
+                if( ( parseInt($("#costo_declarado").val()) < 1 && parseInt($("#costo_referencial").val()) > 0) )
+                {
+                   $("#costo_declarado").val($("#costo_referencial").val());
+                }
                 if($("#estatus").val()==0){                 
                     if($.trim($("#causa").val()) ==''){
                            Ext.Msg.alert("Alerta","Debe especificar la causa de la no aprobacion.");
@@ -330,6 +339,8 @@ $("#cantidaddeberia").change(function(){
                     tipo_uso:           $("#tipo_uso1").val(),
                     id_ubicacion:       $("#ubicacion").val(),
                     cantidad:           $("#cantidadunitaria").val(),
+                    costo_referencial:  $("#costo_referencial").val(),
+                    costo_declarado:  $("#costo_declarado").val(),
                     vencimiento:        $("#fVencimiento").val(),
                     lote:               $("#nlote").val(),
                     c_esperada:         $("#cantidaddeberia").val(),

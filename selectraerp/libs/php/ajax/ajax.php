@@ -54,7 +54,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
                 a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
                 a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
-                a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion
+                a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado
                 from calidad_almacen as a 
                 inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
                 where b.id_transaccion_detalle=".$_POST['id_movimiento']." 
@@ -71,7 +71,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
                     a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
                     a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
-                    a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion 
+                    a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado
                     from kardex_almacen as a
                     inner join calidad_almacen_detalle as b on a.id_transaccion_calidad=b.id_transaccion
                     where b.id_transaccion_detalle=".$_POST['id_movimiento']." and a.tipo_movimiento_almacen=3";
@@ -97,11 +97,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     "
                         INSERT INTO kardex_almacen_detalle (
                         `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`)
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`)
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
                         '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
-                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .");
+                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .");
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
                     //actualizo correlativo
@@ -171,7 +171,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     `observacion`, `fecha`, `usuario_creacion`,
                     `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, 
                     `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,  `id_seguridad`, `id_aprobado`,
-                    `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`)
+                    `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`, `costo_declarado`)
                     VALUES (
                     {$datospadre[0]['id_transaccion']} , '3', '{$datospadre[0]['autorizado_por']}',
                     '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
@@ -180,7 +180,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     '{$datospadre[0]['orden_despacho']}',
                     '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
                     '{$datospadre[0]['id_aprobado']}',
-                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}', '{$datospadre[0]['id_proveedor']}');
+                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}', '{$datospadre[0]['id_proveedor']}', '{$datospadre[0]['costo_declarado']}');
                 ";
                 
                 //print_r($kardex_almacen_instruccion); exit();
@@ -308,6 +308,16 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 $codservicio[$contador]= $contarservicio[0]['cod_item'];
                 $contador++;
             }
+            //ahora a realizar el cobro del seguro******
+            $sql="selec id_item, cod_item, iva, descripcion1 from item where cod_item='P00000'";
+            $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
+            $iva[$contador] = $contarservicio[0]['iva'];
+            $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.5); //$contarservicio[0]['precio1'];
+            $total[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.5) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.5)*$contarservicio[0]['iva']) / 100);
+            $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+            $idservicios[$contador]= $contarservicio[0]['id_item'];
+            $codservicio[$contador]= $contarservicio[0]['cod_item'];
+            $contador++;
             //se comienza hacer el pedido por la entrada.
             //obtener correlativo:
             //obtenemos el correlativo de la factura

@@ -1,5 +1,5 @@
 <?php
-
+ini_set('memory_limit', '256M');
 $comunes = new Comunes();
 
 $tabla = $name_form = "item AS i, marca AS mc, unidad_medida AS um, grupo as grup";

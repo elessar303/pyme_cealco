@@ -231,7 +231,7 @@
                     <!--Seccion nueva para ingresar el punto de venta del que se enviaron los productos-->
                     <tr>    
                         <td>
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Estado de Procedencia</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Estado Instalacion</b></span>
                         </td>
                             <!--ESTADOS-->
                         <td> 
@@ -243,7 +243,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Punto de Procedencia</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Instalacion</b></span>
                         </td>
                              <!-- PUNTOS -->
                             <td>
@@ -389,6 +389,12 @@
                 <input type="hidden" name="items" id="items">
                  <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
                 <!--<select style="width:100%" id="items" name="items" onchange="comprobarfechavencimiento(this.id)"></select>-->
+            </p>
+
+            <p>
+                <label><b>Costo</b></label><br/>
+                <input type="text" name="costo_declarado" id="costo_declarado"/>
+                <input type="hidden" name="costo_referencial" id="costo_referencial"/>
             </p>
             
             <p>

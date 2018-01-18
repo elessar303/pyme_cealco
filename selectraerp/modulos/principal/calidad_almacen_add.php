@@ -154,15 +154,12 @@ if (isset($_POST["input_cantidad_items"])) {
        
         for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
 
-
-
-
             $kardex_almacen_detalle_instruccion = "INSERT INTO calidad_almacen_detalle (
                      `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso` )
+                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso`, `costo_declarado` )
                 VALUES (
                     '{$id_transaccion}', '{$_POST["_id_almacen"][$i]}',
-                    '', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}','{$_POST["_ubicacion"][$i]}','{$_POST["_vencimineto"][$i]}','{$_POST["_lote"][$i]}','{$_POST["_observacion1"][$i]}','{$_POST["_estatus_producto"][$i]}', '{$_POST["_tipo_uso"][$i]}');";
+                    '', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}','{$_POST["_ubicacion"][$i]}','{$_POST["_vencimineto"][$i]}','{$_POST["_lote"][$i]}','{$_POST["_observacion1"][$i]}','{$_POST["_estatus_producto"][$i]}', '{$_POST["_tipo_uso"][$i]}', '{$_POST["_costo_declarado"][$i]}');";
 
             $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
 

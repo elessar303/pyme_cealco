@@ -285,11 +285,12 @@ pBuscaItem.main = {
         this.gridProductos.on('rowdblclick', function( grid, row, evt){
             this.record = pBuscaItem.main.storeProductos.getAt(row);
             pBuscaItem.main.ocultarWin();
-
             var filtro_referencia = this.record.data["id_item"];
             $("input[name='codigoBarra']").val(this.record.data["codigo_barras"]);
             $("input[name='items_descripcion']").val(this.record.data["cod_item"]+'-'+this.record.data["descripcion1"]);
             $("input[name='fecha_vence']").val(this.record.data["producto_vencimiento"]);
+            $("input[name='costo_declarado']").val(this.record.data["costo_declarado"]);
+            $("input[name='costo_referencial']").val(this.record.data["costo_referencial"]);
             $("input[name='unidad_paleta']").val(this.record.data["unidad_paleta"]);
             $("input[name='items']").val(this.record.data["id_item"]);
             $("#items").change();
@@ -429,6 +430,12 @@ pBuscaItem.main = {
             },
             {
                 name: 'unidad_paleta'
+            },
+            {
+                name: 'costo_declarado'
+            },
+            {
+                name: 'costo_referencial'
             },
             ]
         });
