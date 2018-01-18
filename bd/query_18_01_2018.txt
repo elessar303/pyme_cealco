@@ -3,3 +3,4 @@ ALTER TABLE `item` CHANGE `costo_referencial` `costo_referencial` DECIMAL(10,2) 
 
 ALTER TABLE `calidad_almacen_detalle` ADD `costo_declarado` DECIMAL(10,2) NOT NULL AFTER `tipo_uso`;
 ALTER TABLE `kardex_almacen` ADD `costo_declarado` DECIMAL(10, 2) NOT NULL AFTER `ticket_entrada`;
+ALTER TABLE `kardex_almacen_detalle` ADD `costo_declarado` DECIMAL(10, 2) NOT NULL;

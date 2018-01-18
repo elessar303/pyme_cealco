@@ -392,9 +392,12 @@
             </p>
 
             <p>
-                <label><b>Costo</b></label><br/>
+                <label><b>Costo Declarado</b></label><br/>
                 <input type="text" name="costo_declarado" id="costo_declarado"/>
-                <input type="hidden" name="costo_referencial" id="costo_referencial"/>
+            </p>
+            <p>
+                <label><b>Costo Referencial</b></label><br/>
+                <input type="text" name="costo_referencial" id="costo_referencial" readonly="readonly" />
             </p>
             
             <p>

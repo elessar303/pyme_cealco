@@ -152,7 +152,8 @@ if (isset($_POST["input_cantidad_items"])) {
         }
 
        
-        for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
+        for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) 
+        {
 
             $kardex_almacen_detalle_instruccion = "INSERT INTO calidad_almacen_detalle (
                      `id_transaccion` ,`id_almacen_entrada`,
@@ -163,8 +164,15 @@ if (isset($_POST["input_cantidad_items"])) {
 
             $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
 
-    
-    }				
+            //verificamos si es necesario cambiar el costo declarado
+            $sql="select costo_declarado from item where id_item='{$_POST["_id_item"][$i]}'";
+            $resultado=$almacen->ObtenerFilasBySqlSelect($sql);
+            if($resultado[0]['costo_declarado']!=$_POST["_costo_declarado"][$i])
+            {
+                $sql="update item set costo_declarado={$_POST["_costo_declarado"][$i]} where id_item='{$_POST["_id_item"][$i]}'";
+                $almacen->ExecuteTrans($sql);
+            }
+        }				
     if ($almacen->errorTransaccion == 1)
     {    
         //echo "paso";   

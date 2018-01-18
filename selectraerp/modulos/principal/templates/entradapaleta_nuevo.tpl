@@ -158,7 +158,7 @@
                                 if(resultado!=-1)
                                 {
                                     //si se procesó correctamente se hace llamado a la tabla de movimiento
-                                    location.reload();
+                                    //location.reload();
                                     
                                 }
                             }
