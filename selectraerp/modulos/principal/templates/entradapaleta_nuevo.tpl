@@ -158,7 +158,7 @@
                                 if(resultado!=-1)
                                 {
                                     //si se procesó correctamente se hace llamado a la tabla de movimiento
-                                    //location.reload();
+                                    location.reload();
                                     
                                 }
                             }
@@ -251,6 +251,7 @@
                                         <th class="tb-head" ><b>Producto</b></th>
                                         <th class="tb-head" ><b>Total Cantidad</b></th>
                                         <th class="tb-head" ><b>Unidad Paleta</b></th>
+                                        <th class="tb-head" ><b>Total Peso Ingresado</b></th>
                                     </tr>
                                 </thead>
                                 <tr>
@@ -265,6 +266,10 @@
                                     <td align="center">
                                         <b>{$paleta}</b>
                                         <input type='hidden' value = '{$paleta}' name='valorpaleta' id='valorpaleta'/>
+                                    </td>
+                                    <td align="center">
+                                        <b>{$totalpeso}</b>
+                                        <input type='hidden' value = '{$totalpeso}' name='totalpeso' id='totalpeso'/>
                                     </td>
                                 </tr>
                             </table>

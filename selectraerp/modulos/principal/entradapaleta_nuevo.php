@@ -32,6 +32,8 @@ if($datos==null)
         where b.id_transaccion_detalle=".$id_transaccion."
     ";
     $total=$usuarios->ObtenerFilasBySqlSelect($sql);
+    //total peso es 0
+    $smarty->assign("totalpeso", 0);
     $smarty->assign("total", $total[0]['cantidad']);
     $smarty->assign("paleta", $total[0]['unidad_paleta']);
     $smarty->assign("nombre_producto", $total[0]['nombre_producto']);
@@ -42,6 +44,21 @@ if($datos==null)
 }
 else
 {
+    //buscar el peso total ingresado al almacen
+    $sql=
+    "
+        SELECT sum(b.peso) as peso FROM 
+        kardex_almacen as a 
+        inner join  
+        kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+        inner join item as c on b.id_item=c.id_item
+        where a.id_transaccion_calidad=
+        (select a.id_transaccion 
+        from calidad_almacen as a 
+        inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion 
+        where b.id_transaccion_detalle=".$id_transaccion.")
+    ";
+    $totalpeso=$usuarios->ObtenerFilasBySqlSelect($sql);
     //existen transacciones, buscar la cantidad disponible
     $sql=
     "
@@ -70,6 +87,7 @@ else
         select descripcion1 from item where id_item=".$id_item[0]['id_item']."
     ";
     $nombre=$usuarios->ObtenerFilasBySqlSelect($sql);
+    $smarty->assign("totalpeso", $totalpeso[0]['peso']);
     $smarty->assign("nombre_producto", $nombre[0]['descripcion1']);
     $smarty->assign("total", $total[0]['total']);
     $smarty->assign("paleta", $datos[0]['unidad_paleta']);
@@ -156,22 +174,6 @@ $arraySelectOutPut_tipo=array('PYME','POS');
 
 if (isset($_POST["aceptar"])) {
 
-/////////////////////////////////////////////////////////////////////////
-    /*
-      //Departamento
-      $valueSELECT = "";
-      $outputSELECT =  "";
-      $tprecio  = $usuarios->ObtenerFilasBySqlSelect("select * from centros");
-      foreach($tprecio as $key => $item){
-      $valueSELECT[] = $item["cod_centro"];
-      $outputSELECT[] = $item["descripcion"];
-      }
-      $smarty->assign("option_values_centro",$valueSELECT);
-      $smarty->assign("option_output_centro",$outputSELECT);
-      $smarty->assign("option_selected_centro",$datacliente[0]["cod_centro"]);
-     */
-//////////////////////////////////////////////////////////////////////////
-
     $instruccion = "
     INSERT INTO caja_impresora (caja_host, serial_impresora, ip, caja_tipo)
     VALUES ('" . $_POST["nombre_caja"]. "', '" . $_POST["serial"] . "','" . $_POST["ip"] . "','" . $_POST["tipo_caja"] . "');";
@@ -209,26 +211,9 @@ $instruccion = "
 
 
 }
-
-
-    //////////////////////////////////////////////////////////////////////////
-    
-    //////////////////////////////////////////////////////////////////////////
-
-    /*$instruccion = "INSERT INTO `modulo_usuario` (`cod_usuario`, `cod_modulo`)
-    VALUES
-    ( " . $codNewUsuario . ",  1),
-    ( " . $codNewUsuario . ",  2),
-    ( " . $codNewUsuario . ",  3),
-    ( " . $codNewUsuario . ",  5),
-    ( " . $codNewUsuario . ",  6),
-    ( " . $codNewUsuario . ",  7);";
-
-    $usuarios->Execute2($instruccion);*/
-
-       echo "<script type=\"text/javascript\">
-           history.go(-1);
-       </script>";
-        exit;
+   echo "<script type=\"text/javascript\">
+       history.go(-1);
+   </script>";
+    exit;
 }
 ?>
