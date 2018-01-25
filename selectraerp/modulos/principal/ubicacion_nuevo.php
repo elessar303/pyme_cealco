@@ -8,11 +8,12 @@ $instruccion = "
 INSERT INTO `ubicacion` (
 
 `descripcion`,
+`orden`,
 `puede_vender`,
 `id_almacen`
 )
 VALUES (
- '".$_POST["descripcion_ubicacion"]."', '".$_POST["puede_vender"]."', '".$_POST["id_almacen"]."'
+ '".$_POST["descripcion_ubicacion"]."', '".$_POST["orden_ubicacion"]."', '".$_POST["puede_vender"]."', '".$_POST["id_almacen"]."'
 );
 ";
 $almacen->Execute2($instruccion);

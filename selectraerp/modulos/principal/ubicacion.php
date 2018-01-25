@@ -37,7 +37,7 @@ $pagina=$comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos=$comunes->paginacion($pagina, $instruccion);
 
 $smarty->assign("registros",$campos);
-$smarty->assign("cabecera",array("Codigo","Descripción"));
+$smarty->assign("cabecera",array("Codigo","Descripción", "Orden"));
 $smarty->assign("limitePaginacion",$comunes->LimitePaginaciones);
 $smarty->assign("num_paginas",$num_paginas);
 $smarty->assign("pagina",$pagina);

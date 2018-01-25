@@ -12,12 +12,48 @@
         {literal}
             <script type="text/javascript">
             //<![CDATA[
-            $(document).ready(function(){
+            $(document).ready(function()
+            {
+                $("#orden_ubicacion").keyup(function()
+                {
+                    valor = $("#orden_ubicacion").val();
+                    valor2 = $("#id_almacen").val();
+                    if(valor!='' &&  valor2!='')
+                    {
+                        $.ajax({
+                            type: "GET",
+                            url:  "../../libs/php/ajax/ajax.php",
+                            data: "opt=ValidarOrdenUbicacion&v1="+valor+"&v2="+valor2,
+                            beforeSend: function()
+                            {
+                                $("#notificacionVCodCliente").html(MensajeEspera("<b>Veficando Nro de orden..</b>"));
+                            },
+                            success: function(data)
+                            {
+                                resultado = data
+                                if(resultado=="-1")
+                                {
+                                    $("#orden_ubicacion").val("").focus();
+                                    $("#notificacionVUsuario").html("<img align=\"absmiddle\" src=\"../../../includes/imagenes/ico_note.gif\"><span style=\"color:red;\"> <b>Disculpe, este Nro. de Orden Ya Existe.</b></span>");
+                                    return false;
+
+                                }
+                                if(resultado=="1")
+                                {//cod de item disponble
+                                    $("#notificacionVUsuario").html("<img align=\"absmiddle\" src=\"../../../includes/imagenes/ok.gif\"><span style=\"color:#0c880c;\"><b> Nro. de orden Disponible</b></span>");
+                                }
+                            }
+                        });
+                    }
+                });
               
                 $("input[name='aceptar']").click(function(){
-                    if($("#descripcion_ubicacion").val()==""){
+                    valor = $("#orden_ubicacion").val();
+                    valor2 = $("#id_almacen").val();
+                    
+                    if($("#descripcion_ubicacion").val()=="" || $("#orden_ubicacion").val()==""){
                         $("#descripcion_ubicacion").focus();
-                        Ext.Msg.alert("Alerta","Debe Ingresar la descripción de la ubicacion!");
+                        Ext.Msg.alert("Alerta","Debe Ingresar todos los campos!");
                         return false;
                     }
                 });
@@ -34,7 +70,7 @@
                 <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>
                 <input type="hidden" name="opt_seccion" value="{$smarty.get.opt_seccion}"/>
                 <input type="hidden" name="opt_subseccion" value="{$smarty.get.opt_subseccion}"/>
-                <input type="hidden" name="id_almacen" value="{$smarty.get.cod}"/>
+                <input type="hidden" name="id_almacen" id="id_almacen" value="{$smarty.get.cod}"/>
                 <table style="width:100%; background-color: white;">
                     <thead>
                         <tr>
@@ -51,6 +87,15 @@
                             </td>
                             <td style="padding-top:2px; padding-bottom: 2px;">
                                 <input type="text" name="descripcion_ubicacion" size="60" id="descripcion_ubicacion" class="form-text" />
+                            </td>
+                        </tr> 
+                        <tr>
+                            <td colspan="3" class="label">
+                                Orden
+                            </td>
+                            <td style="padding-top:2px; padding-bottom: 2px;">
+                                <input type="text" name="orden_ubicacion" size="60" id="orden_ubicacion" class="form-text" />
+                                <div id="notificacionVUsuario"></div>
                             </td>
                         </tr> 
                          <!--<tr>

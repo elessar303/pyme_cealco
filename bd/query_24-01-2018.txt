@@ -1,0 +1,1 @@
+ALTER TABLE `ubicacion` ADD `order` INT NOT NULL AFTER `id`; 

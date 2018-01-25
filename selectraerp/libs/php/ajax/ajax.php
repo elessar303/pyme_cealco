@@ -22,6 +22,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "ValidarOrdenUbicacion":
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT id FROM ubicacion  WHERE id_almacen = '" . $_GET["v2"] . "' and orden = '" . $_GET["v1"] . "'");
+            echo (count($campos) == 0) ? "1" : "-1";
+        break;
+
         case "eliminarConductor" :
         $id=isset($_POST['id']) ? $_POST['id'] : '';
         if($conn->Execute2("delete from transporte_conductores where id=".$id))
@@ -518,7 +523,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
         break;
         case "cargaUbicacionNuevo":
            $almacen=$_POST["idUbicacion"];
-           $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado<>1");
+           $campos = $conn->ObtenerFilasBySqlSelect("SELECT id, concat(descripcion, ' - ', orden) as descripcion FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado<>1 order by  orden asc ");
             if (count($campos) == 0) 
             {
                 echo "[{band:'-1'}]";

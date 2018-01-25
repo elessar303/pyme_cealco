@@ -35,7 +35,8 @@ Modificado por: daniel fernandez
                             {/if}
                         <tr bgcolor="{$bgcolor}">
                             <td>{$campos.id}</td>
-                            <td>{$campos.descripcion}</td>                           
+                            <td>{$campos.descripcion}</td>
+                            <td>{$campos.orden}</td>
                             <td style="cursor: pointer; width: 30px; text-align:center">
                                 <img class="editar" {if $smarty.get.loc } onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=editUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}&amp;idLocalidad={$smarty.get.idLocalidad}&amp;loc=1'" {else}onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=editUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}'" {/if} title="Editar" src="../../../includes/imagenes/edit.gif"/>
                             </td>
