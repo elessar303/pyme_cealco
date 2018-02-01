@@ -13,7 +13,7 @@ Objetivos:
         <title></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         {include file="snippets/header_form.tpl"}
-        <script type="text/javascript" src="../../libs/js/entrada_almacen.js"></script>
+        <script type="text/javascript" src="../../libs/js/salida_almacen.js"></script>
     </head>
     <body>
         <form id="form-{$name_form}" name="form-{$name_form}" action="?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}" method="post">

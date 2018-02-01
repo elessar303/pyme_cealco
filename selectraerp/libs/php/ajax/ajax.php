@@ -7196,6 +7196,28 @@ order by mb.cod_movimiento_ban";
                             echo json_encode($campos);
                         }
             break;
+            case "cargaUbicacionCliente":
+                       $almacen=$_POST["idAlmacen"];
+                       $cliente=$_POST["cliente"];
+                       $sql="SELECT a.* FROM ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion 
+                        WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."' ";
+                       $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                        if (count($campos) == 0) {
+                            echo "[{band:'-1'}]";
+                        } else {
+                            echo json_encode($campos);
+                        }
+            break;
+            case "cargaUbicacionTraslado":
+                       $almacen=$_POST["idAlmacen"];
+                       $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 ");
+                        if (count($campos) == 0) 
+                        {
+                            echo "[{band:'-1'}]";
+                        } else {
+                            echo json_encode($campos);
+                        }
+            break;
 
             case "cargaUbicacion2":
                        $almacen=$_POST["idAlmacen"];
