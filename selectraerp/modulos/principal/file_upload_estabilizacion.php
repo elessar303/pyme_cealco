@@ -117,6 +117,14 @@ if(!empty($_FILES['archivo_productos']))
         $comunes->Execute2($sql);
     }
 
+    //Sincronizando Productos
+    $comunes->Execute2("TRUNCATE TABLE `item`");
+    foreach ($data['productos'] as $producto=>$value)
+    {
+        $sql="INSERT INTO `item`(`id_item` , `codigo_barras` , `descripcion1` ,  `unidad_empaque` ,  `seriales` ,  `cod_departamento` ,  `cod_grupo` , `cantidad_bulto` ,  `kilos_bulto` ,  `id_marca` ,  `unidadxpeso` ,  `unidad_venta` , `pesoxunidad` ,  `producto_vencimiento`, `iva`, `produccion`) VALUES ('".$value['id_item']."','".$value['codigo_barras']."','".$value['descripcion1']."','".$value['unidad_empaque']."', '".$value['seriales']."', '".$value['cod_departamento']."', '".$value['cod_grupo']."', '".$value['cantidad_bulto']."', '".$value['kilos_bulto']."','".$value['id_marca']."','".$value['unidadxpeso']."','".$value['unidad_venta']."','".$value['pesoxunidad']."','".$value['producto_vencimiento']."','".$value['iva']."','".$value['sae']."')";
+        $comunes->Execute2($sql);
+    }
+
     //Sincronizando Clientes
     $comunes->Execute2("TRUNCATE TABLE `clientes`");
     foreach ($data['proveedores'] as $cliente=>$value)
