@@ -1,0 +1,2 @@
+ALTER TABLE `calidad_almacen_detalle` ADD `id_marca` INT NOT NULL AFTER `costo_declarado`;
+ALTER TABLE `calidad_almacen_detalle` CHANGE `id_marca` `id_marca` BIGINT NOT NULL;

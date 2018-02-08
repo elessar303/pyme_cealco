@@ -307,7 +307,8 @@ $("#cantidaddeberia").change(function(){
                 if($("#items").val()==""||
                     $("#almacen").val()==""||
                     $("#almacen").val()=="0"||
-                    $("#ubicacion").val()==""||                    
+                    $("#ubicacion").val()==""||
+                     $("#marca").val()==""||                    
                     $("#cantidadunitaria").val()==""||
                     (($("#fVencimiento").val()=="") && ($("#fecha_vencimiento").val()=="Si")) ||
                     $("#nlote").val()==""||

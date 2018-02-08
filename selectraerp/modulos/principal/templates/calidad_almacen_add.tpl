@@ -392,6 +392,14 @@
             </p>
 
             <p>
+                <label for="marca"><b>Marca</b></label><br/>
+                <select name="marca" id="marca" >
+                    <option value="">Seleccione...</option>
+                    {html_options values=$option_values_id_marca output=$option_values_nombre_marca}
+                </select>
+            </p>
+
+            <p>
                 <label><b>Costo Declarado</b></label><br/>
                 <input type="text" name="costo_declarado" id="costo_declarado"/>
             </p>

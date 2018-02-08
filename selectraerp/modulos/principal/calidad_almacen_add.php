@@ -59,6 +59,16 @@ foreach ($ubica as $key => $item) {
 $smarty->assign("option_values_nombre_estado", $arrayubiN);
 $smarty->assign("option_values_id_estado", $arrayubi);
 
+//marcas
+$ubica=$ubicacion->ObtenerFilasBySqlSelect("select * from marca");
+
+foreach ($ubica as $key => $item) {
+    $arraymarca[] = utf8_encode($item["marca"]);
+    $arrayid[] = $item["id"];
+}
+$smarty->assign("option_values_nombre_marca", $arraymarca);
+$smarty->assign("option_values_id_marca", $arrayid);
+//fin de marcas;
 // punto de ventas
 $arraySelectOption = "";
 $arraySelectoutPut1 = "";
@@ -154,13 +164,12 @@ if (isset($_POST["input_cantidad_items"])) {
        
         for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) 
         {
-
             $kardex_almacen_detalle_instruccion = "INSERT INTO calidad_almacen_detalle (
                      `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso`, `costo_declarado` )
+                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso`, `costo_declarado`, `id_marca` )
                 VALUES (
                     '{$id_transaccion}', '{$_POST["_id_almacen"][$i]}',
-                    '', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}','{$_POST["_ubicacion"][$i]}','{$_POST["_vencimineto"][$i]}','{$_POST["_lote"][$i]}','{$_POST["_observacion1"][$i]}','{$_POST["_estatus_producto"][$i]}', '{$_POST["_tipo_uso"][$i]}', '{$_POST["_costo_declarado"][$i]}');";
+                    '', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}','{$_POST["_ubicacion"][$i]}','{$_POST["_vencimineto"][$i]}','{$_POST["_lote"][$i]}','{$_POST["_observacion1"][$i]}','{$_POST["_estatus_producto"][$i]}', '{$_POST["_tipo_uso"][$i]}', '{$_POST["_costo_declarado"][$i]}', '{$_POST["_marca"][$i]}');";
 
             $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
 

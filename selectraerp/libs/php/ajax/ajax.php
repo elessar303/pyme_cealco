@@ -548,11 +548,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 (
                     "SELECT ite.*,m.*, kad.id_transaccion_detalle, kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, date_format(k.fecha_creacion, '%d/%m/%Y %h:%i:%s ') as fecha_creacion
                     FROM calidad_almacen_detalle AS kad
+                    LEFT JOIN marca m ON m.id = kad.id_marca
                     JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
                     LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
                     LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
                     LEFT JOIN item AS ite ON kad.id_item=ite.id_item
-                    LEFT JOIN marca m ON m.id = ite.id_marca
                     LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
                     WHERE kad.id_transaccion =" . $_GET["id_transaccion"]." order by k.fecha_creacion"
                 );
@@ -3307,7 +3307,7 @@ $i=0;
 
 
         case "det_items_calidad_estatus":
-       $campos= $conn->ObtenerFilasBySqlSelect("select b.estatus as estatus, c.codigo_barras, c.descripcion1, m.marca, c.pesoxunidad, d.nombre_unidad, b.cantidad, b.observacion from calidad_almacen as a, calidad_almacen_detalle as b, item as c LEFT JOIN marca m ON c.id_marca= m.id, unidad_medida as d where b.id_item=c.id_item and a.id_transaccion=b.id_transaccion and c.unidadxpeso=d.id and a.id_transaccion=".$_GET['id_transaccion']);
+       $campos= $conn->ObtenerFilasBySqlSelect("select b.estatus as estatus, c.codigo_barras, c.descripcion1, m.marca, c.pesoxunidad, d.nombre_unidad, b.cantidad, b.observacion from calidad_almacen as a, calidad_almacen_detalle as b LEFT JOIN marca m ON b.id_marca= m.id, item as c, unidad_medida as d where b.id_item=c.id_item and a.id_transaccion=b.id_transaccion and c.unidadxpeso=d.id and a.id_transaccion=".$_GET['id_transaccion']);
 
  
         echo '<tr class="detalle_items">
@@ -3329,7 +3329,7 @@ $i=0;
                   echo '
                        <tr>
                         <td style="width:150px; padding-left:10px;">' . $item["codigo_barras"] . '</td>
-                        <td style="width:110px; text-align: right; padding-right:10px;">' .$item["descripcion1"].'- '.$item["marca"].' '.$item["pesoxunidad"].' '.$item["nombre_unidad"].'</td>
+                        <td style="width:110px; text-align: center; padding-right:10px;">' .$item["descripcion1"].'- '.$item["marca"].' '.$item["pesoxunidad"].' '.$item["nombre_unidad"].'</td>
                         <td style="width:150px; padding-left:10px;">' . $item["cantidad"] . '</td>
                         <td style="width:150px; padding-left:10px;">' . $item["observacion"] . '</td>
                         <!--<td style="width:150px; padding-left:10px;">' . $item["estatus"] . '</td>-->
@@ -6005,8 +6005,8 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
             break;
         
 
-        case "det_items_calidad":
-       $campos= $conn->ObtenerFilasBySqlSelect("select c.codigo_barras, c.descripcion1, m.marca, c.pesoxunidad, d.nombre_unidad, b.cantidad, b.observacion from calidad_almacen as a, calidad_almacen_detalle as b, item as c LEFT JOIN marca m ON c.id_marca= m.id, unidad_medida as d where b.id_item=c.id_item and a.id_transaccion=b.id_transaccion and c.unidadxpeso=d.id and a.id_transaccion=".$_GET['id_transaccion']);
+        case "det_items_calidad3":
+       $campos= $conn->ObtenerFilasBySqlSelect("select c.codigo_barras, c.descripcion1, m.marca, c.pesoxunidad, d.nombre_unidad, b.cantidad, b.observacion from calidad_almacen as a, calidad_almacen_detalle as b LEFT JOIN marca m ON b.id_marca= m.id, item as c, unidad_medida as d where b.id_item=c.id_item and a.id_transaccion=b.id_transaccion and c.unidadxpeso=d.id and a.id_transaccion=".$_GET['id_transaccion']);
 
  
         echo '<tr class="detalle_items">
