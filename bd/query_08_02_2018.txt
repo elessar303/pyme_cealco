@@ -1,2 +1,5 @@
 ALTER TABLE `calidad_almacen_detalle` ADD `id_marca` INT NOT NULL AFTER `costo_declarado`;
 ALTER TABLE `calidad_almacen_detalle` CHANGE `id_marca` `id_marca` BIGINT NOT NULL;
+ALTER TABLE `item_existencia_almacen` ADD `id_marca` BIGINT NOT NULL AFTER `id_proveedor`;
+ALTER TABLE `kardex_almacen_detalle` ADD `id_marca` BIGINT NOT NULL AFTER `costo_declarado`;
+ALTER TABLE `ubicacion` CHANGE `order` `orden` INT(11) NOT NULL;
