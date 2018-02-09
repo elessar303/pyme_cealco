@@ -62,7 +62,7 @@ function Header()
         $this->SetX(25);
         $this->SetWidths(array(150));
         $this->SetAligns(array("L"));
-        $this->Row(array($this->datoscampos[0]['descripcion1']), 0);
+        $this->Row(array($this->datoscampos[0]['descripcion1']." - ".$this->datoscampos[0]['marca']), 0);
         $this->SetLineWidth(0.60);
         $this->Line($this->GetX()+10, $this->GetY(), 140, $this->GetY());
         $this->SetX(25);
@@ -160,9 +160,10 @@ $datosgenerales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_ge
 $sql = 
 "
     select c.codigo_barras, c.descripcion1, b.etiqueta,  d.nombre as proveedor, date_format(a.fecha_creacion, '%d/%m/%Y') as fecha_recepcion,
-    b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.peso, b.observacion
+    b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.peso, b.observacion, m.marca
     from kardex_almacen as a
     inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+    left join marca as m on m.id=b.id_marca
     inner join item as c on b.id_item=b.id_item
     inner join clientes as d  on a.id_proveedor=d.id_cliente
     where b.id_transaccion_detalle=".$nro;

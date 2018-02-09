@@ -106,6 +106,7 @@ var eventos_form = {
                 campos += $.inputHidden("_vencimineto", options.vencimiento, "[]");
                 campos += $.inputHidden("_elaboracion", options.elaboracion, "[]");
                 campos += $.inputHidden("_lote", options.lote, "[]");
+                campos += $.inputHidden("_marca", options.marca, "[]");
                 campos += $.inputHidden("_nlote", options.nlote, "[]");
                 campos += $.inputHidden("_c_esperada", options.c_esperada, "[]");
                 campos += $.inputHidden("_observacion", options.observacion, "[]");

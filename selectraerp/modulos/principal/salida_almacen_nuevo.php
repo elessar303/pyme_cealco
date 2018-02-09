@@ -141,7 +141,7 @@ if (isset($_POST["input_cantidad_items"]))
     for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) 
     {
       
-        //Se consulta el precio actual para dejar el historico en kardex (Junior)
+            //Se consulta el precio actual para dejar el historico en kardex (Junior)
             $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$_POST["_id_item"][$i]}'";
             $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
 
@@ -149,9 +149,9 @@ if (isset($_POST["input_cantidad_items"]))
 
         $kardex_almacen_detalle_instruccion = "
         INSERT INTO kardex_almacen_detalle (
-        `id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `id_ubi_salida`, `precio`, lote)
+        `id_transaccion_detalle`, `id_transaccion`, `id_almacen_entrada`, `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `id_ubi_salida`, `precio`, lote, id_marca)
         VALUES (
-        NULL, '" . $id_transaccion2 . "', '', '" . $_POST["_id_almacen"][$i] . "', '" . $_POST["_id_item"][$i] . "', '" . $_POST["_cantidad"][$i] . "', '" . $_POST["_peso"][$i] . "',  '" . $_POST["_ubicacion"][$i] . "', ".$precioconiva.",  '" . $_POST["_nlote"][$i] . "');";
+        NULL, '" . $id_transaccion2 . "', '', '" . $_POST["_id_almacen"][$i] . "', '" . $_POST["_id_item"][$i] . "', '" . $_POST["_cantidad"][$i] . "', '" . $_POST["_peso"][$i] . "',  '" . $_POST["_ubicacion"][$i] . "', ".$precioconiva.",  '" . $_POST["_nlote"][$i] . "', '" . $_POST["_marca"][$i] . "');";
 
         $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
          //REALIZAR LA DISMINUCION DEL POS EN ESTE BLOQUE EL SOLO REALIZA LA DEL PYME 
@@ -197,19 +197,19 @@ if (isset($_POST["input_cantidad_items"]))
         //-------------------------------- FIN OJO---------------------
         $campos = $almacen->ObtenerFilasBySqlSelect("
                     select * from item_existencia_almacen
-                    where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion ='". $_POST["_ubicacion"][$i] . "'  and lote='" . $_POST["_nlote"][$i] . "'");
+                    where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion ='". $_POST["_ubicacion"][$i] . "'  and lote='" . $_POST["_nlote"][$i] . "' and id_marca='" . $_POST["_marca"][$i] . "'");
         if (count($campos) > 0) 
         {
             $cantidadExistente = $campos[0]["cantidad"];
             $pesoExistente = $campos[0]["peso"];
             $almacen->ExecuteTrans("update item_existencia_almacen set cantidad = '" . ($cantidadExistente - $_POST["_cantidad"][$i]) . "', peso = '" . ($pesoExistente - $_POST["_peso"][$i]) . "'
-                                    where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "'");
+                                    where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "' and id_marca='" . $_POST["_marca"][$i] . "'");
 
             //si cantidad es 0 o negativo debe borrarse de item existencia
             if($cantidadExistente - $_POST["_cantidad"][$i]<=0)
             {
                 $almacen->ExecuteTrans("
-                    delete from item_existencia_almacen where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "'"
+                    delete from item_existencia_almacen where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "' and id_marca='" . $_POST["_marca"][$i] . "'"
                 );
                 //se habilita la ubicacion
                 $almacen->ExecuteTrans("

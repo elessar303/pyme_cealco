@@ -438,11 +438,12 @@
         </p>
     <label>
         <p><b>Productos</b></p>
-        <p><input type="hidden" name="items" id="items">
+            <input type="hidden" name="items" id="items">
+            <input type="hidden" name="marca" id="marca">
             <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
         <!--<p><select style="width:100%" id="items" name="items"></select></p>-->
     </label>
-        <label>
+    <label>
         <p><b>Lote</b></p>
         <p><input type="text" name="nlote" id="nlote" onkeypress="return solonumeros(event)"></p>
     </label>

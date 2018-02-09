@@ -97,7 +97,8 @@ if (isset($_POST["input_cantidad_items"]))
          `id_ubi_entrada` ,
         `id_ubi_salida`, 
         `precio`,
-        `lote`
+        `lote`,
+        `id_marca`
         )
         VALUES (
         NULL ,
@@ -110,7 +111,8 @@ if (isset($_POST["input_cantidad_items"]))
         '" . $_POST["ubicacion_entrada"]. "',
         '" . $_POST["_ubicacion"][$i]. "',
         ".$precio_actual[0]['coniva1'].",
-        '" . $_POST["_nlote"][$i]. "'
+        '" . $_POST["_nlote"][$i]. "',
+        '" . $_POST["_marca"][$i]. "'
         );";
 
         //echo $kardex_almacen_detalle_instruccion; exit();
@@ -125,6 +127,7 @@ if (isset($_POST["input_cantidad_items"]))
                         and id_ubicacion  = '" . $_POST["_ubicacion"][$i] . "' 
                         and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' 
                         and lote='" . $_POST["_nlote"][$i] . "' 
+                        and id_marca='" . $_POST["_marca"][$i] . "' 
                         and id_proveedor='{$_POST["id_proveedor"]}'");
         if (count($campos) > 0) 
         {
@@ -137,7 +140,8 @@ if (isset($_POST["input_cantidad_items"]))
                 id_item  = '" . $_POST["_id_item"][$i] . "' 
                 and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' 
                 and id_ubicacion='". $_POST["_ubicacion"][$i]."' 
-                and lote='" . $_POST["_nlote"][$i] . "' 
+                and lote='" . $_POST["_nlote"][$i] . "'
+                and id_marca='" . $_POST["_marca"][$i] . "'
                 and id_proveedor='{$_POST["id_proveedor"]}'");
         }
         //si cantidad es 0 o negativo debe borrarse de item existencia
@@ -149,7 +153,8 @@ if (isset($_POST["input_cantidad_items"]))
                 id_item  = '" . $_POST["_id_item"][$i] . "' 
                 and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' 
                 and id_ubicacion='". $_POST["_ubicacion"][$i] . "' 
-                and lote='" . $_POST["_nlote"][$i] . "' 
+                and lote='" . $_POST["_nlote"][$i] . "'
+                and id_marca='" . $_POST["_marca"][$i] . "' 
                 and id_proveedor='{$_POST["id_proveedor"]}'"
             );
             //se habilita la ubicacion
@@ -164,7 +169,8 @@ if (isset($_POST["input_cantidad_items"]))
                         id_item  = '" . $_POST["_id_item"][$i] . "' 
                         and cod_almacen = '" . $_POST["almacen_entrada"]. "' 
                         and id_ubicacion = '" . $_POST["ubicacion_entrada"]. "' 
-                        and lote='" . $_POST["_nlote"][$i] . "' 
+                        and lote='" . $_POST["_nlote"][$i] . "'
+                        and id_marca='" . $_POST["_marca"][$i] . "' 
                         and id_proveedor='{$_POST["id_proveedor"]}'");
 
         
@@ -180,6 +186,7 @@ if (isset($_POST["input_cantidad_items"]))
                 and cod_almacen = '" . $_POST["almacen_entrada"] . "' 
                 and id_ubicacion = '" . $_POST["ubicacion_entrada"]. "' 
                 and lote='" . $_POST["_nlote"][$i] . "' 
+                and id_marca='" . $_POST["_marca"][$i] . "' 
                 and id_proveedor='{$_POST["id_proveedor"]}'");
         } else {
             $instruccion = "
@@ -190,6 +197,7 @@ if (isset($_POST["input_cantidad_items"]))
                     `peso`,
                     `id_ubicacion`,
                     `lote`,
+                    `id_marca`,
                     `id_proveedor`
                     )
                     VALUES (
@@ -199,6 +207,7 @@ if (isset($_POST["input_cantidad_items"]))
                         '" . $_POST["_peso"][$i] . "',
                         '" .$_POST["ubicacion_entrada"]. "',
                         '" . $_POST["_nlote"][$i] . "',
+                        '" . $_POST["_marca"][$i] . "',
                         '" . $_POST["id_proveedor"] . "'
                     );";
             $almacen->ExecuteTrans($instruccion);

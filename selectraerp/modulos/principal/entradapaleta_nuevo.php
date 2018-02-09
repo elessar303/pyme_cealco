@@ -95,10 +95,11 @@ else
     //construir tabla de datos 
     $sql=
     "
-        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, b.peso, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen, a.ticket_entrada
+        select b.id_transaccion_detalle as detalle_movimiento,  e.nombre as cliente, d.descripcion, c.codigo_barras, c.descripcion1, b.lote, b.cantidad, b.peso, d.descripcion as ubicacion, a.id_documento, f.descripcion as almacen, a.ticket_entrada, m.marca
         from 
         kardex_almacen as a
         inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+        left join marca as m on m.id=b.id_marca
         inner join item as c on b.id_item=c.id_item
         inner join ubicacion as d on b.id_ubi_entrada=d.id
         inner join clientes as e on a.id_proveedor=e.id_cliente
@@ -124,7 +125,7 @@ else
                     ".$valor['codigo_barras']."
                 </td>
                 <td align='center'>
-                    ".$valor['descripcion1']."
+                    ".$valor['descripcion1']." - ".$valor['marca']."
                 </td>
                 <td align='center'>
                     ".$valor['lote']."

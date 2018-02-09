@@ -164,6 +164,7 @@ if (isset($_POST["input_cantidad_items"])) {
        
         for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) 
         {
+        
             $kardex_almacen_detalle_instruccion = "INSERT INTO calidad_almacen_detalle (
                      `id_transaccion` ,`id_almacen_entrada`,
                     `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso`, `costo_declarado`, `id_marca` )

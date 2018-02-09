@@ -145,6 +145,7 @@ Ext.onReady(function() {
                         $("#cantidad_existente").val(resultado[0].cantidad);
                         $("#peso_existente").val(resultado[0].peso);
                         $("#nlote").val(resultado[0].lote);
+                        $("#marca").val(resultado[0].marca);
                         cargarproductoitem(resultado[0].id_item);
 
                     }
@@ -421,6 +422,7 @@ Ext.onReady(function() {
                         id_ubicacion: $("#ubicacion").val(),
                         cantidad: $("#cantidadunitaria").val(),
                         peso: $("#peso").val(),
+                        marca:  $("#marca").val(),
                         nlote: $("#nlote").val() /*,*/
                     });
                 }

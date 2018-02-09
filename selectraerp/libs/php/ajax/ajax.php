@@ -5999,21 +5999,21 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
                 $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item, kad.peso, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
         FROM kardex_almacen_detalle AS kad
         join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        LEFT JOIN marca m ON m.id = kad.id_marca
         LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
         LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id
         LEFT JOIN item AS ite ON kad.id_item=ite.id_item
-        LEFT JOIN marca m ON m.id = ite.id_marca
         LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
         WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
             } else if ($_GET["id_tipo_movimiento_almacen"] == '5') {
                 $operacion = "Traslado";
                 $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
         FROM kardex_almacen_detalle AS kad
-        LEFT JOIN kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        JOIN kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        LEFT JOIN marca m ON m.id = kad.id_marca
         LEFT JOIN almacen AS alm ON kad.id_almacen_entrada=alm.cod_almacen
         LEFT JOIN ubicacion AS ubi ON kad.id_ubi_entrada=ubi.id
         LEFT JOIN item AS ite ON kad.id_item=ite.id_item
-        LEFT JOIN marca m ON m.id = ite.id_marca
         LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
         WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
                 $campos1 = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen

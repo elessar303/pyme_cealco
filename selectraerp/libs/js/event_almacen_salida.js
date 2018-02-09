@@ -156,6 +156,7 @@ Ext.onReady(function(){
                             $("#cantidad_existente").val(resultado[0].cantidad);
                             $("#peso_existente").val(resultado[0].peso);
                             $("#nlote").val(resultado[0].lote);
+                            $("#marca").val(resultado[0].marca);
                             cargarproductoitem(resultado[0].id_item);
 
                         }
@@ -511,7 +512,8 @@ $("#codigoBarra").keypress(function(e){
                     id_item:            $("#items").val(),
                     descripcion:        $("#items :selected").text()=="" ? $("#items_descripcion").val() : $("#items :selected").text(),
                     id_almacen:         $("#almacen").val(),
-                    id_ubicacion:         $("#ubicacion").val(),
+                    id_ubicacion:       $("#ubicacion").val(),
+                    marca:              $("#marca").val(),
                     cantidad:           $("#cantidadunitaria").val(),/*,*/
                     peso:           $("#peso").val(),/*,*/
                     nlote:           $("#nlote").val()/*,*/

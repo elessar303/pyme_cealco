@@ -211,6 +211,8 @@ function solonumeros(evt) {
     <label>
         <p><b>Productos</b></p>
         <p>
+            
+            <input type="hidden" name="marca" id="marca">
             <input type="hidden" name="items" id="items">
             <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
             <!--    <select style="width:100%" id="items" name="items"></select>-->
