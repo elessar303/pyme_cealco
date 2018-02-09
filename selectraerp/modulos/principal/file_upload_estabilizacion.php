@@ -117,6 +117,14 @@ if(!empty($_FILES['archivo_productos']))
         $comunes->Execute2($sql);
     }
 
+    //Sincronizando Marca
+    $comunes->Execute2("TRUNCATE TABLE `marca`");
+    foreach ($data['marca'] as $marca=>$value)
+    {
+        $sql="INSERT INTO `marca`(`id`, `marca`) VALUES ('".$value['id']."','".$value['marca']."')";
+        $comunes->Execute2($sql);
+    }
+
     //Sincronizando Productos
     $comunes->Execute2("TRUNCATE TABLE `item`");
     foreach ($data['productos'] as $producto=>$value)
