@@ -251,8 +251,8 @@
                                 <thead>
                                     <tr>
                                         <th class="tb-head" ><b>Producto</b></th>
-                                        <th class="tb-head" ><b>Total Cantidad</b></th>
-                                        <th class="tb-head" ><b>Unidad Paleta</b></th>
+                                        <th class="tb-head" ><b>Total Cantidad Unitaria</b></th>
+                                        <th class="tb-head" ><b>Peso Paleta</b></th>
                                         <th class="tb-head" ><b>Total Peso Ingresado</b></th>
                                     </tr>
                                 </thead>
