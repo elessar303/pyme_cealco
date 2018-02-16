@@ -3,143 +3,146 @@
 <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
 {literal}
     <script type="text/javascript">//<![CDATA[
-            $(document).ready(function(){
-                //funcion para cargar los puntos 
-                  $("#estado").change(function() {
-                    estados = $("#estado").val();
-                        $.ajax({
-                            type: 'GET',
-                            data: 'opt=getPuntos&'+'estados='+estados,
-                            url: '../../libs/php/ajax/ajax.php',
-                            beforeSend: function() {
-                                $("#puntodeventa").find("option").remove();
-                                $("#puntodeventa").append("<option value=''>Cargando..</option>");
-                            },
-                            success: function(data) {
-                                $("#puntodeventa").find("option").remove();
-                                this.vcampos = eval(data);
-                                     $("#puntodeventa").append("<option value='0'>Todos</option>");
-                                for (i = 0; i <= this.vcampos.length; i++) {
-                                    $("#puntodeventa").append("<option value='" + this.vcampos[i].siga+ "'>" + this.vcampos[i].nombre_punto + "</option>");
-                                }
-                            }
-                        }); 
-                        $("#puntodeventa").val(0);
-                  });
-                //se habilita ventana modal para solicitar clave secreta (si esta activa)
-                $.ajax({
-                            type: 'GET',
-                            data: 'opt=getCodigoKardex&',
-                            url: '../../libs/php/ajax/ajax.php',
-                            success: function(data) 
-                            {
-                                if(data==1)
-                                {
-                                    var ventana = document.getElementById('miVentana');
-                                    ventana.style.marginTop = '100px';
-                                    ventana.style.left = ((document.body.clientWidth-350) / 2) +  'px';
-                                    ventana.style.display = 'block';
-                                    document.getElementById("autorizado_por").disabled=true;
-                                    document.getElementById("observaciones").disabled=true;
-                                    document.getElementById("prescintos").disabled=true;
-                                    document.getElementById("cedula_conductor").disabled=true;
-                                    document.getElementById("nacionalidad_conductor").disabled=true;
-                                    document.getElementById("marca").disabled=true;
-                                    document.getElementById("color").disabled=true;
-                                    document.getElementById("placa").disabled=true;
-                                }
-                            }
-                        }); 
+        $(document).ready(function()
+        {
+            //funcion para cargar los puntos 
+            $("#estado").change(function() 
+            {
+                estados = $("#estado").val();
+                $.ajax(
+                {
+                    type: 'GET',
+                    data: 'opt=getPuntos&'+'estados='+estados,
+                    url: '../../libs/php/ajax/ajax.php',
+                    beforeSend: function() 
+                    {
+                        $("#puntodeventa").find("option").remove();
+                        $("#puntodeventa").append("<option value=''>Cargando..</option>");
+                    },
+                    success: function(data) 
+                    {
+                        $("#puntodeventa").find("option").remove();
+                        this.vcampos = eval(data);
+                        $("#puntodeventa").append("<option value='0'>Todos</option>");
+                        for (i = 0; i <= this.vcampos.length; i++) 
+                        {
+                            $("#puntodeventa").append("<option value='" + this.vcampos[i].siga+ "'>" + this.vcampos[i].nombre_punto + "</option>");
+                        }
+                    }
+                }); 
+                $("#puntodeventa").val(0);
             });
+            //se habilita ventana modal para solicitar clave secreta (si esta activa)
+            $.ajax(
+            {
+                type: 'GET',
+                data: 'opt=getCodigoKardex&',
+                url: '../../libs/php/ajax/ajax.php',
+                success: function(data) 
+                {
+                    if(data==1)
+                    {
+                        var ventana = document.getElementById('miVentana');
+                        ventana.style.marginTop = '100px';
+                        ventana.style.left = ((document.body.clientWidth-350) / 2) +  'px';
+                        ventana.style.display = 'block';
+                        document.getElementById("autorizado_por").disabled=true;
+                        document.getElementById("observaciones").disabled=true;
+                        document.getElementById("prescintos").disabled=true;
+                        document.getElementById("cedula_conductor").disabled=true;
+                        document.getElementById("nacionalidad_conductor").disabled=true;
+                        document.getElementById("marca").disabled=true;
+                        document.getElementById("color").disabled=true;
+                        document.getElementById("placa").disabled=true;
+                    }
+                }
+            }); 
+        });
 
-            //función que verifica el codigo seleccionado
-            function procesarCodigo()
-            {   
-                var codigo = $("#codigo_seguridad").val();
-                $.ajax({
-                            type: 'GET',
-                            data: 'opt=getverificacionCodigo&'+'codigo='+codigo,
-                            url: '../../libs/php/ajax/ajax.php',
-                            success: function(data) 
-                            {
-                                if(data==1)
-                                {
-                                    document.getElementById('miVentana').style.display='none';
-                                    $("#codigo_kardex").val(codigo);
-                                    document.getElementById("autorizado_por").disabled=false;
-                                    document.getElementById("observaciones").disabled=false;
-                                    document.getElementById("prescintos").disabled=false;
-                                    document.getElementById("cedula_conductor").disabled=false;
-                                    document.getElementById("nacionalidad_conductor").disabled=false;
-                                    document.getElementById("marca").disabled=false;
-                                    document.getElementById("color").disabled=false;
-                                    document.getElementById("placa").disabled=false;
-                                }
-                                else
-                                {
-                                    if(data==-4)
-                                    {
-                                        alert("Clave Vencida");
-                                        return false;
-                                    }
-                                    if(data==-1)
-                                    {
-                                        alert("Codigo ya se uso");
-                                        return false;
-                                    }
-                                    if(data==-2)
-                                    {
-                                        alert("No puede dejar el codigo vacio");
-                                        return false;
-                                    }
-                                    if(data==-3)
-                                    {
-                                        alert("Este Codigo no Corresponde a la tienda");
-                                        return false;
-                                    }
-                                    if(data!=-4 && data!=-1 && data!=-2 && data!=-3)
-                                    {
-                                        alert("Error, Verifique el formato de la clave");
-                                        return false;
-                                    }
-                                }
-                                
-                            }
-                        }); 
+        //función que verifica el codigo seleccionado
+        function procesarCodigo()
+        {   
+            var codigo = $("#codigo_seguridad").val();
+            $.ajax(
+            {
+                type: 'GET',
+                data: 'opt=getverificacionCodigo&'+'codigo='+codigo,
+                url: '../../libs/php/ajax/ajax.php',
+                success: function(data) 
+                {
+                    if(data==1)
+                    {
+                        document.getElementById('miVentana').style.display='none';
+                        $("#codigo_kardex").val(codigo);
+                        document.getElementById("autorizado_por").disabled=false;
+                        document.getElementById("observaciones").disabled=false;
+                        document.getElementById("prescintos").disabled=false;
+                        document.getElementById("cedula_conductor").disabled=false;
+                        document.getElementById("nacionalidad_conductor").disabled=false;
+                        document.getElementById("marca").disabled=false;
+                        document.getElementById("color").disabled=false;
+                        document.getElementById("placa").disabled=false;
+                    }
+                    else
+                    {
+                        if(data==-4)
+                        {
+                            alert("Clave Vencida");
+                            return false;
+                        }
+                        if(data==-1)
+                        {
+                            alert("Codigo ya se uso");
+                            return false;
+                        }
+                        if(data==-2)
+                        {
+                            alert("No puede dejar el codigo vacio");
+                            return false;
+                        }
+                        if(data==-3)
+                        {
+                            alert("Este Codigo no Corresponde a la tienda");
+                            return false;
+                        }
+                        if(data!=-4 && data!=-1 && data!=-2 && data!=-3)
+                        {
+                            alert("Error, Verifique el formato de la clave");
+                            return false;
+                        }
+                    }
+                }
+            }); 
 
-            }
-            //fin del verificar codigo
+        }
+        //fin del verificar codigo
 
-
-
-            
-
-
-            function comprobarconductor() {
-        var consulta;     
-        consulta = $("#nacionalidad_conductor").val()+$("#cedula_conductor").val();                      
-                        $.ajax({
-                              type: "POST",
-                              url: "comprobar_conductor.php",
-                              data: "b="+consulta,
-                              dataType: "html",
-                              asynchronous: false, 
-                              error: function(){
-                                    alert("error petici�n ajax");
-                              },
-                              success: function(data){  
-
-                                $("#resultado").html(data);
-                                document.getElementById("conductor").focus();
-                                ///// verificamos su estado
-
-                              }
-                  });
-
+        function comprobarconductor() 
+        {
+            var consulta;     
+            consulta = $("#nacionalidad_conductor").val()+$("#cedula_conductor").val();                      
+            $.ajax(
+            {
+              type: "POST",
+              url: "comprobar_conductor.php",
+              data: "b="+consulta,
+              dataType: "html",
+              asynchronous: false, 
+              error: function()
+              {
+                    alert("error petici�n ajax");
+              },
+              success: function(data)
+              {
+                $("#resultado").html(data);
+                document.getElementById("conductor").focus();
+                
+                }
+            });
         }
     </script>
 {/literal}
- <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
+<link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
 <form name="formulario" id="formulario" method="POST" action="">
     <input type="hidden" name="Datosproveedor" value="">
     <input type="hidden" name="codigo_empresa" value="{$DatosEmpresa[0].codigo}"/>
@@ -176,7 +179,6 @@
         <table>
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/28.png"/-->
                     <span style="font-family:'Verdana';"><b>Elaborado Por (*):</b></span>
                 </td>
                 <td>
@@ -186,7 +188,6 @@
             </tr>
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/8.png"/-->
                     <span style="font-family:'Verdana';"><b>Observaciones:</b></span>
                 </td>
                 <td>
@@ -196,7 +197,6 @@
 
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"-->
                     <span style="font-family:'Verdana';"><b>Cliente:</b></span>
                 </td>
                 <td>
@@ -206,40 +206,12 @@
                     </select>
                 </td>
             </tr>
-
-            <!--<tr>
-                <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"
-                    <span style="font-family:'Verdana';"><b>Estado Destino:</b></span>
-                </td>
-                <td>
-                    <select  name="estado_destino" id="estado" class="form-text">
-                        <option value="9999">Todos</option>
-                        {html_options output=$option_values_nombre_estado values=$option_values_id_estado}
-                    </select>
-                </td>
-            </tr>
-
-            <tr>
-                <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"
-                    <span style="font-family:'Verdana';"><b>Almacen de Destino:</b></span>
-                </td>
-                <td>
-                    <select  name="puntodeventa" id="puntodeventa" class="form-text">
-                        <option value="0">Todos</option> 
-                        {html_options output=$option_output_punto values=$option_values_punto}
-                    </select>
-                </td>
-            </tr>-->
-
             <tr>
                 <td>
                     <span style="font-family:'Verdana';"><b>Fecha:</b></span>
                 </td>
                 <td>
                     <input class="form-text" maxlength="100" type="text" name="input_fechacompra" id="input_fechacompra"  size="30" value='{$smarty.now|date_format:"%Y-%m-%d"}' readonly/>
-                    <!--div  style="color:#4e6a48" id="fechacompra">{$smarty.now|date_format:"%d-%m-%Y"}</div-->
                     {literal}
                         <script type="text/javascript">//<![CDATA[
                             // var cal = Calendar.setup({onSelect: function(cal) { cal.hide() }});
@@ -248,118 +220,73 @@
                     {/literal}
                 </td>
             </tr>
-
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"-->
                     <span style="font-family:'Verdana';"><b>Prescintos:</b></span>
                 </td>
                 <td>
                     <input class="form-text" type="text" maxlength="100"  size="30" name="prescintos" id="prescintos"/>
                 </td>
             </tr>
-            <!--<tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>C&eacute;dula del Conductor:</b></span>
-                        </td>
-                        <td>
-                            <select name="nacionalidad_conductor" id="nacionalidad_conductor" class="form-text">
-                              <option value="">..</option>
-                              <option value="V">V</option>
-                              <option value="E">E</option>
-                            </select>
-                            <input type="text" name="cedula_conductor" maxlength="8" id="cedula_conductor" size="21"  class="form-text" onBlur="comprobarconductor(this.id)" onKeyPress="return soloNumeros(event)"/>
-                        </td>
-                    </tr>
-                    <tr>
-                    <td style="font-family:'Verdana';font-weight:bold;">
-                    <span style="font-family:Verdana"><b>Nombre del Conductor:</b></span>
-                    </td>
-                    <td>
-                    <div id="resultado" style="font-family:'Verdana';font-weight:bold;">
-                    
-                    </div>
-                    </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Placa:</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="placa" maxlength="100" id="placa" size="30" maxlength="70" class="form-text"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Marca:</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="marca" maxlength="100" id="marca" size="30" maxlength="70" class="form-text"/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Color:</b></span>
-                        </td>
-                        <td>
-                            <input type="text" name="color" maxlength="100" id="color" size="30" maxlength="70" class="form-text"/>
-                        </td>
-                    </tr>
-                -->
-                     <!-- Firmas Casillas-->
-                    <tr>
-                        <td colspan="2" align="center"><span style="font-family:'Verdana';font-weight:bold;"><b>CASILLA DE FIRMAS:</b></span></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Aprobado Por:</b></span>
-                        </td>
-                        <td>
-                            <select name="id_aprobado" id="id_aprobado" class="form-text" style="width:205px">                        
-                                {html_options values=$option_values_aprobado output=$option_output_aprobado}
-                                
-                                </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Despachador:</b></span>
-                        </td>
-                        <td>
-                            <select name="id_despachador" id="id_despachador" class="form-text" style="width:205px">                        
-                                {html_options values=$option_values_receptor output=$option_output_receptor}
-                                
-                                </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Seguridad:</b></span>
-                        </td>
-                        <td>
-                           <select name="id_seguridad" id="id_seguridad" class="form-text" style="width:205px">                        
-                                {html_options values=$option_values_seguridad output=$option_output_seguridad}
-                                
-                                </select>
-                        </td>
-                    </tr>
+            <!-- Firmas Casillas-->
+            <tr>
+                <td colspan="2" align="center"><span style="font-family:'Verdana';font-weight:bold;"><b>CASILLA DE FIRMAS:</b></span></td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-family:'Verdana';font-weight:bold;"><b>Aprobado Por:</b></span>
+                </td>
+                <td>
+                    <select name="id_aprobado" id="id_aprobado" class="form-text" style="width:205px">                        
+                        {html_options values=$option_values_aprobado output=$option_output_aprobado}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-family:'Verdana';font-weight:bold;"><b>Despachador:</b></span>
+                </td>
+                <td>
+                    <select name="id_despachador" id="id_despachador" class="form-text" style="width:205px">                        
+                        {html_options values=$option_values_receptor output=$option_output_receptor}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-family:'Verdana';font-weight:bold;"><b>Seguridad:</b></span>
+                </td>
+                <td>
+                   <select name="id_seguridad" id="id_seguridad" class="form-text" style="width:205px">                        
+                        {html_options values=$option_values_seguridad output=$option_output_seguridad}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="tb-head"><b>Servicios Asociados Al Movimiento</b></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    {foreach key=key item=servicios from=$checkbox}
+                      
+                      <label><input type="checkbox" id="{$servicios.id}" name='cajas[]' value="{$servicios.id}" checked="checked"/>{$servicios.nombre}</label>&nbsp;
 
+                    {/foreach}
+                </td>
+            </tr>
         </table>
     </div>
     <!--</Datos del proveedor y vendedor>-->
-
     <div  id="dcompra" class="x-hide-display" >
-
-
     </div>
-
     <div id="PanelGeneralCompra">
         <div id="tabproducto" class="x-hide-display">
             <div id="contenedorTAB">
@@ -400,12 +327,6 @@
 
                 </div>
             </div>
-
-
-
-
-
-
         </div>
     </div>
 

@@ -24,14 +24,16 @@ $(document).ready(function() {
             }
         });
     }
-    $("#almacen_entrada").change(function() {
+    $("#almacen_entrada").change(function() 
+    {
         cargarUbicaciones();
     });
     cargarUbicaciones();
 
 });
 
-function solonumeros(evt) {
+function solonumeros(evt) 
+{
     // Backspace = 8, Enter = 13, ’0' = 48, ’9' = 57, ‘.’ = 46
     tecla = (document.all) ? e.keyCode : e.which;
 
@@ -82,7 +84,6 @@ function solonumeros(evt) {
         <table>
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/28.png"-->
                     <span style="font-family:'Verdana';"><b>Elaborado Por (*):</b></span>
                 </td>
                 <td>
@@ -102,7 +103,6 @@ function solonumeros(evt) {
             </tr>
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/8.png"-->
                     <span style="font-family:'Verdana';"><b>Observaciones</b></span>
                 </td>
                 <td>
@@ -111,7 +111,6 @@ function solonumeros(evt) {
             </tr>
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"-->
                     <span style="font-family:'Verdana';"><b>Almacen de Entrada:</b></span>
                 </td>
                 <td>
@@ -122,7 +121,6 @@ function solonumeros(evt) {
             </tr>
             <tr>
                 <td>
-                    <!--img align="absmiddle" width="17" height="17" src="../../libs/imagenes/ico_user.gif"-->
                     <span style="font-family:'Verdana';"><b>Ubicacion de Entrada:</b></span>
                 </td>
                 <td>
@@ -137,6 +135,26 @@ function solonumeros(evt) {
                 <td>
                     <input type="hidden" name="input_fechacompra" id="input_fechacompra" value='{$smarty.now|date_format:"%Y-%m-%d"}'>
                     <div class="form-text" style="color:#4e6a48" id="fechacompra">{$smarty.now|date_format:"%d-%m-%Y"}</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" align="center">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="tb-head"><b>Servicios Asociados Al Movimiento</b></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    {foreach key=key item=servicios from=$checkbox}
+                      
+                      <label><input type="checkbox" id="{$servicios.id}" name='cajas[]' value="{$servicios.id}" checked="checked"/>{$servicios.nombre}</label>&nbsp;
+
+                    {/foreach}
                 </td>
             </tr>
         </table>

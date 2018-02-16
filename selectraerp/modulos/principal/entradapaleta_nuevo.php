@@ -6,6 +6,22 @@ $usuarios = new Usuarios();
 $arrayCodModulo = array();
 $arrayNomModulo = array();
 $id_transaccion=$_GET['id'];
+//servicios asociados al cargo
+$sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion= 'Cargo'";
+$id_movimiento=$usuarios->ObtenerFilasBySqlSelect($sql);
+$sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$id_movimiento[0]['id_tipo_movimiento_almacen'];
+$buscarservicios=$usuarios->ObtenerFilasBySqlSelect($sql);
+$checkbox="";
+foreach ($buscarservicios as $servicios) 
+{
+    $sql="select id_item, cod_item, precio1, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+    $contarservicio=$usuarios->ObtenerFilasBySqlSelect($sql);
+    $checkbox[]=['id' => $contarservicio[0]['id_item'], 'nombre' => $contarservicio[0]['descripcion1'],];
+}
+//print_r($checkbox); exit();
+$smarty->assign("checkbox", $checkbox);
+
+            
 $smarty->assign("movimiento", $id_transaccion);
 //buscar si existe movimientos con este id
 $sql="SELECT *,a.id_transaccion as id FROM 

@@ -22,6 +22,27 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "EliminarFacturaPedido":
+            $sql="delete from despacho_new_detalle where id_factura = (select id_factura from despacho_new where cod_factura='".$_POST["factura"]."')";
+            $conn->BeginTrans();
+            $conn->ExecuteTrans($sql);
+            $sql="delete from despacho_new where cod_factura='".$_POST["factura"]."'";
+            $conn->ExecuteTrans($sql);
+            $sql="delete from kardex_almacen_detalle where id_transaccion = (select id_transaccion from kardex_almacen where nro_factura='".$_POST["factura"]."')";
+            $conn->ExecuteTrans($sql);
+            $sql="delete from kardex_almacen where nro_factura='".$_POST["factura"]."'";
+            $conn->ExecuteTrans($sql);
+            if ($conn->errorTransaccion == 1)
+            {    
+                echo "1";
+            }
+            elseif($conn->errorTransaccion == 0)
+            {
+                echo "-1";
+            }
+            $conn->CommitTrans($conn->errorTransaccion);
+            
+        break;
         case "ValidarOrdenUbicacion":
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT id FROM ubicacion  WHERE id_almacen = '" . $_GET["v2"] . "' and orden = '" . $_GET["v1"] . "'");
             echo (count($campos) == 0) ? "1" : "-1";
@@ -52,6 +73,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             echo (count($campos) == 0) ? "1" : "-1";
         break;
         case "EntradaNuevaAlmacen" :
+            
             //buscamos los datos básicos en calidad y a su vez nos aseguramos  que no se ha registrado en kardex almacen
             $sql=
             "
@@ -271,6 +293,25 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             //se procede a realizar el commit(quedaría pendiente realizar el pedido por entrada)
             //se comienza hacer la facturacion
             
+            //tipo cliente
+            $sql="select cod_tipo_cliente from clientes where id_cliente={$datospadre[0]['id_proveedor']}";
+            $tipocliente=$conn->ObtenerFilasBySqlSelect($sql);
+            if($tipocliente[0]['cod_tipo_cliente']==1)
+            {
+                //privada
+                $precio='precio1';
+            }
+            elseif ($tipocliente[0]['cod_tipo_cliente']==2) 
+            {
+                //publica
+                $precio='precio2';
+            }
+            else
+            {
+                //minpal
+                $precio='precio3';
+            }
+            
             //busco el id del movimiento cargo
             $sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion= 'Cargo'";
             $id_movimiento=$conn->ObtenerFilasBySqlSelect($sql);
@@ -282,18 +323,27 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             $codservicio[]="";
             $nombreservicio[]="";
             $contador=0;
+            $cobrar="";
+            //guardando los servicios
+            $cajas=json_decode($_POST['cajas']);
+            foreach($cajas as $key => $valueser)
+            {
+                $cobrar.="'".$valueser->value."', ";
+            }
+            $cobrar=substr($cobrar, 0, -2);
             foreach ($id_movimiento as $key => $idmovimiento)
             {
-                $sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$idmovimiento['id_tipo_movimiento_almacen'];
+                $sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$idmovimiento['id_tipo_movimiento_almacen']." and id_servicio in (".$cobrar.")";
                 $buscarservicios=$conn->ObtenerFilasBySqlSelect($sql);
                 foreach($buscarservicios as $key2 => $servicios)
                 {
-                    $sql="select id_item, cod_item, precio1, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                    
+                    $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
                     //echo $sql; exit();
                     $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
                     $iva[$contador] = $contarservicio[0]['iva'];
-                    $base[$contador] = $contarservicio[0]['precio1'];
-                    $total[$contador] = $contarservicio[0]['precio1']+(($contarservicio[0]['precio1']*$contarservicio[0]['iva']) / 100);
+                    $base[$contador] = $contarservicio[0][$precio];
+                    $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
                     $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
                     $idservicios[$contador]= $contarservicio[0]['id_item'];
                     $codservicio[$contador]= $contarservicio[0]['cod_item'];
@@ -307,24 +357,24 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             $buscarserviciosubicacion=$conn->ObtenerFilasBySqlSelect($sql);
             foreach($buscarserviciosubicacion as $key => $servicios)
             {
-                $sql="select id_item, cod_item, precio1, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
                 $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
                 $iva[$contador] = $contarservicio[0]['iva'];
-                $base[$contador] = $contarservicio[0]['precio1'];
-                $total[$contador] = $contarservicio[0]['precio1']+(($contarservicio[0]['precio1']*$contarservicio[0]['iva']) / 100);
+                $base[$contador] = $contarservicio[0][$precio];
+                $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
                 $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
                 $idservicios[$contador]= $contarservicio[0]['id_item'];
                 $codservicio[$contador]= $contarservicio[0]['cod_item'];
                 $contador++;
             }
             //ahora a realizar el cobro del seguro******
-            $sql="select id_item, cod_item, iva, descripcion1 from item where cod_item='P00000'";
+            $sql="select id_item, cod_item, iva, descripcion1 from item where precio1=-1";
             $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
             if($contarservicio!=null)
             {
                 $iva[$contador] = $contarservicio[0]['iva'];
-                $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.5); //$contarservicio[0]['precio1'];
-                $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.5) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.5)*$contarservicio[0]['iva']) / 100) ) ;
+                $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005); //$contarservicio[0]['precio1'];
+                $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005)*$contarservicio[0]['iva']) / 100) ) ;
                 $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
                 $idservicios[$contador]= $contarservicio[0]['id_item'];
                 $codservicio[$contador]= $contarservicio[0]['cod_item'];
@@ -774,6 +824,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                             <div style=" background-color:#f3ed8b; border-radius: 7px; padding:1px; margin-top:0.3%; margin-bottom: 10px; padding-bottom: 7px;margin-left: 10px; font-size: 13px;">
                             <table >
                                 <thead>
+                                    <th style="width:110px; font-weight: bold; text-align: center;">Factura</th>
                                     <th style="width:110px; font-weight: bold; text-align: center;">C&oacute;digo</th>
                                     <th style="width:150px; font-weight: bold;">Fecha Creación </th>
                                     
@@ -781,6 +832,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                                     <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
                                     <th style="width:110px; font-weight: bold; text-align: center;">Precio</th>
                                     <th style="width:110px; font-weight: bold; text-align: center;">Total</th>
+                                    <th style="width:110px; font-weight: bold; text-align: center;">Acci&oacute;n</th>
                                 </thead>
                             <tbody>
                 ';
@@ -790,12 +842,14 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 echo 
                 '
                     <tr>
+                        <td style="width:110px; text-align: right; padding-right:10px;">' . $item["nro_factura"] . '</td>
                         <td style="width:110px; text-align: right; padding-right:10px;">' . $item["codigo_barras"] . '</td>
                         <td style="width:150px; padding-left:10px;">' . $item["fecha_creacion"] . '</td>
                         <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
                         <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
                         <td style="text-align: right; padding-right:10px;">' . number_format($item['precio'], '2', ',', '.') . '</td>
                         <td style="text-align: right; padding-right:10px;">' . number_format(($item['cantidad_item']*$item['precio']), '2', ',', '.') . '</td>
+                        <td style="padding: 0px;" align="center"><img  src="../../libs/imagenes/delete.gif" title="Eliminar" alt="Eliminar" width="20" height="20" style="border-width: 0px;"  onclick=\'eliminar("'.$item["nro_factura"].'");\'/></td>
                     </tr>
                 ';
             }

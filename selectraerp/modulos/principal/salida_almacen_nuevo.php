@@ -7,6 +7,21 @@ $almacen = new Almacen();
 $pos = POS;
 
 $login = new Login();
+//servicios asociados al cargo
+$sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion='Descargo'";
+$id_movimiento=$almacen->ObtenerFilasBySqlSelect($sql);
+$sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$id_movimiento[0]['id_tipo_movimiento_almacen'];
+$buscarservicios=$almacen->ObtenerFilasBySqlSelect($sql);
+$checkbox="";
+foreach ($buscarservicios as $servicios) 
+{
+    $sql="select id_item, cod_item, precio1, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+    $contarservicio=$almacen->ObtenerFilasBySqlSelect($sql);
+    $checkbox[]=['id' => $contarservicio[0]['id_item'], 'nombre' => $contarservicio[0]['descripcion1'],];
+}
+//print_r($checkbox); exit();
+$smarty->assign("checkbox", $checkbox);
+//fin servicios
 $smarty->assign("nombre_usuario", $login->getNombreApellidoUSuario());
 
 $datos_almacen = $almacen->ObtenerFilasBySqlSelect("select * from almacen");
@@ -217,6 +232,25 @@ if (isset($_POST["input_cantidad_items"]))
                     ");
             }
             //se comienza a cobrar
+            
+            //tipo cliente
+            $sql="select cod_tipo_cliente from clientes where id_cliente={$_POST['cliente']}";
+            $tipocliente=$almacen->ObtenerFilasBySqlSelect($sql);
+            if($tipocliente[0]['cod_tipo_cliente']==1)
+            {
+                //privada
+                $precio='precio1';
+            }
+            elseif ($tipocliente[0]['cod_tipo_cliente']==2) 
+            {
+                //publica
+                $precio='precio2';
+            }
+            else
+            {
+                //minpal
+                $precio='precio3';
+            }
             //busco el id del movimiento cargo
             $sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion='Descargo'";
             $id_movimiento=$almacen->ObtenerFilasBySqlSelect($sql);
@@ -228,18 +262,25 @@ if (isset($_POST["input_cantidad_items"]))
             $codservicio[]="";
             $nombreservicio[]="";
             $contador=0;
+            $cobrar="";
+            $cajas=$_POST['cajas'];
+            foreach($cajas as $key => $valueser)
+            {
+                $cobrar.="'".$valueser."', ";
+            }
+            $cobrar=substr($cobrar, 0, -2);
             foreach ($id_movimiento as $key => $idmovimiento)
             {
-                $sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$idmovimiento['id_tipo_movimiento_almacen'];
+                $sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$idmovimiento['id_tipo_movimiento_almacen']." and id_servicio in (".$cobrar.")";
                 $buscarservicios=$almacen->ObtenerFilasBySqlSelect($sql);
                 foreach($buscarservicios as $key2 => $servicios)
                 {
-                    $sql="select id_item, cod_item, precio1, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                    $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
                     //echo $sql; exit();
                     $contarservicio=$almacen->ObtenerFilasBySqlSelect($sql);
                     $iva[$contador] = $contarservicio[0]['iva'];
-                    $base[$contador] = $contarservicio[0]['precio1'];
-                    $total[$contador] = $contarservicio[0]['precio1']+(($contarservicio[0]['precio1']*$contarservicio[0]['iva']) / 100);
+                    $base[$contador] = $contarservicio[0][$precio];
+                    $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
                     $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
                     $idservicios[$contador]= $contarservicio[0]['id_item'];
                     $codservicio[$contador]= $contarservicio[0]['cod_item'];

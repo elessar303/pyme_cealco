@@ -98,6 +98,7 @@
                     $( "#form-usuarios_nuevo").submit(function( event ) 
                     {
                         //se toman los valores
+                        var cajas = JSON.stringify($('[name="cajas[]"]').serializeArray());
                         var principal = $('#ubicacion_principal').val();
                         var detalle = $('#ubicacion_detalle').val();
                         var cantidad = $('#peso_unidad').val();
@@ -137,6 +138,7 @@
                         'cantidad' : cantidad,
                         'peso' : peso,
                         'ticket' : ticket,
+                        'cajas' : cajas,
                         
                       };
                         $.ajax(
@@ -275,6 +277,7 @@
                             </table>
                         </td>
                     </tr>
+                    
                     <thead>
                         <tr>
                             <th colspan="4" class="tb-head">&nbsp;</th>
@@ -332,6 +335,26 @@
                             <input type="text" name="ticket" placeholder="Ticket Entrada" size="60" id="ticket" class="form-text" value="{$id_ticket_entrada}" readonly="true" />
                         </td>
                     </tr>
+                    <tr>
+                        <td colspan="4" align="center">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="tb-head"><b>Servicios Asociados Al Movimiento</b></th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            {foreach key=key item=servicios from=$checkbox}
+                              
+                              <label><input type="checkbox" id="{$servicios.id}" name='cajas[]' value="{$servicios.id}" checked="checked"/>{$servicios.nombre}</label>&nbsp;
+
+                            {/foreach}
+                        </td>
+                    </tr>
                     <tr  style="text-align: center;">
                         <td align="center" style="padding-top:2px; padding-right: 2px;" colspan="4">
                             <input type="submit" name="aceptar" id="aceptar" value="Generar Paleta" class="form-text"/>
@@ -340,6 +363,7 @@
                             </div>
                         </td>
                     </tr>
+                    
                 </table>
             </div>
         </form>

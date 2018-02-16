@@ -6,6 +6,47 @@
         {include file="snippets/header_form.tpl"}
         <script type="text/javascript" src="../../libs/js/entrada_almacen_servicios.js"></script>
         <script language="JavaScript" type="text/javascript" src="../../libs/js/funciones.js"></script>
+        {literal}
+        <script type="text/javascript">//<![CDATA[
+            function eliminar( factura)
+            {
+                if(confirm("¿Esta seguro de querer eliminar la factura "+ factura + "?"))
+                {
+                    //ajax de eliminar factura
+                    $.ajax(
+                    {
+                        type: "POST",
+                        data: 'opt=EliminarFacturaPedido&'+'factura='+factura,
+                        url: '../../libs/php/ajax/ajax.php',
+                        dataType: "html",
+                        asynchronous: false, 
+                        error: function()
+                        {
+                            alert("error petici�n ajax");
+                        },
+                        success: function(data)
+                        {
+                            if(data==1)
+                            {
+                                alert("Factura Eliminada");
+                                location.reload();
+                            }
+                            else
+                            {
+                                alert("Error al Eliminar Factura, Consulte al Administrador");
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    return false;
+                }
+                
+            };
+        </script>
+        {/literal}
+        
     </head>
     <body>
         <form id="form-{$name_form}" name="form-{$name_form}" action="?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}" method="post">
