@@ -23,14 +23,88 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
     switch ($opt) {
 
         case "EliminarFacturaPedido":
-            $sql="delete from despacho_new_detalle where id_factura = (select id_factura from despacho_new where cod_factura='".$_POST["factura"]."')";
+            $sql="delete from despacho_new_detalle where id_detalle_factura = '".$_POST["id"]."'";
             $conn->BeginTrans();
             $conn->ExecuteTrans($sql);
-            $sql="delete from despacho_new where cod_factura='".$_POST["factura"]."'";
-            $conn->ExecuteTrans($sql);
-            $sql="delete from kardex_almacen_detalle where id_transaccion = (select id_transaccion from kardex_almacen where nro_factura='".$_POST["factura"]."')";
-            $conn->ExecuteTrans($sql);
-            $sql="delete from kardex_almacen where nro_factura='".$_POST["factura"]."'";
+            //$sql="delete from despacho_new where cod_factura='".$_POST["factura"]."'";
+            //$conn->ExecuteTrans($sql);
+            //$sql="delete from kardex_almacen_detalle where id_transaccion = (select id_transaccion from kardex_almacen where nro_factura='".$_POST["factura"]."')";
+            //$conn->ExecuteTrans($sql);
+            //$sql="delete from kardex_almacen where nro_factura='".$_POST["factura"]."'";*/
+            //$sql="delete from kardex_almacen_detalle where id_transaccion_detalle=".$_POST["id"];
+            //$conn->ExecuteTrans($sql);
+            //verificamos si quedan detalles de no se asi se elimina los maestros
+            $sql="select * from despacho_new  as a inner join despacho_new_detalle as b on a.id_factura=b.id_factura where cod_factura='".$_POST["factura"]."'";
+            $total=$conn->ObtenerFilasBySqlSelect($sql);
+            if(count($total)>0)
+            {
+                $iva=0;
+                $subtotal=0;
+                $totaltotal=0;
+                $itemstotal=0;
+                
+                foreach($total as $key => $value)
+                {
+                    
+                    $ivatotal+=($value['_item_piva']*$value['_item_preciosiniva'])/100;
+                    $subtotal+=$value['_item_preciosiniva'];
+                    $totaltotal+=$value['_item_preciosiniva']+(($value['_item_piva']*$value['_item_preciosiniva'])/100);
+                    $itemstotal++;
+                    
+                }
+                
+                $sql = "update `despacho_new` set 
+                `subtotal` = ". $subtotal . ", `descuentosItemFactura`= 0,`montoItemsFactura`=" . $subtotal . ",
+                `ivaTotalFactura`= ". $ivatotal . ", `TotalTotalFactura` = " . $totaltotal . ", `cantidad_items` = ".$itemstotal.",
+                `totalizar_sub_total` =".$subtotal.",`totalizar_descuento_parcial`=0,`totalizar_total_operacion`= ".$totaltotal.",
+                `totalizar_pdescuento_global`= 0,`totalizar_descuento_global`= 0,
+                `totalizar_base_imponible`= ".$subtotal.",`totalizar_monto_iva`=".$ivatotal.",
+                `totalizar_total_general`=".$totaltotal.",`totalizar_total_retencion`=0
+                where cod_factura='".$_POST["factura"]."'
+                ";
+                $conn->ExecuteTrans($sql);
+                
+                //eliminamos los hijos del kardex maestro
+                $sql="delete from kardex_almacen_detalle where id_transaccion=(select id_transaccion from kardex_almacen where nro_factura='".$_POST['factura']."')";
+                $conn->ExecuteTrans($sql);
+                //obtenemos el id del maestro
+                $sql="select * from kardex_almacen where nro_factura='".$_POST['factura']."'";
+                $datospadre=$conn->ObtenerFilasBySqlSelect($sql);
+                foreach($total as $key => $value2)
+                {
+                    $sql = "
+                    INSERT INTO kardex_almacen_detalle (
+                    `id_transaccion_detalle` ,
+                    `id_transaccion` ,
+                    `id_almacen_entrada` ,
+                    `id_almacen_salida` ,
+                    `id_item` ,
+                    `precio` ,
+                    `cantidad`
+                    )
+                    VALUES (
+                    NULL ,
+                    '" . $datospadre[0]['id_transaccion'] . "',
+                    '',
+                    '1',
+                    '" . $value2['id_item'] . "',
+                    '" . $value2['_item_preciosiniva'] . "',
+                    1
+                    );";
+                    $conn->ExecuteTrans($sql);
+                }
+           
+                
+            }
+            else
+            {   //se elimina toda la factura
+                $sql="delete from despacho_new where cod_factura='".$_POST["factura"]."'";
+                $conn->ExecuteTrans($sql);
+                $sql="delete from kardex_almacen_detalle where id_transaccion=(select id_transaccion from kardex_almacen where nro_factura='".$_POST['factura']."')";
+                $conn->ExecuteTrans($sql);
+                $sql="delete from kardex_almacen where nro_factura='".$_POST["factura"]."'";
+                $conn->ExecuteTrans($sql);
+            }
             $conn->ExecuteTrans($sql);
             if ($conn->errorTransaccion == 1)
             {    
@@ -792,11 +866,13 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
             if ($_GET["id_tipo_movimiento_almacen"] == '8')
             {
-                $operacion = "Salida";
-                $sql="SELECT *,kad.cantidad as cantidad_item, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, kad.precio, DATE_FORMAT(k.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
+                /*
+                $sql="SELECT *,kad.cantidad as cantidad_item, b.id_detalle_factura as id_detalle_f, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, kad.precio, DATE_FORMAT(k.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
                 FROM kardex_almacen_detalle AS kad
                 join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
                 Inner Join clientes as cli on k.id_cliente=cli.id_cliente
+                INNER JOIN despacho_new as a on a.cod_factura=k.nro_factura
+                INNER JOIN despacho_new_detalle as b on a.id_factura=b.id_factura
                 LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
                 LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id
                 LEFT JOIN item AS ite ON kad.id_item=ite.id_item
@@ -806,7 +882,26 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 cli.id_cliente='".$_GET['id_cliente']."' 
                 and 
                 k.estado='".$_GET['estatus']."'
-                order by k.fecha_creacion, kad.id_transaccion asc
+                order by k.fecha_creacion, kad.id_transaccion asc 
+                ";
+                */
+                $operacion = "Salida";
+                $sql="SELECT *,a.cantidad_items as cantidad_item, b.id_detalle_factura as id_detalle_f, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, b._item_totalsiniva as precio, DATE_FORMAT(k.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
+                FROM despacho_new as a
+                INNER JOIN despacho_new_detalle as b on a.id_factura=b.id_factura
+                Inner Join clientes as cli on a.id_cliente=cli.id_cliente
+                INNER JOIN kardex_almacen as k on a.cod_factura=k.nro_factura
+                
+                LEFT JOIN almacen AS alm ON b._item_almacen=alm.cod_almacen
+                LEFT JOIN ubicacion AS ubi ON b._item_almacen=ubi.id
+                LEFT JOIN item AS ite ON b.id_item=ite.id_item
+                LEFT JOIN marca m ON m.id = ite.id_marca
+                LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+                WHERE 
+                cli.id_cliente='".$_GET['id_cliente']."' 
+                and 
+                k.estado='".$_GET['estatus']."'
+                order by k.fecha_creacion, b.id_detalle_factura asc 
                 ";
                 //echo $sql; exit();
                 $campos = $conn->ObtenerFilasBySqlSelect($sql);
@@ -848,8 +943,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                         <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
                         <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
                         <td style="text-align: right; padding-right:10px;">' . number_format($item['precio'], '2', ',', '.') . '</td>
-                        <td style="text-align: right; padding-right:10px;">' . number_format(($item['cantidad_item']*$item['precio']), '2', ',', '.') . '</td>
-                        <td style="padding: 0px;" align="center"><img  src="../../libs/imagenes/delete.gif" title="Eliminar" alt="Eliminar" width="20" height="20" style="border-width: 0px;"  onclick=\'eliminar("'.$item["nro_factura"].'");\'/></td>
+                        <td style="text-align: right; padding-right:10px;">' . number_format(($item['_item_totalconiva']), '2', ',', '.') . '</td>
+                        <td style="padding: 0px;" align="center"><img  src="../../libs/imagenes/delete.gif" title="Eliminar" alt="Eliminar" width="20" height="20" style="border-width: 0px;"  onclick=\'eliminar("'.$item["nro_factura"].'", '.$item["id_detalle_f"].' );\'/></td>
                     </tr>
                 ';
             }

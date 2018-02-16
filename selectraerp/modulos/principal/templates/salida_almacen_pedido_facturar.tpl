@@ -8,15 +8,15 @@
         <script language="JavaScript" type="text/javascript" src="../../libs/js/funciones.js"></script>
         {literal}
         <script type="text/javascript">//<![CDATA[
-            function eliminar( factura)
+            function eliminar( factura, id)
             {
-                if(confirm("¿Esta seguro de querer eliminar la factura "+ factura + "?"))
+                if(confirm("¿Esta seguro de querer eliminar la factura "+ factura + " de id " + id + "?"))
                 {
                     //ajax de eliminar factura
                     $.ajax(
                     {
                         type: "POST",
-                        data: 'opt=EliminarFacturaPedido&'+'factura='+factura,
+                        data: 'opt=EliminarFacturaPedido&'+'factura='+factura+'&id='+id,
                         url: '../../libs/php/ajax/ajax.php',
                         dataType: "html",
                         asynchronous: false, 
@@ -29,7 +29,7 @@
                             if(data==1)
                             {
                                 alert("Factura Eliminada");
-                                location.reload();
+                               // location.reload();
                             }
                             else
                             {
