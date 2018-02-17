@@ -1,0 +1,16 @@
+UPDATE  `pyme_prueba_standar_cealco`.`modulos` SET  `nom_menu` =  'Subir catalogo de sede' WHERE  `modulos`.`cod_modulo` =221;
+UPDATE  `pyme_prueba_standar_cealco`.`modulos` SET  `nom_menu` =  'Pre - Entrada Productos' WHERE  `modulos`.`cod_modulo` =226;
+UPDATE  `pyme_prueba_standar_cealco`.`modulos` SET  `visible` =  '0' WHERE  `modulos`.`cod_modulo` =228;
+UPDATE  `pyme_prueba_standar_cealco`.`modulos` SET  `visible` =  '0' WHERE  `modulos`.`cod_modulo` =227
+UPDATE  `pyme_prueba_standar_cealco`.`tipo_cliente` SET  `cod_tipo_cliente` =  '1' WHERE  `tipo_cliente`.`cod_tipo_cliente` =0;
+//posible basura
+DELETE FROM  `pyme_prueba_standar_cealco`.`movimiento_almacen_servicio` WHERE  `movimiento_almacen_servicio`.`id` =1 LIMIT 1 ; ;
+
+DELETE FROM  `pyme_prueba_standar_cealco`.`movimiento_almacen_servicio` WHERE  `movimiento_almacen_servicio`.`id` =2 LIMIT 1 ; ;
+
+DELETE FROM  `pyme_prueba_standar_cealco`.`movimiento_almacen_servicio` WHERE  `movimiento_almacen_servicio`.`id` =3 LIMIT 1 ; ;
+
+DELETE FROM  `pyme_prueba_standar_cealco`.`movimiento_almacen_servicio` WHERE  `movimiento_almacen_servicio`.`id` =4 LIMIT 1 ; ;
+UPDATE  `pyme_prueba_standar_cealco`.`ubicacion` SET  `ocupado` =  '0' WHERE  `ubicacion`.`id` =37;
+UPDATE  `pyme_prueba_standar_cealco`.`ubicacion` SET  `ocupado` =  '0' WHERE  `ubicacion`.`id` =1;
+

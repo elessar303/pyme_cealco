@@ -291,7 +291,7 @@ if (isset($_POST["input_cantidad_items"]))
             //echo $sql; exit();
         }
         //fin del cobro de movimiento, ahora se cobra la ubicacion 
-        $sql="select id_servicio from ubicacion_servicio where id_ubicacion in ('".$_POST['ubicacion_entrada']."', '".$_POST['_ubicacion'][$i]."')";
+        $sql="select id_servicio from ubicacion_servicio where id_ubicacion in ('".$_POST['ubicacion_entrada']."')";
         $buscarserviciosubicacion=$almacen->ObtenerFilasBySqlSelect($sql);
         foreach($buscarserviciosubicacion as $key => $servicios)
         {
@@ -389,7 +389,7 @@ if (isset($_POST["input_cantidad_items"]))
                 `fecha_creacion`, `_item_almacen`
                 )
                 VALUES (
-                '{$id_facturaTrans}', '{$codservicio[$ii]}',
+                '{$id_facturaTrans}', '{$idservicios[$ii]}',
                 '{$descripcion}', '1', '{$base[$ii]}',
                 0, 0, '{$iva[$ii]}',
                 '{$base[$ii]}', '{$total[$ii]}', '{$login->getUsuario()}',

@@ -373,7 +373,7 @@ if (isset($_POST["input_cantidad_items"]))
                     `fecha_creacion`, `_item_almacen`
                     )
                     VALUES (
-                    '{$id_facturaTrans}', '{$codservicio[$ii]}',
+                    '{$id_facturaTrans}', '{$idservicios[$ii]}',
                     '{$descripcion}', '1', '{$base[$ii]}',
                     0, 0, '{$iva[$ii]}',
                     '{$base[$ii]}', '{$total[$ii]}', '{$usuario}',

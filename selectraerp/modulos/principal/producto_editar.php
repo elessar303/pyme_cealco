@@ -235,10 +235,10 @@ if (isset($_POST["aceptar"]))
     $i = 1;
     $codigo = $_POST['id' . $i];
 
-    $query = "DELETE FROM productos_kit
-    WHERE id_item_padre = (SELECT id_item FROM item WHERE cod_item = '{$_POST['cod_item']}');";
+    //$query = "DELETE FROM productos_kit
+    //WHERE id_item_padre = (SELECT id_item FROM item WHERE cod_item = '{$_POST['cod_item']}');";
 
-    $productos->ExecuteTrans($query);
+    //$productos->ExecuteTrans($query);
 
     while ($codigo != '') {
 

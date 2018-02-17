@@ -29,7 +29,7 @@
                             if(data==1)
                             {
                                 alert("Factura Eliminada");
-                               // location.reload();
+                                location.reload();
                             }
                             else
                             {
