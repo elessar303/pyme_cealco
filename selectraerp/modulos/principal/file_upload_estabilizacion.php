@@ -153,7 +153,8 @@ if(!empty($_FILES['archivo_productos']))
     UPDATE item SET unidad_venta='1' where unidad_venta='' or unidad_venta='Unidad';
     UPDATE item SET id_marca=1 WHERE id_marca=0 or id_marca='';
     UPDATE item SET cantidad_bulto=1 WHERE cantidad_bulto=0;
-    UPDATE item SET kilos_bulto=1 WHERE kilos_bulto=0";
+    UPDATE item SET kilos_bulto=1 WHERE kilos_bulto=0;
+    UPDATE item SET unidad_paleta=950;";
     $comunes->Execute2($sql_arreglar_productos);
 
     unlink($path_local.$nombre);
