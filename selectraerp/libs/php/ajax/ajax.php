@@ -369,11 +369,13 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             
             //tipo cliente
             $sql="select cod_tipo_cliente from clientes where id_cliente={$datospadre[0]['id_proveedor']}";
+            $clienteseguro=0;
             $tipocliente=$conn->ObtenerFilasBySqlSelect($sql);
             if($tipocliente[0]['cod_tipo_cliente']==1)
             {
                 //privada
                 $precio='precio1';
+                $clienteseguro=1;
             }
             elseif ($tipocliente[0]['cod_tipo_cliente']==2) 
             {
@@ -444,15 +446,31 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             //ahora a realizar el cobro del seguro******
             $sql="select id_item, cod_item, iva, descripcion1 from item where precio1=-1";
             $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
-            if($contarservicio!=null)
+            if($clienteseguro==0)
             {
-                $iva[$contador] = $contarservicio[0]['iva'];
-                $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005); //$contarservicio[0]['precio1'];
-                $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005)*$contarservicio[0]['iva']) / 100) ) ;
-                $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
-                $idservicios[$contador]= $contarservicio[0]['id_item'];
-                $codservicio[$contador]= $contarservicio[0]['cod_item'];
-                $contador++;
+                if($contarservicio!=null)
+                {
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005); //$contarservicio[0]['precio1'];
+                    $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005)*$contarservicio[0]['iva']) / 100) ) ;
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
+            }
+            else
+            {
+                if($contarservicio!=null)
+                {
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.0075); //$contarservicio[0]['precio1'];
+                    $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.0075) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.0075)*$contarservicio[0]['iva']) / 100) ) ;
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
             }
             //se comienza hacer el pedido por la entrada.
             //obtener correlativo:
