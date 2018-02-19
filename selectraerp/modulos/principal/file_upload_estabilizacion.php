@@ -137,7 +137,7 @@ if(!empty($_FILES['archivo_productos']))
     $comunes->Execute2("TRUNCATE TABLE `clientes`");
     foreach ($data['proveedores'] as $cliente=>$value)
     {
-        $sql="INSERT INTO `clientes`(`id_cliente`, `cod_cliente`, `nombre`, `direccion`, `telefonos`, `fax`, `email`, `rif`, `estado`) VALUES ('".$value['id_proveedor']."', '".$value['cod_proveedor']."', '".$value['descripcion']."', '".$value['direccion']."', '".$value['telefonos']."', '".$value['fax']."', '".$value['email']."', '".$value['rif']."', 'A')";
+        $sql="INSERT INTO `clientes`(`id_cliente`, `cod_cliente`, `nombre`, `direccion`, `telefonos`, `fax`, `email`, `rif`, `estado`, `cod_tipo_cliente`) VALUES ('".$value['id_proveedor']."', '".$value['cod_proveedor']."', '".$value['descripcion']."', '".$value['direccion']."', '".$value['telefonos']."', '".$value['fax']."', '".$value['email']."', '".$value['rif']."', 'A',  '".$value['clase_proveedor']."')";
         $comunes->Execute2($sql);
     }
 
