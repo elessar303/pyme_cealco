@@ -1,0 +1,2 @@
+ALTER TABLE `kardex_almacen_detalle` ADD `observacion_limite` VARCHAR( 255 ) CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'Observación de cuando la cantidad limite no concuerda y debe cortarse o aumentarse';
+ALTER TABLE `kardex_almacen` ADD `cierre_entrada` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'indica si se termino las entradas';
