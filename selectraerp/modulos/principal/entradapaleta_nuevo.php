@@ -50,6 +50,7 @@ if($datos==null)
     $total=$usuarios->ObtenerFilasBySqlSelect($sql);
     //total peso es 0
     $smarty->assign("totalpeso", 0);
+    $smarty->assign("visiblecerrar", 0);
     $smarty->assign("total", $total[0]['cantidad']);
     $smarty->assign("paleta", $total[0]['unidad_paleta']);
     $smarty->assign("nombre_producto", $total[0]['nombre_producto']);
@@ -60,6 +61,18 @@ if($datos==null)
 }
 else
 {
+    if($datos[0]['cierre_entrada']==1)
+    {
+        //no debe verse nada
+        $smarty->assign("visiblecerrar", 2);
+        
+    }
+    else
+    {
+        //debe verse el boton cerrar entrada
+        $smarty->assign("visiblecerrar", 1);
+    }
+    
     //buscar el peso total ingresado al almacen
     $sql=
     "
@@ -173,6 +186,7 @@ else
 }
 $modulos = $usuarios->ObtenerFilasBySqlSelect("SELECT cod_modulo, nom_menu FROM modulos WHERE cod_modulo_padre IS NULL AND visible = 1 AND cod_modulo != 54 ORDER BY orden");
 $smarty->assign("modulos", $modulos);
+
 //agregando almacenes
 $almacenes= $usuarios->ObtenerFilasBySqlSelect("select * from almacen");
 foreach ($almacenes as $key => $item) 

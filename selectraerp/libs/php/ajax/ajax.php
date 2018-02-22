@@ -22,6 +22,29 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "CerrarEntrada" :
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM kardex_almacen  WHERE id_transaccion_calidad = '" . $_GET["v1"] . "'");
+            if($campos!=null)
+            {
+                $sql="update kardex_almacen set cierre_entrada=1 where id_transaccion='".$campos[0]['id_transaccion']."'";
+                $conn->BeginTrans();
+                $conn->ExecuteTrans($sql);
+                if ($conn->errorTransaccion == 1)
+                {    
+                    echo "1";
+                }
+                elseif($conn->errorTransaccion == 0)
+                {
+                    echo "-1";
+                }
+                
+                $conn->CommitTrans($conn->errorTransaccion);
+            }
+            else
+            {
+                echo "-1";
+            }
+        break;
         case "EliminarFacturaPedido":
             $sql="delete from despacho_new_detalle where id_detalle_factura = '".$_POST["id"]."'";
             $conn->BeginTrans();
@@ -198,11 +221,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     "
                         INSERT INTO kardex_almacen_detalle (
                         `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`)
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `observacion_limite`)
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
                         '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
-                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .");
+                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .", '{$_POST["observacion_limite"]}');
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
                     //actualizo correlativo
@@ -301,11 +324,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 "
                     INSERT INTO kardex_almacen_detalle (
                     `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`)
+                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `observacion_limite`)
                     VALUES (
                     NULL, '{$id_transaccion}', '{$_POST["ubicacion_principal"]}',
                     '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
-                    '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}');
+                    '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}', '{$_POST["observacion_limite"]}');
                 ";
                 $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
                 //actualizo correlativo

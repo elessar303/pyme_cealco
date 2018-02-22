@@ -43,6 +43,40 @@
                $(document).ready(function()
                {
                     
+                    $("#cerrar").click(function()
+                    {
+                        
+                        if(confirm("¿Esta seguro de querer cerrar la entrada?"))
+                        {
+                            valor = $('#movimiento').val();
+                            $.ajax(
+                            {
+                                type: "GET",
+                                url:  "../../libs/php/ajax/ajax.php",
+                                data: "opt=CerrarEntrada&v1="+valor,
+                                success: function(data)
+                                {
+                                    resultado = data
+                                    if(resultado=="1")
+                                    {
+                                        alert("Se ha cerrado la entrada");
+                                        location.reload();
+                                        
+                                    }
+                                    else
+                                    {
+                                        alert("Error al intentar cerrar la entrada, consulte al administrador");
+                                    }
+                                    
+                                }
+                            });
+                        }
+                        else
+                        {
+                            return false;
+                        }
+                    });
+                    //fin de cerrar la entrada
                     if($("#ticketestatus").val()==1)
                     {                    
                         $("#ticket").keyup(function()
@@ -128,6 +162,14 @@
                         {
                             event.preventDefault();
                         }
+                        if(document.getElementById('observacion_limite_1').style.display!='none')
+                        {
+                            observacion_limite= $.trim($('#observacion_limite').val());
+                        }
+                        else
+                        {
+                            observacion_limite=null;
+                        }
                         
                         parametros=
                       {
@@ -139,6 +181,7 @@
                         'peso' : peso,
                         'ticket' : ticket,
                         'cajas' : cajas,
+                        'observacion_limite' : observacion_limite,
                         
                       };
                         $.ajax(
@@ -166,7 +209,6 @@
                             }
                         }); 
                         //fin ajax
-                        
                     });
                     
                     
@@ -205,16 +247,25 @@
                         valor = parseFloat($(this).val());
                         if(isNaN(valor))
                         {
-                            Ext.Msg.alert("Alerta","El Peso Unidad debe ser un número válido");
+                            Ext.Msg.alert("Alerta","La Unidad debe ser un número válido");
                             $(this).val("");
                             return false;
                         }
                         valortotal = $('#valortotal').val();
                         if(valor > valortotal)
                         {
-                            Ext.Msg.alert("Alerta","El producto no debe superar el limite total");
-                            $(this).val(0);
-                            return false;
+                            if(confirm("Esta Superando el limite total de unidad, ¿esta seguro de querer realizar la operación?"))
+                            {
+                                alert("Por favor ingrese La observación");
+                                $("#observacion_limite_1").removeAttr("style");
+                                $("#observacion_limite").focus();
+                            }
+                            else
+                            {
+                                Ext.Msg.alert("Alerta","El producto no debe superar el limite total");
+                                $(this).val(0);
+                                return false;    
+                            }
                         }
                     });
                     $("#peso").keyup(function()
@@ -277,7 +328,7 @@
                             </table>
                         </td>
                     </tr>
-                    
+                    {if $visiblecerrar neq 2}
                     <thead>
                         <tr>
                             <th colspan="4" class="tb-head">&nbsp;</th>
@@ -335,6 +386,14 @@
                             <input type="text" name="ticket" placeholder="Ticket Entrada" size="60" id="ticket" class="form-text" value="{$id_ticket_entrada}" readonly="true" />
                         </td>
                     </tr>
+                    <tr id="observacion_limite_1"  style="display : none;">
+                        <td colspan="3" class="label">
+                            Observación Límite **
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="text" name="observacion_limite" placeholder="Observacion" size="60" id="observacion_limite" class="form-text"/>
+                        </td>
+                    </tr>
                     <tr>
                         <td colspan="4" align="center">
                             <table>
@@ -357,16 +416,20 @@
                     </tr>
                     <tr  style="text-align: center;">
                         <td align="center" style="padding-top:2px; padding-right: 2px;" colspan="4">
+                            {if $visiblecerrar eq 1}
+                            <input type="button" name="cerrar" id="cerrar" value="Cerrar Entrada" class="form-text"/>
+                            {/if}
                             <input type="submit" name="aceptar" id="aceptar" value="Generar Paleta" class="form-text"/>
                             <div id="notificacionticket">
                                 
                             </div>
                         </td>
                     </tr>
-                    
+                {/if}            
                 </table>
             </div>
         </form>
+        
         <div id='gridpaletas' align="center" style='text-align: cemter'>
             
             <table width=100%; align='center' border="1">
