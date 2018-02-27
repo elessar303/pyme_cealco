@@ -52,9 +52,9 @@ class PDF extends FPDFSelectra {
 
         //$rs = query("SELECT * FROM item i, item_existencia_almacen a WHERE i.id_item = a.id_item AND cod_item_forma = 1 AND a.cantidad>0;",$conexion);
         // $rs = query("SELECT * FROM item i, item_existencia_almacen a WHERE i.id_item = a.id_item AND cod_item_forma = 1 AND a.cantidad>0 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' ORDER BY descripcion1;", $conexion);
-       $rs = query("select v.*,i.precio1,  i.codigo_barras, i.iva, pro.descripcion as nombre_proveedor FROM vw_existenciabyalmacen v, item i, proveedores pro
+       $rs = query("select v.*,i.precio1,  i.codigo_barras, i.iva, pro.nombre as nombre_proveedor FROM vw_existenciabyalmacen v, item i, clientes pro
         where i.id_item=v.id_item 
-        AND v.id_proveedor=pro.id_proveedor
+        AND v.id_proveedor=pro.id_cliente
         AND v.cantidad>0 AND i.cod_departamento = '" . $dpto["cod_departamento"] . "' 
         AND ubicacion!='PISO DE VENTA' 
         GROUP BY i.codigo_barras, ubicacion, lote
