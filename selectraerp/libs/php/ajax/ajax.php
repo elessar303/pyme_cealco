@@ -6900,7 +6900,14 @@ order by mb.cod_movimiento_ban";
              *
              */
             $tipo_item = (isset($_POST["cmb_tipo_item"])) ? $_POST["cmb_tipo_item"] : 1;
-				
+			if(isset($_POST["codigoProducto"]))
+			{
+			    $campos = $conn->ObtenerFilasBySqlSelect("SELECT cod_item_forma FROM item  WHERE id_item = '" . $_POST["codigoProducto"]. "'");
+                if($campos!=null && $campos[0]['cod_item_forma']!=null)
+                {
+                    $tipo_item=$campos[0]['cod_item_forma'];
+                }
+			}
             $busqueda = (isset($_POST["BuscarBy"])) ? $_POST["BuscarBy"] : "";
             $limit = (isset($_POST["limit"])) ? $_POST["limit"] : 10;
             $start = (isset($_POST["start"])) ? $_POST["start"] : 0;
@@ -6962,7 +6969,7 @@ order by mb.cod_movimiento_ban";
 
                     $andWHERE = " and ";
                     if ($codigo != "") {
-                        $andWHERE .= " upper(cod_item) = upper('" . $codigo . "')";
+                        $andWHERE .= " (upper(cod_item) = upper('" . $codigo . "') or id_item  = '".$codigo."') ";
                     }
                     if ($descripcion != "") {
                         if ($codigo != "") {
@@ -6980,6 +6987,7 @@ order by mb.cod_movimiento_ban";
                 $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
 					
                 $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item . " " . $andWHERE . " limit $start,$limit";
+                //echo $sql; exit();
                 $campos_comunes = $conn->ObtenerFilasBySqlSelect($sql);
             } else {
                 $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item;
