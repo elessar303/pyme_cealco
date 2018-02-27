@@ -157,7 +157,7 @@ class FPDFSelectra extends FPDF {
         $this->SetLeftMargin(15);
         $this->SetFont("Arial", "B", 8);
         #$this->Image($var_imagen_izq, 10, 8, 33);
-        $this->Image($var_imagen_der ? $var_imagen_der : $var_imagen_izq, 10, 8, 50, 20);
+        //$this->Image($var_imagen_der ? $var_imagen_der : $var_imagen_izq, 10, 8, 50, 20);
         #$this->Cell(45);
         $this->Cell(0, 0, utf8_decode($var_nomemp), 0, 0, "C");
         //$this->Image($var_imagen_der,170,15,33);
