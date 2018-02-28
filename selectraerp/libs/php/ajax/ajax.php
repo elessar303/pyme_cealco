@@ -6983,7 +6983,7 @@ order by mb.cod_movimiento_ban";
                         $andWHERE = "";
                     }
                 }
-					
+				//echo $sql; exit();
                 $campos_comunes1 = $conn->ObtenerFilasBySqlSelect($sql);
 					
                 $sql = "SELECT * FROM item i WHERE cod_item_forma = " . $tipo_item . " " . $andWHERE . " limit $start,$limit";

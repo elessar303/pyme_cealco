@@ -412,7 +412,7 @@ $(function(){
         campos += $.inputHidden("_totalft3",totalft3,"[]");
 
         //alert(campos);return false;
-        if (data.productoSeleccionado.cod_item_forma == 1) { // Si es un Producto
+        if (data.productoSeleccionado.cod_item_forma == 1 ) { // Si es un Producto
             $.ajax({
                 type: "GET",
                 url:  "../../libs/php/ajax/ajax.php",
@@ -481,27 +481,37 @@ $(function(){
 
                 }
             });
-        }else{
+        }else{ 
             //total=parseFloat(totalsiniva)+parseFloat(piva);
             campos += '<input type="hidden" name="_pitem_almacen" value="">';
             campos += '<input type="hidden" name="_idpitem_almacen" value="">';
 
-            html  = "<tr>";
-            html += "<td title=\"Haga click aqu&iacute; para ver detalles\" class=\"info_detalle\" style=\"cursor:pointer;background-color:#507e95;color:white;\"><a class=\"codigo\" rel=\"facebox\" style=\"color:white; text-align: center;\" href=\"#info\">"+producto+"</a><input type='hidden' name='idItem_' value='"+codigo+"'/></td>";
-            html += "<td style='text-align: left;' class=\"filter-column\" style=\"width:auto;\">"+descripcion+"</td>";
-            html += "<td style='text-align: right; padding-right: 20px;' rel='"+cantidad+"'>"+cantidad+"</td>";
-            html += "<td style='text-align: right; padding-right: 20px;'>"+parseFloat(preciosiniva).toFixed(3)+"</td>";
-            html += "<td style='text-align: right; padding-right: 20px;'>"+parseFloat(descuento).toFixed(3)+"</td>";//antes solo descuento
-            html += "<td style='text-align: right; padding-right: 20px;'>"+parseFloat(montodescuento).toFixed(3)+"</td>";//antes solo montodescuento
-            html += "<td style='text-align: right; padding-right: 20px;' class='totalsiniva'>"+parseFloat(totalsiniva).toFixed(3)+"</td>";
-            html += "<td style='text-align: right; padding-right: 20px;' title='"+$("#moneda").val()+" "+parseFloat(piva).toFixed(3)+"'>"+parseFloat(iva).toFixed(3)+"</td>";
-            html += "<td style='text-align: right; padding-right: 20px;' class='piva' rel='"+parseFloat(piva).toFixed(3)+"'>"+totalconiva.toFixed(3)+"</td>";
-            //html += "<td style='text-align: center;'><img style=\"cursor: pointer;\" class=\"eliminar\" title=\"Eliminar Item\" src=\"../../libs/imagenes/delete.png\">"+campos+"</td>";
-             html += "<td style='text-align: center;' class=\"eliminar_precomp\"><input type='hidden' name='idItem1_' value='"+codigo+"'/><input type='hidden' name='cod_pre' value='"+ContarInputItem+"'/><img style=\"cursor: pointer;\" class=\"eliminar\"  title=\"Eliminar Item\" src=\"../../libs/imagenes/delete.png\">"+campos+"</td>";
-            html += "</tr>";
-            $(".grid table.lista tbody").append(html);
-            $("#MostrarTabla").trigger("click");
-            fn_cantidad();
+           html  = "<tr>";
+                    html += "<td><img src=\"../../imagenes/"+foto+"\" width=\"50\" align=\"absmiddle\" height=\"50\"/></td>";
+                    html += "<td title=\"Haga click aqu&iacute; para ver detalles\" class=\"info_detalle\" style=\"cursor:pointer;background-color:#507e95;color:white;\"><a class=\"codigo\" rel=\"facebox\" style=\"color:white; text-align: center;\" href=\"#info\">"+producto+"</a><input type='hidden' name='idItem_' value='"+codigo+"'/></td>";
+                    html += "<td style='text-align: left;' class=\"filter-column\" style=\"width:auto;\">"+descripcion+"</td>";
+                    
+                    html += "<td style='text-align: left;' class=\"filter-column\" style=\"width:auto;\">"+unidad_empaque_descripcion+"</td>";
+                    html += "<td style='text-align: left;' class=\"filter-column\" style=\"width:auto;\">"+cantidad_bulto+"</td>";
+                    html += "<td style='text-align: left;' class=\"filter-column\" style=\"width:auto;\">"+porcentaje_ganancia+"</td>";
+
+                    html += "<td style='text-align: right; padding-right: 20px;' class='cantidad' rel='"+cantidad+"'>"+cantidad+"</td>";
+
+                    html += "<td style='text-align: right; padding-right: 20px;' class='cantidad_bultos_totales' rel='"+cantidad_bultos_totales+"'>"+cantidad_bultos_totales+"</td>";
+
+                    html += "<td style='text-align: right; padding-right: 20px;' class='preciosiniva'>"+parseFloat(preciosiniva).toFixed(3)+"</td>";
+                    html += "<td style='text-align: right; padding-right: 20px;' class='montodescuento'>"+parseFloat(montodescuento).toFixed(3)+"</td>";
+                    html += "<td style='text-align: right; padding-right: 20px;'>"+parseFloat(descuento_).toFixed(3)+"</td>";
+                    html += "<td style='text-align: right; padding-right: 20px;' class='totalsiniva'>"+parseFloat(totalsiniva).toFixed(3)+"</td>";
+                    html += "<td style='text-align: right; padding-right: 20px;' title='"+$("#moneda").val()+" "+piva.toFixed(3)+"'>"+parseFloat(iva).toFixed(3)+"</td>";
+                    html += "<td style='text-align: right; padding-right: 20px;' class='piva' rel='"+parseFloat(piva).toFixed(3)+"'>"+totalconiva.toFixed(3)+"</td>";
+                    //html += "<td style='text-align: center;'><img style=\"cursor: pointer;\" class=\"eliminar\"  title=\"Eliminar Item\" src=\"../../libs/imagenes/delete.png\">"+campos+"</td>";
+                     html += "<td style='text-align: center;' class=\"eliminar_precomp\"><input type='hidden' name='idItem1_' value='"+codigo+"'/><input type='hidden' name='cod_pre' value='"+ContarInputItem+"'/><img style=\"cursor: pointer;\" class=\"eliminar\"  title=\"Eliminar Item\" src=\"../../libs/imagenes/delete.png\">"+campos+"</td>";
+                    html += "</tr>";
+                    $(".grid table.lista tbody").append(html);
+                    $("#MostrarTabla").trigger("click");
+                    fn_cantidad();
+                    $.limpiarCamposFiltro();
         }
     }
     /**
