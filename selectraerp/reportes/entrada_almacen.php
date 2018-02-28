@@ -120,10 +120,14 @@ class PDF extends FPDF {
       }
 if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_movimiento[0]["tipo_movimiento_almacen"]== 4 || $this->array_movimiento[0]["tipo_movimiento_almacen"]== 8){
     $this->SetX(14);
-      $this->Cell(0,0, "Empresa Transporte :".utf8_decode($this->array_movimiento[0]["empresa_transporte"])."            Conductor :".utf8_decode($this->array_movimiento[0]["nombre_conductor"])."           Cedula Conductor:".$this->array_movimiento[0]["cedula_conductor"]."         Placa :".$this->array_movimiento[0]["placa"],0,0,'L');
+      $this->Cell(0,0, "Conductor :".utf8_decode($this->array_movimiento7[0]["nombres"]." ".$this->array_movimiento7[0]["apellidos"])."     Cedula Conductor:".$this->array_movimiento7[0]["cedula"]."        ".utf8_decode("Teléfono:").$this->array_movimiento7[0]["telefono"]."      Ticket Entrada:".$this->array_movimiento7[0]["id_ticket"],0,0,'L');
 
          $this->Ln(5);
          $this->SetX(14);
+         $this->Cell(0,0, "Hora Entrada :".$this->array_movimiento7[0]["hora_entrada"]."     Hora Salida:".$this->array_movimiento7[0]["hora_salida"],0,0,'L');
+         $this->Ln(5);
+         $this->SetX(14);
+        $this->Cell(0,0, "Peso Entrada :".$this->array_movimiento7[0]["peso_entrada"]."Kg.     Peso Salida:".$this->array_movimiento7[0]["peso_salida"]."Kg.",0,0,'L');
          if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
 
          if( $this->array_movimiento[0]["nombre_proveedor"]!=''){
@@ -290,7 +294,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         $this->Cell(63.75,$width,utf8_decode('Receptor:'),1,0,"C",0);
         }
         if( $this->array_movimiento6[0]['nombre_persona']=='' && $this->array_movimiento5[0]['nombre_persona']==''){
-        $this->Cell(63.75,$width,utf8_decode('Responsable Cargo/Descargo:'),1,0,"C",0);
+        $this->Cell(63.75,$width,utf8_decode('Conductor:'),1,0,"C",0);
         }
 
         $this->Ln(5);
@@ -310,7 +314,8 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         if( $this->array_movimiento6[0]['nombre_persona']!=''){
         $this->Cell(63.75,$width,utf8_decode('Nombre y Apellido: '.$this->array_movimiento6[0]['nombre_persona']),0,0,"J",0);
         }
-         $this->SetX(205.25);
+        $this->Cell(63.75,$width,utf8_decode('Nombre y Apellido: '.utf8_decode($this->array_movimiento7[0]["nombres"]." ".$this->array_movimiento7[0]["apellidos"])),0,0,"J",0);
+        $this->SetX(205.25);
         $this->Cell(63.75,25,'',1,0,"J",0);
         $this->Ln(5);
         $this->SetX(14);
@@ -323,6 +328,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         if( $this->array_movimiento6[0]['nombre_persona']!=''){
         $this->Cell(63.75,$width,utf8_decode('C.I: '.$this->array_movimiento6[0]['cedula_persona']),0,0,"J",0);
         }
+        $this->Cell(63.75,$width,utf8_decode('C.I: '.$this->array_movimiento7[0]['cedula']),0,0,"J",0);
         $this->Ln(5);
         $this->SetX(14);
         $this->Cell(63.75,$width,utf8_decode('Cargo: '),0,0,"J",0);
@@ -384,6 +390,9 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
     function Arraymovimiento6($array) {
         $this->array_movimiento6 = $array;
     }
+    function Arraymovimiento7($array) {
+        $this->array_movimiento7 = $array;
+    }
 
 
 }
@@ -410,7 +419,7 @@ $array_movimiento = $comunes->ObtenerFilasBySqlSelect("SELECT *, REPLACE(REPLACE
     left join unidad_medida um on um.id = ite.unidadxpeso
     left join clientes as prove on k.id_cliente=prove.id_cliente
     left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
-    where kad.id_transaccion=".$id_transaccion);
+    where k.id_transaccion_calidad=".$id_transaccion);
 
 if(count($array_movimiento)==0){
     echo "no se encontraron registros.";
@@ -424,23 +433,26 @@ $array_movimiento2 = $comunes->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as
     left join kardex_almacen as k on k.id_transaccion=kad.id_transaccion 
     left join item as ite on kad.id_item=ite.id_item 
     left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
-    where kad.id_transaccion =".$id_transaccion);
+    where k.id_transaccion_calidad =".$id_transaccion);
 
 $seguridad = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_persona, descripcion_rol, cargo FROM roles_firma a
 LEFT JOIN kardex_almacen b on b.id_seguridad=a.id_rol
-WHERE b.id_transaccion=".$id_transaccion);
+WHERE b.id_transaccion_calidad=".$id_transaccion);
 
 $aprobado = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_persona, descripcion_rol, cargo FROM roles_firma a
 LEFT JOIN kardex_almacen b on b.id_aprobado=a.id_rol
-WHERE b.id_transaccion=".$id_transaccion);
+WHERE b.id_transaccion_calidad=".$id_transaccion);
 
 $despachador = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_persona, descripcion_rol, cargo FROM roles_firma a
 LEFT JOIN kardex_almacen b on b.id_despachador=a.id_rol
-WHERE b.id_transaccion=".$id_transaccion);
+WHERE b.id_transaccion_calidad=".$id_transaccion);
 
 $receptor = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_persona, descripcion_rol, cargo FROM roles_firma a
 LEFT JOIN kardex_almacen b on b.id_receptor=a.id_rol
-WHERE b.id_transaccion=".$id_transaccion);
+WHERE b.id_transaccion_calidad=".$id_transaccion);
+
+$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['ticket_entrada'].")";
+$conductor=$comunes->ObtenerFilasBySqlSelect($sql);
 
 if(count($array_movimiento2)==0){
     echo "no se encontraron registros.";
@@ -456,6 +468,7 @@ $pdf->Arraymovimiento3($seguridad);
 $pdf->Arraymovimiento4($aprobado);
 $pdf->Arraymovimiento5($despachador);
 $pdf->Arraymovimiento6($receptor);
+$pdf->Arraymovimiento7($conductor);
 $pdf->SetTitle($title);
 $pdf->PrintChapter();
 $pdf->SetDisplayMode('default');
