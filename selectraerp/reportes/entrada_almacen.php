@@ -25,16 +25,15 @@ class PDF extends FPDF {
 
         $this->SetFont('Arial','',8);
         $this->SetX(160);
-        $this->Cell(0,0, "Cod. Movimiento: ",0,0,'L');
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
-        $this->Cell(0,0, "E-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
+        $this->Cell(0,0, utf8_decode('N° CONTROL: ')."E-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
         }
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==2 || $this->array_movimiento[0]["tipo_movimiento_almacen"]==4){
-        $this->Cell(0,0, "S-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
+        $this->Cell(0,0, utf8_decode('N° CONTROL: ')."S-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
         }
 
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==8){
-        $this->Cell(0,0, "S-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
+        $this->Cell(0,0, utf8_decode('N° CONTROL: ')."S-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
         }
 
         $this->Ln(10);
@@ -106,16 +105,14 @@ class PDF extends FPDF {
 
         $this->SetFont('Arial','',8);
          $this->SetX(55);
-         $this->Cell(0,0,utf8_decode("Cliente a Despachar: ".$this->array_movimiento[0]["nombre_cliente"]."         Rif: ".$this->array_movimiento[0]["rif_cliente"]."          Direccion: ".$this->array_movimiento[0]["direccion_cliente"]) ,0,0,'L');
+         $this->Cell(0,0,utf8_decode("Cliente: ".$this->array_movimiento[0]["nombre_cliente"]."         Rif: ".$this->array_movimiento[0]["rif_cliente"]."         Direccion: ".$this->array_movimiento[0]["direccion_cliente"]) ,0,0,'L');
          $this->SetFont('Arial','',8);
           $this->Ln(5);
 
         }
-
-        $this->Ln(5);
     if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_movimiento[0]["tipo_movimiento_almacen"]==5 ){
         $this->SetX(14);
-        $this->Cell(0,0, "Almacen entrada: ".utf8_decode($this->array_movimiento[0]["almacen"]." ".$this->datosgenerales[0]["nombre_empresa"]." ".$this->datosgenerales[0]["codigo_siga"])."            Ubicacion entrada :".utf8_decode($this->array_movimiento[0]["ubicacion"])."         Almacen Procedencia:".utf8_decode($this->array_movimiento[0]["almacen_procedencia"]."-".$this->array_movimiento[0]["nombre_punto_rep2"]),0,0,'L');
+        $this->Cell(0,0, "Almacen entrada: ".utf8_decode($this->array_movimiento[0]["almacen"])." Consignatario:".utf8_decode($this->array_movimiento[0]["almacen_procedencia"]."-".$this->array_movimiento[0]["nombre_punto_rep2"]),0,0,'L');
          $this->SetFont('Arial','',8);
           $this->Ln(5);
 
@@ -130,9 +127,9 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
          if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
 
          if( $this->array_movimiento[0]["nombre_proveedor"]!=''){
-            $proveedor="            Proveedor :".$this->array_movimiento[0]["rif"]." - ".$this->array_movimiento[0]["nombre_proveedor"];
+            $proveedor="            Cliente :".$this->array_movimiento[0]["rif"]." - ".$this->array_movimiento[0]["nombre_proveedor"];
         }
-        $this->Cell(0,0, "Nro Guia SUNAGRO :".utf8_decode($this->array_movimiento[0]["guia_sunagro"]).$proveedor."",0,0,'L');
+        $this->Cell(0,0, "Nro Guia SUNAGRO :".utf8_decode($this->array_movimiento[0]["guia_sunagro"])."",0,0,'L');
         }
 
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==4 || $this->array_movimiento[0]["tipo_movimiento_almacen"]== 8){
@@ -172,17 +169,18 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         $this->SetX(14);
         $this->SetFont('Arial','',7);
         $this->SetFillColor(10,10,10,10,10,10,10,10,10,10,10,10,10);
+        $this->Cell(10,$width,utf8_decode('N°'),1,0,"C",0);
         $this->Cell(20,$width,'Codigo',1,0,"C",0);
         $this->Cell(90,$width,utf8_decode('Descripción'),1,0,"C",0);
+        $this->Cell(20,$width,utf8_decode('Etiqueta'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Cantidad'),1,0,"C",0);
-        $this->Cell(18,$width,utf8_decode('Cantidad Esp'),1,0,"C",0);
-        $this->Cell(18,$width,utf8_decode('Unid. Bultos'),1,0,"C",0);
-        $this->Cell(18,$width,utf8_decode('Bultos'),1,0,"C",0);
-        $this->Cell(18,$width,utf8_decode('Unid. Sueltas'),1,0,"C",0);
+        $this->Cell(18,$width,utf8_decode('Peso'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Toneladas'),1,0,"C",0);
+        $this->Cell(18,$width,utf8_decode('Ubicación Cava'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Precio C/Iva'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Precio Total'),1,0,"C",0);
         $this->Ln(5);
+        $this->SetX(14);
 
 
     }
@@ -214,35 +212,13 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
 
     function ChapterBody() {
 
-
-
-        //$conn = new rp_Connect();
-        //$conn->SQL("select * from esquema.almacen_ubicacion");
-
-
-
-
-        //aqui metemos los parametros del contenido
-        $this->SetWidths(array(20,90,18,18,18,18,18,18,18,18));
-        $this->SetAligns(array("C","J","C","C","C","C","C","C","C","C"));
-        $this->SetFillColor(232,232,232,232,232,232,232,232,232,232);
-        // $cantidaditems = $this->array_movimiento[0]["numero_item"];
+        $this->SetWidths(array(10,20,90,20,18,18,18,18,18,18));
+        $this->SetAligns(array("C","J","C","C","C","C","C","C","C"));
+        $this->SetFillColor(232,232,232,232,232,232,232,232,232);
 
         $subtotal = 0;
-        // for($i=0;$i<$cantidaditems;$i++) {
-        //     $this->SetLeftMargin(30);
-        //     $width = 5;
-        //     $this->SetX(14);
-        //     $this->SetFont('Arial','',7);
-
-        //     $this->Row(
-        //             array(  $this->array_movimiento[$i]["cod_item"],
-        //             $this->array_movimiento[$i]["descripcion1"],
-        //             $this->array_movimiento[$i]["cantidad_item"]),1);
-
-        // }
-        $total_bolivares=0;
         $total_ton=0;
+        $contador=1;
         foreach ($this->array_movimiento as $key => $value) {
 
             if ($value["precio_hist"]==0){
@@ -276,22 +252,24 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
             $this->SetX(14);
             $this->SetFont('Arial','',7);
             $this->Row(
-                    array($value["codigo_barras"],
+                    array(
+                    $contador,
+                    $value["codigo_barras"],
                     $value["descripcion1"],
+                    $value["etiqueta"],
                     $value["cantidad_item"],
-                    $value["c_esperada"],
-                    $value["cantidad_bulto"],
-                    number_format($bultos, 0, '.', ' '),
-                    number_format($unidades_sueltas, 2, '.', ' '),
+                    number_format($value["peso"], 2, '.', ' '),
                     number_format(($gramos_prod*$value["cantidad_item"])/1000000, 2, '.', ' '),
+                    $value["ubicacion"],
                     number_format($precio_total, 2, '.', ' '),
                     number_format($precio_total*$value["cantidad_item"], 2, '.', ' ')),1);
-             $this->SetX(14);
              if( $value["cantidad_item"] != $value["c_esperada"] && $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
-                 $this->Cell(110,5,'Observacion : '.$value["observacion_dif"],1,1,'L');
+                $this->SetX(14);
+                $this->Cell(120,5,utf8_decode('OBSERVACIÓN : ').$value["observacion_dif"],1,1,'L');
              }
            $total_bolivares=$total_bolivares+$precio_total*$value["cantidad_item"];
            $total_ton=$total_ton+($gramos_prod*$value["cantidad_item"]/1000000);
+           $contador++;
 
         }
         $this->SetX(14);
@@ -417,7 +395,7 @@ $comunes = new ConexionComun();
 $array_parametros_generales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_generales");
 
 $operacion="Entrada";
-$array_movimiento = $comunes->ObtenerFilasBySqlSelect("SELECT *, REPLACE(REPLACE(pv1.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep1, REPLACE(REPLACE(pv2.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep2, kad.cantidad as cantidad_item,k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion,kad.observacion as observacion_dif, cli.nombre as nombre_cliente, cli.rif as rif_cliente, cli.direccion as direccion_cliente, kad.precio as precio_hist, ite.iva as iva, k.marca as marca_vehiculo, prove.descripcion as nombre_proveedor,
+$array_movimiento = $comunes->ObtenerFilasBySqlSelect("SELECT *, REPLACE(REPLACE(pv1.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep1, REPLACE(REPLACE(pv2.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep2, kad.cantidad as cantidad_item,k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion,kad.observacion as observacion_dif, cli.nombre as nombre_cliente, cli.rif as rif_cliente, cli.direccion as direccion_cliente, kad.precio as precio_hist, ite.iva as iva, k.marca as marca_vehiculo, prove.nombre as nombre_proveedor,
     concat(ite.descripcion1,' - ',m.marca,' ',ite.pesoxunidad,um.nombre_unidad) AS descripcion1, k.observacion as observacion_cabecera, k.fecha_creacion, tp.descripcion as tipo_despacho
     from kardex_almacen_detalle as kad  
     left join almacen as alm on kad.id_almacen_entrada=alm.cod_almacen  
@@ -430,7 +408,7 @@ $array_movimiento = $comunes->ObtenerFilasBySqlSelect("SELECT *, REPLACE(REPLACE
     left join clientes AS cli ON k.id_cliente = cli.id_cliente
     left join marca m on m.id = ite.id_marca 
     left join unidad_medida um on um.id = ite.unidadxpeso
-    left join proveedores as prove on k.id_proveedor=prove.id_proveedor
+    left join clientes as prove on k.id_cliente=prove.id_cliente
     left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
     where kad.id_transaccion=".$id_transaccion);
 
