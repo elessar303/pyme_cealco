@@ -23,27 +23,60 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
     switch ($opt) {
 
         case "CerrarEntrada" :
-            $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM kardex_almacen  WHERE id_transaccion_calidad = '" . $_GET["v1"] . "'");
+            //cierro el detalle de calidad
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM calidad_almacen_detalle  WHERE id_transaccion_detalle = '" . $_GET["v1"] . "'");
+            
             if($campos!=null)
             {
-                $sql="update kardex_almacen set cierre_entrada=1 where id_transaccion='".$campos[0]['id_transaccion']."'";
+                $sql="update calidad_almacen_detalle set cierre_entrada=1 where id_transaccion_detalle='".$_GET["v1"]."'";
                 $conn->BeginTrans();
                 $conn->ExecuteTrans($sql);
-                if ($conn->errorTransaccion == 1)
-                {    
-                    echo "1";
-                }
-                elseif($conn->errorTransaccion == 0)
+                //verificar si todos los hijos estan cerrados de ser asi, se debe avisar al kardex y cerrarlo
+                $sql="select count(*) as total from calidad_almacen_detalle where id_transaccion='". $campos[0]['id_transaccion'] ."' and cierre_entrada=0";
+                $datos=$conn->ObtenerFilasBySqlSelect($sql);
+                if($datos[0]['total']==0)
                 {
-                    echo "-1";
+                    $campos2 = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM kardex_almacen  WHERE id_transaccion_calidad = '" . $campos[0]['id_transaccion'] . "'");
+                    if($campos2!=null)
+                    {
+                        $sql="update kardex_almacen set cierre_entrada=1 where id_transaccion='".$campos2[0]['id_transaccion']."'";
+                        $conn->ExecuteTrans($sql);
+                        if ($conn->errorTransaccion == 1)
+                        {    
+                            echo "1";
+                        }
+                        elseif($conn->errorTransaccion == 0)
+                        {
+                            echo "-1";
+                        }
+                        
+                        $conn->CommitTrans($conn->errorTransaccion);
+                    }
+                    else
+                    {
+                        echo "-1";
+                    }
                 }
-                
+                else
+                {
+                    //si todavia existen cierres pendientes no se hace nada mas
+                    if ($conn->errorTransaccion == 1)
+                    {    
+                        echo "1";
+                    }
+                    elseif($conn->errorTransaccion == 0)
+                    {
+                        echo "-1";
+                    }
+                }
                 $conn->CommitTrans($conn->errorTransaccion);
             }
             else
             {
                 echo "-1";
             }
+           
+            
         break;
         case "EliminarFacturaPedido":
             $sql="delete from despacho_new_detalle where id_detalle_factura = '".$_POST["id"]."'";
@@ -658,7 +691,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
                 $campos = $conn->ObtenerFilasBySqlSelect
                 (
-                    "SELECT ite.*,m.*, kad.id_transaccion_detalle, kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, date_format(k.fecha_creacion, '%d/%m/%Y %h:%i:%s ') as fecha_creacion
+                    "SELECT ite.*,m.*, k.id_transaccion as id_calidad2, kad.id_transaccion_detalle, kad.cantidad AS cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, date_format(k.fecha_creacion, '%d/%m/%Y %h:%i:%s ') as fecha_creacion
                     FROM calidad_almacen_detalle AS kad
                     LEFT JOIN marca m ON m.id = kad.id_marca
                     JOIN calidad_almacen AS k ON kad.id_transaccion=k.id_transaccion
@@ -811,7 +844,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                             
                             <td style="width:300px; padding-left:10px;">' . $item["descripcion1"] ." - ". $item["marca"] . " ". $item["pesoxunidad"]."". $item["nombre_unidad"].'</td>
                             <td style="text-align: right; padding-right:10px;">' . $item['cantidad_item'] . '</td>
-                            <td style="text-align: center; padding-right:10px;"><img id="'.$item['id_transaccion_detalle'].'" title="Realizar Entrada" src="../../../includes/imagenes/ico_last.gif" onclick="entradapaleta(this.id);"/></td>
+                            <td style="text-align: center; padding-right:10px;"><img id="'.$item['id_transaccion_detalle'].'" alt="'.$item['id_calidad2'].'" title="Realizar Entrada" src="../../../includes/imagenes/ico_last.gif" onclick="entradapaleta(this.id, this.alt);"/></td>
                         </tr>';
                 }
             }
@@ -7346,6 +7379,7 @@ order by mb.cod_movimiento_ban";
                        $cliente=$_POST["cliente"];
                        $sql="SELECT a.* FROM ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion 
                         WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."' ";
+                        //echo $sql; exit();
                        $campos = $conn->ObtenerFilasBySqlSelect($sql);
                         if (count($campos) == 0) {
                             echo "[{band:'-1'}]";

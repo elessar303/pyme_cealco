@@ -16,11 +16,11 @@ Objetivos:
         <script type="text/javascript" src="../../libs/js/entrada_almacen.js"></script>
         {literal}
         <script language="JavaScript" type="text/JavaScript">
-            function entradapaleta(id)
+            function entradapaleta(id, name)
             {
                 opt_menu=$('#opt_menu').val();
                 opt_seccion=$('#opt_section').val();
-                window.location='?opt_menu='+opt_menu+'&opt_seccion='+opt_seccion+'&opt_subseccion=entradapaleta&id='+id;
+                window.location='?opt_menu='+opt_menu+'&opt_seccion='+opt_seccion+'&opt_subseccion=entradapaleta&id='+id+'&principal='+name;
             }
         </script>
         {/literal}

@@ -1,0 +1,1 @@
+ALTER TABLE `calidad_almacen_detalle` ADD `cierre_entrada` BOOLEAN NOT NULL DEFAULT FALSE COMMENT 'Avisa si se cerro la entrada de este detalle';

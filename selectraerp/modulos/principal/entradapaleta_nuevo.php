@@ -69,8 +69,18 @@ else
     }
     else
     {
-        //debe verse el boton cerrar entrada
-        $smarty->assign("visiblecerrar", 1);
+        //debemos buscar si esta cerrado el detalle de esta calidad
+        $sql="select cierre_entrada from calidad_almacen_detalle where id_transaccion_detalle='".$id_transaccion."'";
+        $cierre_entrada=$usuarios->ObtenerFilasBySqlSelect($sql);
+        if($cierre_entrada[0]['cierre_entrada']==1)
+        {
+            $smarty->assign("visiblecerrar", 2);
+        }
+        else
+        {
+            $smarty->assign("visiblecerrar", 1);
+        }
+        
     }
     
     //buscar el peso total ingresado al almacen

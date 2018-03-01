@@ -121,7 +121,7 @@ if (isset($_POST["input_cantidad_items"]))
     }
 
     $res = array_diff($cadena_item, array_diff(array_unique($cadena_item), array_diff_assoc($cadena_item, array_unique($cadena_item))));
-    if($res[0]!='')
+    /*if($res[0]!='')
     {
         foreach(array_unique($res) as $v) 
         {
@@ -130,7 +130,7 @@ if (isset($_POST["input_cantidad_items"]))
             echo "Producto Duplicado Durante la Operacion: ".$v." ".$item[0]['descripcion1']."<br/>";
         }
         exit();  
-    }
+    }*/
 
     $almacen->BeginTrans();
 

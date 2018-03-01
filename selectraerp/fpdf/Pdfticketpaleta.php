@@ -164,7 +164,7 @@ $sql =
     from kardex_almacen as a
     inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
     left join marca as m on m.id=b.id_marca
-    inner join item as c on b.id_item=b.id_item
+    inner join item as c on c.id_item=b.id_item
     inner join clientes as d  on a.id_proveedor=d.id_cliente
     where b.id_transaccion_detalle=".$nro;
 //echo $sql; exit();
