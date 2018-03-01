@@ -182,8 +182,6 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         $this->Cell(18,$width,utf8_decode('Cantidad'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Peso'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Toneladas'),1,0,"C",0);
-        $this->Cell(18,$width,utf8_decode('Precio C/Iva'),1,0,"C",0);
-        $this->Cell(18,$width,utf8_decode('Precio Total'),1,0,"C",0);
         $this->Ln(5);
         $this->SetX(14);
 
@@ -267,8 +265,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
                     $value["cantidad_item"],
                     number_format($value["peso_total"], 2, '.', ' ')."Kg",
                     number_format(($value["peso_total"])/1000, 2, '.', ' '),
-                    number_format($precio_total, 2, '.', ' '),
-                    number_format($precio_total*$value["cantidad_item"], 2, '.', ' ')),1);
+                    ),1);
              if( $value["observacion_limite"] != '' && $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
                 $this->SetX(14);
                 $this->Cell(120,5,utf8_decode('OBSERVACIÓN : ').$value["observacion_limite"],1,1,'L');
@@ -285,8 +282,6 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         $this->Cell(18,$width,number_format($total_cantidad, 2, '.', ' '),1,0,"C",0);
         $this->Cell(18,$width,number_format($total_peso, 2, '.', ' ')."Kg",1,0,"C",0);
         $this->Cell(18,$width,number_format($total_ton, 2, '.', ' '),1,0,"C",0);
-        $this->Cell(18,$width,'',1,0,"C",0);
-        $this->Cell(18,$width,number_format($total_bolivares, 2, '.', ' '),1,0,"C",0);
         $this->Ln(15);
 
         $this->SetX(14);
