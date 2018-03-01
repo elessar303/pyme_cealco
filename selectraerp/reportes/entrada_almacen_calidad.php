@@ -269,9 +269,9 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
                     number_format(($value["peso_total"])/1000, 2, '.', ' '),
                     number_format($precio_total, 2, '.', ' '),
                     number_format($precio_total*$value["cantidad_item"], 2, '.', ' ')),1);
-             if( $value["cantidad_item"] != $value["c_esperada"] && $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
+             if( $value["observacion_limite"] != '' && $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
                 $this->SetX(14);
-                $this->Cell(120,5,utf8_decode('OBSERVACIÓN : ').$value["observacion_dif"],1,1,'L');
+                $this->Cell(120,5,utf8_decode('OBSERVACIÓN : ').$value["observacion_limite"],1,1,'L');
              }
            $total_cantidad=$total_cantidad+$value["cantidad_item"];
            $total_peso=$total_peso+$value["peso_total"];
