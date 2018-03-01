@@ -176,7 +176,7 @@ if(($libros_pos>0 || $libros_pyme>0) && $operacion_libroventa[0]['status']==1){
 $almacen->BeginTrans();
 
 //Habilitando los modulos 
-$sql="UPDATE modulos SET visible=1 WHERE cod_modulo in (1,3,5,7,54,89,225,239)";
+$sql="UPDATE modulos SET visible=1 WHERE cod_modulo in (1,3,5,7,54,89,225)";
 $almacen->ExecuteTrans($sql);
 
 //Habilitando Cajeros POS
