@@ -133,6 +133,8 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
          if( $this->array_movimiento[0]["nombre_proveedor"]!=''){
             $proveedor="            Cliente :".$this->array_movimiento[0]["rif"]." - ".$this->array_movimiento[0]["nombre_proveedor"];
         }
+        $this->Ln(5);
+        $this->SetX(14);
         $this->Cell(0,0, "Nro Guia SUNAGRO :".utf8_decode($this->array_movimiento[0]["guia_sunagro"])."",0,0,'L');
         }
 
@@ -222,6 +224,8 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
 
         $subtotal = 0;
         $total_ton=0;
+        $total_cantidad=0;
+        $total_peso=0;
         $contador=1;
         foreach ($this->array_movimiento as $key => $value) {
 
@@ -262,8 +266,8 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
                     $value["descripcion1"],
                     $value["etiqueta"],
                     $value["cantidad_item"],
-                    number_format($value["peso"], 2, '.', ' '),
-                    number_format(($gramos_prod*$value["cantidad_item"])/1000000, 2, '.', ' '),
+                    number_format($value["peso"], 2, '.', ' ')."Kg",
+                    number_format(($value["peso"])/1000, 2, '.', ' '),
                     $value["ubicacion"],
                     number_format($precio_total, 2, '.', ' '),
                     number_format($precio_total*$value["cantidad_item"], 2, '.', ' ')),1);
@@ -272,12 +276,16 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
                 $this->Cell(120,5,utf8_decode('OBSERVACIÓN : ').$value["observacion_dif"],1,1,'L');
              }
            $total_bolivares=$total_bolivares+$precio_total*$value["cantidad_item"];
-           $total_ton=$total_ton+($gramos_prod*$value["cantidad_item"]/1000000);
+           $total_ton=$total_ton+($value["peso"]/1000);
+           $total_cantidad=$total_cantidad+$value["cantidad_item"];
+           $total_peso=$total_peso+$value["peso"];
            $contador++;
 
         }
         $this->SetX(14);
-        $this->Cell(200,$width,utf8_decode('TOTALES'),1,0,"C",0);
+        $this->Cell(140,$width,utf8_decode('TOTALES'),1,0,"C",0);
+        $this->Cell(18,$width,number_format($total_cantidad, 2, '.', ' '),1,0,"C",0);
+        $this->Cell(18,$width,number_format($total_peso, 2, '.', ' ')."Kg",1,0,"C",0);
         $this->Cell(18,$width,number_format($total_ton, 2, '.', ' '),1,0,"C",0);
         $this->Cell(18,$width,'',1,0,"C",0);
         $this->Cell(18,$width,number_format($total_bolivares, 2, '.', ' '),1,0,"C",0);
