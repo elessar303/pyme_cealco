@@ -48,7 +48,7 @@
                                         {/if}
                                     </td>
                                      <td style="cursor: pointer; width: 30px; text-align:center">
-                                        <img class="impresion" onclick="javascript:window.open('../../reportes/entrada_almacen.php?id_transaccion={$campos.id_transaccion}', '');" title="Imprimir Detalle de Movimiento" src="../../../includes/imagenes/ico_print.gif"/>
+                                        <img class="impresion" onclick="javascript:window.open('../../reportes/salida_almacen.php?id_transaccion={$campos.id_transaccion}', '');" title="Imprimir Detalle de Movimiento" src="../../../includes/imagenes/ico_print.gif"/>
                                     </td>
                                 </tr>
                             {/foreach}
