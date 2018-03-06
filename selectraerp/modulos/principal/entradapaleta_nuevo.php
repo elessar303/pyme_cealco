@@ -185,7 +185,10 @@ else
                     ".$valor['ticket_entrada']."
                 </td>
                 <td align='center'>
-                    <button id='".$valor['detalle_movimiento']."' value='Generar Ticket' onclick='llamarPdf(this.id)'>Generar Ticket </button>
+                    <button id='".$valor['detalle_movimiento']."' value='Generar Ticket' onclick='llamarPdf(this.id)'>PDF</button>
+                </td>
+                <td align='center'>
+                    <button id='".$valor['detalle_movimiento']."' value='Generar Ticket' onclick='llamarTXT(this.id)'>TXT </button>
                 </td>
             </tr>
         ";
