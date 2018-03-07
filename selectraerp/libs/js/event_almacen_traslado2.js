@@ -473,7 +473,16 @@ Ext.onReady(function() {
                             eventos_form.init();
                             $("#ubicacion").empty();
                             $("#cantidad_existente").val("");
-                            win.show();
+                            //solo debe mostrarse si no existen registros.
+                            if($(".grid table.lista tbody").find("tr").length == 0)
+                            {
+                                win.show();
+                            }
+                            else
+                            {
+                                Ext.Msg.alert("Alerta", "Solo se permite un traslado por vez");
+                                return false;
+                            }
                         }
                     },
                     {

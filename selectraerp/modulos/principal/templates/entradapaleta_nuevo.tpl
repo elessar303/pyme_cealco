@@ -21,6 +21,11 @@
                 {
                     window.open('../../fpdf/Pdfticketpaleta.php?id='+id);
                 };
+                function llamarTXT(id)
+                {
+                    window.open('../../fpdf/Simpleticketpaleta.php?id='+id);
+                };
+                
                //funcion para buscar el combo dependiente
                 function listarubicaciones(idalmacen, tipoSql, idubicacion)
                 {
@@ -444,7 +449,7 @@
                         <th class="tb-head" ><b>Ubicación Principal</b></th>
                         <th class="tb-head" ><b>Ubicación Detalle</b></th>
                         <th class="tb-head" ><b>Nro. Recepcion</b></th>
-                        <th class="tb-head" ><b>Generar Ticket</b></th>
+                        <th class="tb-head" colspan="2" style="text-align: center;"><b>Generar Ticket</b></th>
                     </tr>
                 </thead>
                 <tbody
