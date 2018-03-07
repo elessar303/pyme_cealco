@@ -13,24 +13,27 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
         $des = $_POST['buscar'];
         $busqueda = $_POST['busqueda'];
     }
-    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id
+    $join = "as k 
+        LEFT JOIN tickets_entrada_salida AS tick ON k.id_ticket_entrada = tick.id
+        LEFT JOIN transporte_conductores AS c ON tick.id_conductor = c.id
         LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente ";
     switch ($tipob) {
         case "exacta":
-            $instruccion = $comunes->buscar_exacta($tabla, $des, $busqueda);
+            $instruccion = $comunes->buscar_exacta_join($tabla, $des, $busqueda, $join, $orden);
             break;
         case "todas":
-            $instruccion = $comunes->buscar_todas($tabla, $des, $busqueda);
+            $instruccion = $comunes->buscar_todas_join($tabla, $des, $busqueda, $join);
             break;
         case "cualquiera":
-            $instruccion = $comunes->buscar_cualquiera($tabla, $des, $busqueda);
+            $instruccion = $comunes->buscar_cualquiera_join($tabla, $des, $busqueda, $join);
             break;
     }
     $instruccion = $instruccion . " and tipo_acta=1 order by fecha_creacion desc";
     //exit(0);
 } else {
-    $instruccion = "SELECT * FROM $tabla as k  
-    LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id
+    $instruccion = "SELECT * FROM $tabla as k 
+    LEFT JOIN tickets_entrada_salida AS tick ON k.id_ticket_entrada = tick.id
+    LEFT JOIN transporte_conductores AS c ON tick.id_conductor = c.id
     LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente   where tipo_acta=1  order by fecha_creacion desc";
 }
 

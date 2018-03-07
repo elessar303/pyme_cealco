@@ -13,7 +13,8 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
         $des = $_POST['buscar'];
         $busqueda = $_POST['busqueda'];
     }
-    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente";
+    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN tickets_entrada_salida AS tick ON k.id_ticket_entrada = tick.id
+    LEFT JOIN transporte_conductores AS c ON tick.id_conductor = c.id LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente";
     switch ($tipob) {
         case "exacta":
             $instruccion = $comunes->buscar_exacta_join($tabla, $des, $busqueda, $join, $orden);
@@ -30,7 +31,8 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     //echo $instruccion; exit();
     //exit(0);
 } else {
-    $instruccion = "SELECT * FROM $tabla as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id
+    $instruccion = "SELECT * FROM $tabla as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN tickets_entrada_salida AS tick ON k.id_ticket_entrada = tick.id
+        LEFT JOIN transporte_conductores AS c ON tick.id_conductor = c.id
         LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente 
         where operacion='+' and id_tipo_movimiento_almacen=3 order by id_transaccion desc";
 }

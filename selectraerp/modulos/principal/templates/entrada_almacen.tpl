@@ -65,15 +65,6 @@ Objetivos:
                                         <input type="hidden" name="id_transaccion" value="{$campos.id_transaccion}"/>
                                         <input type="hidden" name="id_tipo_movimiento_almacen" value="{$campos.id_tipo_movimiento_almacen}"/>
                                     </td>
-                                    <td style="width: 30px; text-align:center;">
-                                        {if $campos.estado eq "Entregado"}
-                                            <img title="Entregado" src="../../../includes/imagenes/ico_ok.gif"/>
-                                        {elseif $campos.estado eq "Pendiente"}
-                                            <img title="Pendiente" src="../../../includes/imagenes/ico_note.gif"/>
-                                        {else}
-                                            <img title="Cancelado" src="../../../includes/imagenes/delete.png"/>
-                                        {/if}
-                                    </td>
                                     <td style="cursor: pointer; width: 30px; text-align:center">
                                         <img class="impresion" onclick="javascript:window.open('../../reportes/entrada_almacen.php?id_transaccion={$campos.id_transaccion}', '');" title="Imprimir Detalle de Movimiento" src="../../../includes/imagenes/ico_print.gif"/>
                                     </td>
