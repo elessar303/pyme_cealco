@@ -26,7 +26,7 @@ class PDF extends FPDF {
         $this->SetFont('Arial','',8);
         $this->SetX(160);
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
-        $this->Cell(0,0, utf8_decode('N° CONTROL: ')."E-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
+        $this->Cell(0,0, utf8_decode('N° CONTROL: ').$this->array_movimiento[0]["cod_acta_calidad"],0,0,'R');
         }
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==2 || $this->array_movimiento[0]["tipo_movimiento_almacen"]==4){
         $this->Cell(0,0, utf8_decode('N° CONTROL: ')."S-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
@@ -433,6 +433,7 @@ $array_movimiento = $comunes->ObtenerFilasBySqlSelect("SELECT *, REPLACE(REPLACE
     left join unidad_medida um on um.id = ite.unidadxpeso
     left join clientes as prove on k.id_cliente=prove.id_cliente
     left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
+    left join calidad_almacen as cali on k.id_transaccion_calidad=cali.id_transaccion
     where k.id_transaccion_calidad=".$id_transaccion);
 
 if(count($array_movimiento)==0){

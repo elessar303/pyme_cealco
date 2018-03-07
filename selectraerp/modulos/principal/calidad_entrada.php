@@ -13,7 +13,8 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
         $des = $_POST['buscar'];
         $busqueda = $_POST['busqueda'];
     }
-    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen";
+    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id
+        LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente ";
     switch ($tipob) {
         case "exacta":
             $instruccion = $comunes->buscar_exacta($tabla, $des, $busqueda);
@@ -28,7 +29,9 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     $instruccion = $instruccion . " and tipo_acta=1 order by fecha_creacion desc";
     //exit(0);
 } else {
-    $instruccion = "SELECT * FROM $tabla as k  LEFT JOIN conductores AS c ON k.id_conductor = c.id_conductor  where tipo_acta=1  order by fecha_creacion desc";
+    $instruccion = "SELECT * FROM $tabla as k  
+    LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id
+    LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente   where tipo_acta=1  order by fecha_creacion desc";
 }
 
 $num_paginas = $comunes->obtener_num_paginas($instruccion);
@@ -36,7 +39,7 @@ $pagina = $comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos = $comunes->paginacion($pagina, $instruccion);
 //echo $instruccion; exit();
 $smarty->assign("registros", $campos);
-$smarty->assign("cabecera", array("Transacci&oacute;n", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n", "Empresa Trasporte", "Conductor", "C&eacute;dula", "Placa", "Nro SUNAGRO"));
+$smarty->assign("cabecera", array("Cod. Movimiento", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n", "Cliente", "Conductor", "C&eacute;dula"));
 $smarty->assign("limitePaginacion", $comunes->LimitePaginaciones);
 $smarty->assign("num_paginas", $num_paginas);
 $smarty->assign("pagina", $pagina);
@@ -54,8 +57,8 @@ $smarty->assign("campo_seccion", $campos);
 //**************************************************************************
 //Criterios de Busqueda ****************************************************
 //**************************************************************************
-$smarty->assign("option_values", array("id_transaccion", "observacion", "almacen_procedencia"));
-$smarty->assign("option_output", array("Transaccion", "Observacion", "Almacen"));
+$smarty->assign("option_values", array("cod_acta_calidad", "observacion", "almacen_procedencia"));
+$smarty->assign("option_output", array("Cod. Movimiento", "Observacion", "Almacen"));
 $smarty->assign("option_selected", $busqueda);
 //**************************************************************************
 //**************************************************************************

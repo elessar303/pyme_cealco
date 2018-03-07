@@ -26,7 +26,7 @@ class PDF extends FPDF {
         $this->SetFont('Arial','',8);
         $this->SetX(160);
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
-        $this->Cell(0,0, utf8_decode('N° CONTROL: ')."E-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
+        $this->Cell(0,0, utf8_decode('N° CONTROL: ').$this->array_movimiento[0]["cod_acta_calidad"],0,0,'R');
         }
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==2 || $this->array_movimiento[0]["tipo_movimiento_almacen"]==4){
         $this->Cell(0,0, utf8_decode('N° CONTROL: ')."S-".$this->datosgenerales[0]["codigo_siga"]."-".$this->array_movimiento[0]["id_transaccion"],0,0,'R');
@@ -72,7 +72,7 @@ class PDF extends FPDF {
         $this->SetFont('Arial','B',12);
         //3 es igual a entrada
             if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
-        $this->Cell(0,0, "ENTRADA DE ALMACEN",0,0,'C');
+        $this->Cell(0,0, "PRE ENTRADA DE ALMACEN",0,0,'C');
              }
              if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==8){
         $this->Cell(0,0, "GUIA DE DESPACHO (PEDIDO)",0,0,'C');
@@ -410,23 +410,24 @@ $comunes = new ConexionComun();
 $array_parametros_generales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_generales");
 
 $operacion="Entrada";
-$array_movimiento = $comunes->ObtenerFilasBySqlSelect("SELECT *, REPLACE(REPLACE(pv1.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep1, REPLACE(REPLACE(pv2.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep2, sum(kad.cantidad) as cantidad_item,sum(kad.peso) as peso_total, k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion,kad.observacion as observacion_dif, cli.nombre as nombre_cliente, cli.rif as rif_cliente, cli.direccion as direccion_cliente, kad.precio as precio_hist, ite.iva as iva, k.marca as marca_vehiculo, prove.nombre as nombre_proveedor,
-    concat(ite.descripcion1,' - ',m.marca,' ',ite.pesoxunidad,um.nombre_unidad) AS descripcion1, k.observacion as observacion_cabecera, k.fecha_creacion, tp.descripcion as tipo_despacho
-    from kardex_almacen_detalle as kad  
+$sql="SELECT *, REPLACE(REPLACE(pv1.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep1, REPLACE(REPLACE(pv2.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep2, sum(kad.cantidad) as cantidad_item, k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion,kad.observacion as observacion_dif, cli.nombre as nombre_cliente, cli.rif as rif_cliente, cli.direccion as direccion_cliente, kad.precio as precio_hist, ite.iva as iva, prove.nombre as nombre_proveedor,
+    concat(ite.descripcion1,' - ',m.marca,' ',ite.pesoxunidad,um.nombre_unidad) AS descripcion1, k.observacion as observacion_cabecera, k.fecha_creacion
+    from calidad_almacen_detalle as kad  
     left join almacen as alm on kad.id_almacen_entrada=alm.cod_almacen  
     left join ubicacion as ubi on kad.id_ubi_entrada=ubi.id 
-    left join kardex_almacen as k on k.id_transaccion=kad.id_transaccion 
+    left join calidad_almacen as k on k.id_transaccion=kad.id_transaccion 
     left join item as ite on kad.id_item=ite.id_item 
     left join conductores AS con ON k.id_conductor = con.id_conductor
     left join puntos_venta AS pv1 ON k.almacen_destino = pv1.codigo_siga_punto
     left join puntos_venta AS pv2 ON k.almacen_procedencia = pv2.codigo_siga_punto
-    left join clientes AS cli ON k.id_cliente = cli.id_cliente
+    left join clientes AS cli ON k.id_proveedor = cli.id_cliente
     left join marca m on m.id = ite.id_marca 
     left join unidad_medida um on um.id = ite.unidadxpeso
-    left join clientes as prove on k.id_cliente=prove.id_cliente
-    left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
-    where k.id_transaccion_calidad=".$id_transaccion."
-    group by kad.id_item");
+    left join clientes as prove on k.id_proveedor=prove.id_cliente
+    where k.id_transaccion=".$id_transaccion."
+    group by kad.id_item";
+    //echo $sql; exit;
+$array_movimiento = $comunes->ObtenerFilasBySqlSelect($sql);
 
 if(count($array_movimiento)==0){
     echo "no se encontraron registros.";
@@ -458,7 +459,8 @@ $receptor = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_per
 LEFT JOIN kardex_almacen b on b.id_receptor=a.id_rol
 WHERE b.id_transaccion_calidad=".$id_transaccion);
 
-$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['ticket_entrada'].")";
+$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['id_ticket_entrada'].")";
+
 $conductor=$comunes->ObtenerFilasBySqlSelect($sql);
 
 if(count($array_movimiento2)==0){

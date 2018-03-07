@@ -39,16 +39,14 @@ Objetivos:
                                     {assign var=color value="#cacacf"}
                                 {/if}
                                 <tr bgcolor="{$color}" style="cursor: pointer;" class="detalle">
-                                    <td style="text-align: right; padding-right: 20px;">{$campos.id_transaccion}</td>
+                                    <td style="text-align: right; padding-right: 20px;">{$campos.cod_acta_calidad}</td>
                                     <td style="text-align:center;">{$campos.fecha|date_format:"%d-%m-%Y"}</td>
                                     <td style="padding-left: 20px;">{$campos.autorizado_por}</td>
                                     <td style="padding-left: 20px;">{$campos.descripcion}</td>
                                     <td style="padding-left: 20px;">{$campos.observacion}</td>
-                                    <td style="padding-left: 20px;">{$campos.empresa_transporte}</td>
-                                    <td style="padding-left: 20px;">{$campos.nombre_conductor}</td>
-                                    <td style="padding-left: 20px;">{$campos.cedula_conductor}</td>
-                                    <td style="padding-left: 20px;">{$campos.placa}</td>
-                                    <td style="padding-left: 20px;">{$campos.guia_sunagro}</td>
+                                    <td style="padding-left: 20px;">{$campos.nombre}</td>
+                                    <td style="padding-left: 20px;">{$campos.nombres} {$campos.apellidos}</td>
+                                    <td style="padding-left: 20px;">{$campos.cedula}</td>
                                     <td style="width:30px; text-align: center;">
                                         <img class="boton_detalle" src="../../../includes/imagenes/drop-add.gif" title="Ver detalle"/>
                                         <input type="hidden" name="id_transaccion" value="{$campos.id_transaccion}"/>

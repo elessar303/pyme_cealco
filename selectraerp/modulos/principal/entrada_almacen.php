@@ -13,7 +13,7 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
         $des = $_POST['buscar'];
         $busqueda = $_POST['busqueda'];
     }
-    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN conductores AS c ON k.id_conductor = c.id_conductor";
+    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente";
     switch ($tipob) {
         case "exacta":
             $instruccion = $comunes->buscar_exacta_join($tabla, $des, $busqueda, $join, $orden);
@@ -30,7 +30,9 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     //echo $instruccion; exit();
     //exit(0);
 } else {
-    $instruccion = "SELECT * FROM $tabla as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN conductores AS c ON k.id_conductor = c.id_conductor where operacion='+' and id_tipo_movimiento_almacen=3 order by id_transaccion desc";
+    $instruccion = "SELECT * FROM $tabla as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN transporte_conductores AS c ON k.id_conductor = c.id
+        LEFT JOIN clientes AS cli ON k.id_proveedor = cli.id_cliente 
+        where operacion='+' and id_tipo_movimiento_almacen=3 order by id_transaccion desc";
 }
 
 $num_paginas = $comunes->obtener_num_paginas($instruccion);
@@ -38,7 +40,7 @@ $pagina = $comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos = $comunes->paginacion($pagina, $instruccion);
 
 $smarty->assign("registros", $campos);
-$smarty->assign("cabecera", array("Transacci&oacute;n", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n", "Empresa Trasporte", "Conductor", "C&eacute;dula", "Placa", "Nro SUNAGRO"));
+$smarty->assign("cabecera", array("Cod. Movimiento", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n", "Cliente", "Conductor", "C&eacute;dula"));
 $smarty->assign("limitePaginacion", $comunes->LimitePaginaciones);
 $smarty->assign("num_paginas", $num_paginas);
 $smarty->assign("pagina", $pagina);
@@ -56,8 +58,8 @@ $smarty->assign("campo_seccion", $campos);
 //**************************************************************************
 //Criterios de Busqueda ****************************************************
 //**************************************************************************
-$smarty->assign("option_values", array("id_transaccion", "observacion", "id_almacen"));
-$smarty->assign("option_output", array("Transaccion", "Observacion", "Almacen"));
+$smarty->assign("option_values", array("cod_acta_calidad", "observacion", "id_almacen"));
+$smarty->assign("option_output", array("Cod. Movimiento", "Observacion", "Almacen"));
 $smarty->assign("option_selected", $busqueda);
 //**************************************************************************
 //**************************************************************************
