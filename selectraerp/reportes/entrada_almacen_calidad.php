@@ -132,7 +132,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
          $this->Cell(0,0, "Hora Entrada :".$this->array_movimiento7[0]["hora_entrada"]."     Hora Salida:".$this->array_movimiento7[0]["hora_salida"],0,0,'L');
          $this->Ln(5);
          $this->SetX(14);
-        $this->Cell(0,0, "Peso Entrada :".$this->array_movimiento7[0]["peso_entrada"]."Kg.     Peso Salida:".$this->array_movimiento7[0]["peso_salida"]."Kg.",0,0,'L');
+        $this->Cell(0,0, "Peso Entrada :".$this->array_movimiento7[0]["peso_entrada"]."Kg.     Peso Salida:".$this->array_movimiento7[0]["peso_salida"]."Kg.    Diferencia: ".number_format($this->array_movimiento7[0]["peso_entrada"]-$this->array_movimiento7[0]["peso_salida"], 2, '.', ' '),0,0,'L');
          if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
 
          if( $this->array_movimiento[0]["nombre_proveedor"]!=''){
