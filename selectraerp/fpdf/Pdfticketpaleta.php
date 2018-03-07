@@ -20,7 +20,7 @@ function Header()
         //$this->RotatedText(35,190,'Comprobante Contable ',45);
         $this->SetFont('Arial', 'B', 8);
         $this->SetTextColor(0,0,0);
-        $this->Image('../../includes/imagenes/'.$this->datosgenerales[0]["img_izq"], 10, 8, 50, 20);
+        //$this->Image('../../includes/imagenes/'.$this->datosgenerales[0]["img_izq"], 10, 8, 50, 20);
         $this->SetY(15);
         $this->SetLeftMargin(10);
         $this->SetFont('Arial', 'B', 8);
@@ -28,7 +28,7 @@ function Header()
         $this->Ln(3);
         $this->Cell(0, 0, utf8_decode($this->datosgenerales[0]["nombre_empresa"]), 0, 0, 'C');
         $this->Ln(3);
-        $this->Cell(0, 0, $this->datosgenerales[0]["id_fiscal"] . ": " . $this->datosgenerales[0]["rif"] . " - Telefonos: " . $this->datosgenerales[0]["telefonos"], 0, 0, 'C');
+        $this->Cell(0, 0, $this->datosgenerales[0]["id_fiscal"] . " " . $this->datosgenerales[0]["rif"] . " - Telefonos: " . $this->datosgenerales[0]["telefonos"], 0, 0, 'C');
         $this->Ln(3);
         $this->Cell(0, 0, utf8_decode($this->datosgenerales[0]["direccion"]), 0, 0, 'C');
         $this->Ln(3);

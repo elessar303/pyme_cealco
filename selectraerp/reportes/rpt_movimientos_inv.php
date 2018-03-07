@@ -19,7 +19,7 @@ class PDF extends FPDF {
         $fecha_ini = $fecha_ini->format("d-m-Y");
         $fecha_fin = $fecha_fin->format("d-m-Y");
 
-        $this->Image($this->datosgenerales[0]["img_der"] ? "../../includes/imagenes/" . $this->datosgenerales[0]["img_der"] : "../../includes/imagenes/" . $this->datosgenerales[0]["img_izq"], 10, 8, 50, 20);
+        //$this->Image($this->datosgenerales[0]["img_der"] ? "../../includes/imagenes/" . $this->datosgenerales[0]["img_der"] : "../../includes/imagenes/" . $this->datosgenerales[0]["img_izq"], 10, 8, 50, 20);
         $this->SetY(15);
         $this->SetLeftMargin(10);
         $this->SetFont('Arial', 'B', 8);

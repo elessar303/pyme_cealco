@@ -105,7 +105,13 @@ class PDF extends FPDF {
 
         $this->SetFont('Arial','',8);
          $this->SetX(55);
-         $this->Cell(0,0,utf8_decode("Cliente: ".$this->array_movimiento[0]["nombre_cliente"]."         Rif: ".$this->array_movimiento[0]["rif_cliente"]."         Direccion: ".$this->array_movimiento[0]["direccion_cliente"]) ,0,0,'L');
+         $this->Cell(0,0,utf8_decode("Cliente: ".$this->array_movimiento[0]["nombre_cliente"]."         Rif: ".$this->array_movimiento[0]["rif_cliente"]) ,0,0,'L');
+         $this->SetFont('Arial','',8);
+          $this->Ln(5);
+
+	$this->SetFont('Arial','',8);
+         $this->SetX(13);
+         $this->Cell(0,0,utf8_decode(" Direccion: ".$this->array_movimiento[0]["direccion_cliente"]) ,0,0,'L');
          $this->SetFont('Arial','',8);
           $this->Ln(5);
 
