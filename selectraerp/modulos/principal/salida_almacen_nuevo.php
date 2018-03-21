@@ -35,7 +35,7 @@ $smarty->assign("option_values_almacen", $valueSELECT);
 $smarty->assign("option_output_almacen", $outputSELECT);
 
 
-$datos_almacen = $almacen->ObtenerFilasBySqlSelect("select * from clientes");
+$datos_almacen = $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes ORDER BY nombre");
 $valueSELECT = "";
 $outputSELECT = "";
 foreach ($datos_almacen as $key => $item) {
@@ -99,6 +99,19 @@ foreach ($punto as $key => $puntos) {
 $smarty->assign("option_values_seguridad", $arraySelectOption4);
 $smarty->assign("option_output_seguridad", $arraySelectOutPut4);
 
+// Tickets pendientes por entradas
+$arraySelectOption2 = "";
+$arraySelectoutPut2 = "";
+$tickets = new Almacen();
+mysql_set_charset('utf8');
+$punto = $tickets->ObtenerFilasBySqlSelect("SELECT *, a.id as id_ticket from tickets_entrada_salida a, transporte_conductores b where a.id_conductor=b.id and a.hora_salida='0000-00-00 00:00:00' and a.tipo_ticket = 2 and a.id not in (select distinct(id_ticket_entrada) from calidad_almacen)");
+foreach ($punto as $key => $puntos) {
+    $arraySelectOption2[] = $puntos["id_ticket"];
+    $arraySelectoutPut2[] = "Ticket N°: ".$puntos["id_ticket"]." Conductor: ".$puntos["nombres"]." ".$puntos["apellidos"];
+}
+
+$smarty->assign("option_values_ticket", $arraySelectOption2);
+$smarty->assign("option_output_ticket", $arraySelectoutPut2);
 
 if (isset($_POST["input_cantidad_items"])) 
 { // si el usuario iso post
@@ -138,11 +151,11 @@ if (isset($_POST["input_cantidad_items"]))
         INSERT INTO kardex_almacen (
         `id_transaccion`, `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
         `fecha`, `usuario_creacion`, `fecha_creacion`,
-        `estado`, `fecha_ejecucion`,  `almacen_destino`,`id_conductor`,`placa`,`color`,`marca`, prescintos, `id_seguridad`, `id_aprobado`, `id_despachador`, `id_cliente`)
+        `estado`, `fecha_ejecucion`,  `almacen_destino`,`id_conductor`,`placa`,`color`,`marca`, prescintos, `id_seguridad`, `id_aprobado`, `id_despachador`, `id_cliente`, `ticket_entrada`)
         VALUES (
         NULL, '4', '" . $_POST["autorizado_por"] . "', '" . $_POST["observaciones"] . "',
         '" . $_POST["input_fechacompra"] . "', '" . $login->getUsuario() . "', CURRENT_TIMESTAMP,
-        'Entregado', '" . $_POST["input_fechacompra"] . "', '" . $_POST["puntodeventa"] . "', '{$id_conductor[0]["id_conductor"]}','" . $_POST["placa"] . "','" . $_POST["color"] . "','" . $_POST["marca"] . "', '" . $_POST["prescintos"] . "','{$_POST["id_seguridad"]}','{$_POST["id_aprobado"]}','{$_POST["id_despachador"]}', '{$_POST["cliente"]}' );";
+        'Entregado', '" . $_POST["input_fechacompra"] . "', '" . $_POST["puntodeventa"] . "', '{$id_conductor[0]["id_conductor"]}','" . $_POST["placa"] . "','" . $_POST["color"] . "','" . $_POST["marca"] . "', '" . $_POST["prescintos"] . "','{$_POST["id_seguridad"]}','{$_POST["id_aprobado"]}','{$_POST["id_despachador"]}', '{$_POST["cliente"]}', '{$_POST["id_ticket"]}' );";
 
     $almacen->ExecuteTrans($kardex_almacen_instruccion);
 

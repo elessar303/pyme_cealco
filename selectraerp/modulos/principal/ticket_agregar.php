@@ -36,12 +36,13 @@ if(isset($_POST["aceptar"])){
 	$instruccion = "
 	INSERT INTO 
 	`tickets_entrada_salida`
-	(`id_conductor`, `hora_entrada`, `peso_entrada`)
+	(`id_conductor`, `hora_entrada`, `peso_entrada`, `tipo_ticket`)
 	VALUES
 	(
 	'".$_POST["conductores"]."',
 	'".$_POST["fecha_entrada"]."',
-	'".$_POST["peso_entrada"]."'
+	'".$_POST["peso_entrada"]."',
+	'".$_POST["tipo_ticket"]."'
 	);";
 
 	if ($comunes->Execute2($instruccion)) {

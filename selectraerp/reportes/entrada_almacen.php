@@ -466,7 +466,7 @@ $receptor = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_per
 LEFT JOIN kardex_almacen b on b.id_receptor=a.id_rol
 WHERE b.id_transaccion_calidad=".$id_transaccion);
 
-$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['ticket_entrada'].")";
+$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['ticket_entrada'].") and b.id=".$array_movimiento[0]['ticket_entrada'];
 $conductor=$comunes->ObtenerFilasBySqlSelect($sql);
 
 if(count($array_movimiento2)==0){

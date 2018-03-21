@@ -88,7 +88,7 @@ $arraySelectOption2 = "";
 $arraySelectoutPut2 = "";
 $tickets = new Almacen();
 mysql_set_charset('utf8');
-$punto = $tickets->ObtenerFilasBySqlSelect("SELECT *, a.id as id_ticket from tickets_entrada_salida a, transporte_conductores b where a.id_conductor=b.id and a.hora_salida='0000-00-00 00:00:00' and a.id not in (select distinct(id_ticket_entrada) from calidad_almacen)");
+$punto = $tickets->ObtenerFilasBySqlSelect("SELECT *, a.id as id_ticket from tickets_entrada_salida a, transporte_conductores b where a.id_conductor=b.id and a.hora_salida='0000-00-00 00:00:00' and a.tipo_ticket = 1 and a.id not in (select distinct(id_ticket_entrada) from calidad_almacen)");
 foreach ($punto as $key => $puntos) {
     $arraySelectOption2[] = $puntos["id_ticket"];
     $arraySelectoutPut2[] = "Ticket N°: ".$puntos["id_ticket"]." Conductor: ".$puntos["nombres"]." ".$puntos["apellidos"];

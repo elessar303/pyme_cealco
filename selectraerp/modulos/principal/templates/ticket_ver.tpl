@@ -96,6 +96,13 @@
                             </thead>
                             <tbody>
                                 <tr>
+                                    <td class="label">Tipo de Ticket **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <select name="tipo_ticket" id="tipo_ticket" class="form-text" style="width:205px" class="form-text" disabled="disabled">
+                                            <option value="1" {if $campos.tipo_ticket == "1"} selected="selected"{/if}>Entrada</option>
+                                            <option value="2" {if $campos.tipo_ticket == "2"} selected="selected"{/if}>Salida</option>
+                                        </select>
+                                    </td>
                                     <td class="label">Seleccione el Conductor **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
                                         <select name="conductores" id="conductores" class="form-text" style="width:205px" class="form-text" disabled="disabled">

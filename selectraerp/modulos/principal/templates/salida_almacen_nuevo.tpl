@@ -228,6 +228,19 @@
                     <input class="form-text" type="text" maxlength="100"  size="30" name="prescintos" id="prescintos"/>
                 </td>
             </tr>
+            <tr>
+                        <td>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Ticket Salida</b></span>
+                        </td>
+                             <!-- PUNTOS -->
+                            <td>
+                                <select name="id_ticket" id="id_ticket" class="form-text" style="width:350px">
+                                    <option value="">Seleccione...</option>                               
+                                {html_options values=$option_values_ticket output=$option_output_ticket selected=$puntodeventa}
+                                
+                                </select>
+                            </td>                     
+                    </tr>
             <!-- Firmas Casillas-->
             <tr>
                 <td colspan="2" align="center"><span style="font-family:'Verdana';font-weight:bold;"><b>CASILLA DE FIRMAS:</b></span></td>

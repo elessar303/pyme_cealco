@@ -25,8 +25,20 @@
                         allowClear: true
                     });
 
+                    $('#tipo_ticket').select2(
+                    {
+                        placeholder: "Seleccione ...",
+                        allowClear: true
+                    });
+
                     $("input[name='cancelar']").button();//Coloca estilo JQuery
                     $("input[name='aceptar']").button().click(function(){
+
+                        if($("#tipo_ticket option:selected").val()==''){
+                            Ext.Msg.alert("Alerta","Debe Seleccionar el tipo de ticket");
+                            $("#tipo_ticket").focus();
+                            return false;
+                        }
 
                         if($("#conductores option:selected").val()==''){
                             Ext.Msg.alert("Alerta","Debe Seleccionar el conductor");
@@ -128,9 +140,17 @@
                             </thead>
                             <tbody>
                                 <tr>
+                                    <td class="label">Tipo de Ticket **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <select name="tipo_ticket" id="tipo_ticket" class="form-text" style="width:205px" class="form-text select" >
+                                            <option value="" disabled="disabled" selected="selected">Seleccione</option>
+                                            <option value="1">Entrada</option>
+                                            <option value="2">Salida</option>
+                                        </select>
+                                    </td>
                                     <td class="label">Seleccione el Conductor **</td>
                                     <td style="padding-top:2px; padding-bottom: 2px;">
-                                        <select name="conductores" id="conductores" class="form-text" style="width:205px" class="form-text" >
+                                        <select name="conductores" id="conductores" class="form-text" style="width:205px" class="form-text select" >
                                             <option value="" disabled="disabled" selected="selected"></option>
                                             {html_options values=$option_values_conductores output=$option_output_conductores}
                                         </select>
