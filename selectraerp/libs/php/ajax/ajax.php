@@ -22,6 +22,38 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "EliminarPaleta" :
+            $sql="select * from kardex_almacen_detalle as a where a.id_transaccion_detalle='".$_POST["v1"]."'";
+            $maestro= $conn->ObtenerFilasBySqlSelect($sql);
+            //echo $sql; exit();
+            $sql="select count(*) as total from kardex_almacen_detalle as a where a.id_transaccion='".$maestro[0]['id_transaccion']."'";
+            $total=$conn->ObtenerFilasBySqlSelect($sql);
+            if($total[0]['total']>1)
+            {
+                $conn->BeginTrans();
+                $sql="delete from kardex_almacen_detalle where id_transaccion_detalle='".$_POST["v1"]."'";
+                $conn->ExecuteTrans($sql);
+                //las ubicaciones son unicas, por que lo se puede eliminar directamen solo con el id de la ubicacion
+                $sql="delete from item_existencia_almacen where id_ubicacion='".$maestro[0]["id_ubi_entrada"]."'";
+                $conn->ExecuteTrans($sql);
+                $sql="update ubicacion set ocupado=0 where id_almacen='".$maestro[0]['id_almacen_entrada']."' and id='".$maestro[0]['id_ubi_entrada']."'";
+                $conn->ExecuteTrans($sql);
+                if ($conn->errorTransaccion == 1)
+                {    
+                    echo "1";
+                }
+                elseif($conn->errorTransaccion == 0)
+                {
+                    echo "2";
+                }
+                $conn->CommitTrans($conn->errorTransaccion);
+                
+            }
+            else
+            {
+                echo 2; exit();
+            }
+        break;
         case "CerrarEntrada" :
             //cierro el detalle de calidad
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT id_transaccion FROM calidad_almacen_detalle  WHERE id_transaccion_detalle = '" . $_GET["v1"] . "'");

@@ -26,6 +26,39 @@
                     window.open('../../fpdf/Simpleticketpaleta.php?id='+id);
                 };
                 
+                function EliminarPaleta(id)
+                {
+                    
+                    if(confirm("¿Esta seguro de querer Eliminar la Paleta?"))
+                    {
+                        var paramentros="opt=EliminarPaleta&v1="+id;
+                        $.ajax(
+                        {
+                            type: "POST",
+                            url: "../../libs/php/ajax/ajax.php",
+                            data: paramentros,
+                            
+                            success: function(datos)
+                            {
+                                if(datos==1)
+                                {
+                                    alert("Se ha eliminado la Paleta");
+                                    location.reload();
+                                    
+                                }
+                                else
+                                {
+                                    if(datos==2)
+                                    {
+                                        alert("Paleta No se puede Eliminar, verifique que no sea la unica paleta existente");
+                                    }
+                                }
+                            },
+                            
+                        });
+                    }
+                };
+                
                //funcion para buscar el combo dependiente
                 function listarubicaciones(idalmacen, tipoSql, idubicacion)
                 {
@@ -450,6 +483,7 @@
                         <th class="tb-head" ><b>Ubicación Detalle</b></th>
                         <th class="tb-head" ><b>Nro. Recepcion</b></th>
                         <th class="tb-head" colspan="2" style="text-align: center;"><b>Generar Ticket</b></th>
+                        <th class="tb-head" ><b> Eliminar</b></th>
                     </tr>
                 </thead>
                 <tbody

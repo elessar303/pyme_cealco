@@ -190,6 +190,9 @@ else
                 <td align='center'>
                     <button id='".$valor['detalle_movimiento']."' value='Generar Ticket' onclick='llamarTXT(this.id)'>TXT </button>
                 </td>
+                <td align='center'>
+                    <button id='".$valor['detalle_movimiento']."' value='Eliminar' onclick='EliminarPaleta(this.id)'>Eliminar</button>
+                </td>
             </tr>
         ";
     }
