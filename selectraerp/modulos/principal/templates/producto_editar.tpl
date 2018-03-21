@@ -9,8 +9,8 @@
         <script type="text/javascript" src="../../libs/js/ajax.js"></script>
         <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" />
 
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+        <link href="../../libs/js/select2/dist/css/select2.min.css" rel="stylesheet" />
+        <script src="../../libs/js/select2/dist/js/select2.min.js"></script>
 
         {literal}
         <script language="JavaScript"> 
