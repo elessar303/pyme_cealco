@@ -16,10 +16,15 @@ Ext.onReady(function(){
     });
 
       function cargarUbicaciones() {    
-        idAlmacen=$("#almacen").val();     
+        idAlmacen=$("#almacen").val();
+        idcliente=$("#cliente").val();
+        if(idcliente==null)
+        {
+            idcliente=$("#proveedor").val();
+        }
         $.ajax({
             type: 'POST',
-            data: 'opt=cargaUbicacion&idAlmacen='+idAlmacen,
+            data: 'opt=cargaUbicacion&idAlmacen='+idAlmacen+'&cliente='+idcliente,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
                 $("#ubicacion").find("option").remove();

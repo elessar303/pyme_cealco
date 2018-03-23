@@ -37,9 +37,18 @@ var eventos_form = {
         });
     },
     cargarAlmacenes: function() {
+        if($("#cliente").val()!=null)
+        {
+            cliente = $("#cliente").val();
+        }
+        else
+        {
+            cliente=$("#id_proveedor").val();
+        }
+        
         $.ajax({
             type: 'GET',
-            data: 'opt=getAlmacen',
+            data: 'opt=getAlmacen&cliente='+cliente,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
                 $("#almacen").find("option").remove();

@@ -6392,8 +6392,16 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
             break;
 
         case "getAlmacen":
-
-            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM almacen");
+            if(isset($_GET['cliente']) && $_GET['cliente']!=null)
+            {
+                $sql="select b.descripcion, b.cod_almacen from item_existencia_almacen as a inner join almacen as b on a.cod_almacen=b.cod_almacen where a.id_proveedor='".$_GET['cliente']."' group by a.cod_almacen order by b.cod_almacen";
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+            else
+            {
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM almacen");    
+            }
+            
 
             if (count($campos) == 0) {
                 echo "[{id:'-1'}]";
@@ -7398,13 +7406,26 @@ order by mb.cod_movimiento_ban";
                   echo " </table>";
             break;
             case "cargaUbicacion":
-                       $almacen=$_POST["idAlmacen"];
-                       $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 1 ");
-                        if (count($campos) == 0) {
-                            echo "[{band:'-1'}]";
-                        } else {
-                            echo json_encode($campos);
-                        }
+               $almacen=$_POST["idAlmacen"];
+               $cliente=$_POST["cliente"];
+               if(isset($_POST['cliente']) && $_POST['cliente']!=null)
+                {
+                    $sql="select a.id, a.descripcion, a.orden from ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion  where a.id_almacen='".$almacen."' and b.id_proveedor='".$cliente."'";
+                    $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                }
+                else
+                {
+                    $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 1 ");
+                }
+               
+                if (count($campos) == 0) 
+                {
+                    echo "[{band:'-1'}]";
+                } 
+                else 
+                {
+                    echo json_encode($campos);
+                }
             break;
             case "cargaUbicacionCliente":
                        $almacen=$_POST["idAlmacen"];
