@@ -1,0 +1,1 @@
+ALTER TABLE `parametros_generales` CHANGE `codigo_siga` `codigo_siga` INT(3) UNSIGNED ZEROFILL NOT NULL DEFAULT '0';

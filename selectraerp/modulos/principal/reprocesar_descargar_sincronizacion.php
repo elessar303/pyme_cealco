@@ -52,6 +52,7 @@ if (isset($_POST["descargar"])) {
 	$path_ventas_pyme=$ruta_master."/ventas_pyme";
 	$path_descarga=$ruta_master."/descarga_ventas";
 	$path_comprobantes=$ruta_master."/comprobantes";
+	$path_despacho=$ruta_master."/despacho";
 
 	$nombre_kardex="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_kardex.csv";
 	$nomb="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_ventas.csv";
@@ -59,8 +60,31 @@ if (isset($_POST["descargar"])) {
 	$nombre_comprobante_cabecera="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_comprobante_cabecera.csv";
 	$nombre_comprobante_detalle="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_comprobante_detalle.csv";
 	$nombre_ingresos_detalle="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_ingresos_detalle.csv";
+	$nombre_despacho="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_despacho.json";
 
+	//Agregando Facturas y Despachos (Nuevo)
 
+	//Pedidos del Cliente
+	$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion`, `id_pagos_consolidados` FROM `despacho_new`";
+	$array_despacho=$almacen->ObtenerFilasBySqlSelect($sql);
+
+	$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `despacho_new_detalle`";
+	$array_despacho_detalle=$almacen->ObtenerFilasBySqlSelect($sql);
+
+	//Facturas del Cliente
+	$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion` FROM `factura`";
+	$array_factura=$almacen->ObtenerFilasBySqlSelect($sql);
+
+	$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `factura_detalle`";
+	$array_factura_detalle=$almacen->ObtenerFilasBySqlSelect($sql);
+
+	$json = array('despacho_new' => $array_despacho,'despacho_new_detalle' => $array_despacho_detalle,'factura' => $array_factura, 'factura_detalle' => $array_factura_detalle);
+	$json = json_encode($json);
+
+	$pf_inv=fopen($path_despacho."/".$nombre_despacho,"w+");
+	fwrite($pf_inv, $json);
+	fclose($pf_inv);
+	
 	//Reprocesando Kardex
 	$sql_kardex="SELECT ka.autorizado_por, ka.estado, ka.fecha, REPLACE(ka.id_documento, ',','.') as id_documento, tma.descripcion, REPLACE(ka.observacion, ',','.') as observacion_cabecera, it.codigo_barras, kad.cantidad, kad.c_esperada, REPLACE(kad.observacion, ',','.') as observacion_detalle, alme.descripcion as almacen_entrada, alms.descripcion as almacen_salida, ubie.descripcion as ubicacion_entrada, ubis.descripcion as ubicacion_salida, ka.cod_movimiento as cod_movimiento, kad.vencimiento, kad.lote, prove.rif , REPLACE(REPLACE(prove.descripcion, ',','.'), char(9), '') as nombre_proveedor, ka.guia_sunagro
 		FROM $pyme.kardex_almacen_detalle kad

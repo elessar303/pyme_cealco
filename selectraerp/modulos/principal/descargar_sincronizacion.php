@@ -40,6 +40,7 @@ $path_descarga=$ruta_master."/descarga_ventas";
 $path_libros=$ruta_master."/libro_venta";
 $path_ingresos=$ruta_master."/control_ingresos";
 $path_comprobantes=$ruta_master."/comprobantes";
+$path_despacho=$ruta_master."/despacho";
 
 $directorio=dir("$path_ingresos");
 $directorio2=dir("$path_libros");
@@ -48,6 +49,7 @@ $directorio4=dir("$path_kardex");
 $directorio5=dir("$path_ventas");
 $directorio6=dir("$path_ventas_pyme");
 $directorio7=dir("$path_comprobantes");
+$directorio8=dir("$path_despacho");
 
 $zip = new ZipArchive();
 $dia=date("d");
@@ -125,6 +127,16 @@ if ($zip->open($path_descarga.'/'.$nombre_arc,ZIPARCHIVE::CREATE) === TRUE) {
     }
     }
 
+    while ($archivo = $directorio8->read()) {
+        
+    if (substr($archivo,0,1)!=".") {
+
+        if (file_exists($path_despacho.'/'.$archivo))  {
+        $zip->addFile($path_despacho.'/'.$archivo,$archivo);
+        }
+    }
+    }
+
     $zip->close();
 }
 
@@ -175,6 +187,12 @@ while ($archivo = $directorio6->read()) {
 while ($archivo = $directorio7->read()) {
     if (substr($archivo,0,1)!=".") {
         unlink($path_comprobantes.'/'.$archivo);
+    }
+}
+
+while ($archivo = $directorio8->read()) {
+    if (substr($archivo,0,1)!=".") {
+        unlink($path_despacho.'/'.$archivo);
     }
 }
 

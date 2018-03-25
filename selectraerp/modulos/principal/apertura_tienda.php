@@ -61,6 +61,7 @@ $path_libros=$ruta_master."/libro_venta";
 $path_ingresos=$ruta_master."/control_ingresos";
 $path_cierre_pos=$ruta_master."/cierre_pos";
 $path_comprobantes=$ruta_master."/comprobantes";
+$path_despacho=$ruta_master."/despacho";
 
 $dia=date("d");
 $mes=date("m");
@@ -87,6 +88,7 @@ $nombre_cierre_pos="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_cierre_pos
 $nombre_comprobante_cabecera="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_comprobante_cabecera.csv";
 $nombre_comprobante_detalle="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_comprobante_detalle.csv";
 $nombre_ingresos_detalle="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_ingresos_detalle.csv";
+$nombre_despacho="000".$sucursal.'_'.$dia.$mes.$ano."_v".$version."_despacho.json";
 
 $operacion_cajero=$almacen->ObtenerFilasBySqlSelect("SELECT * FROM `operaciones_apertura` WHERE `operacion`='Cierre de Cajero'");
 $operacion_libroventa=$almacen->ObtenerFilasBySqlSelect("SELECT * FROM `operaciones_apertura` WHERE `operacion`='Libro de Venta'");
@@ -569,6 +571,26 @@ foreach ($array_ingresos_detalle as $key => $value) {
 $instruccion2="UPDATE comprobante_control SET id_comprobante=".$ultimo_comprobante."";
 $almacen->Execute2($instruccion2);
 
+//Pedidos del Cliente
+$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion`, `id_pagos_consolidados` FROM `despacho_new`";
+$array_despacho=$almacen->ObtenerFilasBySqlSelect($sql);
+
+$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `despacho_new_detalle`";
+$array_despacho_detalle=$almacen->ObtenerFilasBySqlSelect($sql);
+
+//Facturas del Cliente
+$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion` FROM `factura`";
+$array_factura=$almacen->ObtenerFilasBySqlSelect($sql);
+
+$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `factura_detalle`";
+$array_factura_detalle=$almacen->ObtenerFilasBySqlSelect($sql);
+
+$json = array('despacho_new' => $array_despacho,'despacho_new_detalle' => $array_despacho_detalle,'factura' => $array_factura, 'factura_detalle' => $array_factura_detalle);
+$json = json_encode($json);
+
+$pf_inv=fopen($path_despacho."/".$nombre_despacho,"w+");
+fwrite($pf_inv, $json);
+fclose($pf_inv);
 //echo $sql_comprobante_detalle; exit();
 
 $sql_corregir_itempos="update item 
