@@ -98,7 +98,20 @@ if (isset($_POST["input_cantidad_items"]))
     $correlativos = new Correlativos();
     for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++)
     {
-
+        //busco primero el costo, este costo sale da la ubicacion de la salida.//
+        $costo=NULL;
+        $sql="select a.costo_declarado from kardex_almacen_detalle as a inner join kardex_almacen as c on a.id_transaccion=c.id_transaccion, item_existencia_almacen as b where
+              a.id_ubi_entrada=b.id_ubicacion
+              and a.id_item='" . $_POST["_id_item"][$i] . "'
+              and c.id_cliente=b.id_proveedor
+              and b.id_item='" . $_POST["_id_item"][$i] . "'
+              and b.id_ubicacion  = '" . $_POST["_ubicacion"][$i] . "' 
+              and b.cod_almacen = '" . $_POST["_id_almacen"][$i] . "' 
+              and b.lote='" . $_POST["_nlote"][$i] . "' 
+              and b.id_marca='" . $_POST["_marca"][$i] . "' 
+              and b.id_proveedor='{$_POST["id_proveedor"]}' order by a.id_transaccion_detalle desc limit 1";
+              
+        $costo=$almacen->ObtenerFilasBySqlSelect($sql);
         $sql="SELECT coniva1 FROM item WHERE id_item  = '{$_POST["_id_item"][$i]}'";
         $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
 
@@ -115,7 +128,8 @@ if (isset($_POST["input_cantidad_items"]))
         `id_ubi_salida`, 
         `precio`,
         `lote`,
-        `id_marca`
+        `id_marca`,
+        `costo_declarado`
         )
         VALUES (
         NULL ,
@@ -129,7 +143,8 @@ if (isset($_POST["input_cantidad_items"]))
         '" . $_POST["_ubicacion"][$i]. "',
         ".$precio_actual[0]['coniva1'].",
         '" . $_POST["_nlote"][$i]. "',
-        '" . $_POST["_marca"][$i]. "'
+        '" . $_POST["_marca"][$i]. "',
+        '" . $costo[0]['costo_declarado']. "'
         );";
 
         //echo $kardex_almacen_detalle_instruccion; exit();
@@ -238,11 +253,13 @@ if (isset($_POST["input_cantidad_items"]))
         //se comienza a cobrar
         //tipo cliente
         $sql="select cod_tipo_cliente from clientes where id_cliente={$_POST["id_proveedor"]}";
+        $clienteseguro=0;
         $tipocliente=$almacen->ObtenerFilasBySqlSelect($sql);
         if($tipocliente[0]['cod_tipo_cliente']==1)
         {
             //privada
             $precio='precio1';
+            $clienteseguro=1;
         }
         elseif ($tipocliente[0]['cod_tipo_cliente']==2) 
         {
@@ -290,6 +307,53 @@ if (isset($_POST["input_cantidad_items"]))
             }
             //echo $sql; exit();
         }
+        /*************************************************/
+        /**********COBRANDO SEGURO ***************/
+        //busco primero el costo, este costo sale da la ubicacion de la salida.//
+        $sql="select a.costo_declarado from kardex_almacen_detalle as a inner join kardex_almacen as c on a.id_transaccion=c.id_transaccion, item_existencia_almacen as b where
+              a.id_ubi_entrada=b.id_ubicacion
+              and a.id_item='" . $_POST["_id_item"][$i] . "'
+              and c.id_cliente=b.id_proveedor
+              and b.id_item='" . $_POST["_id_item"][$i] . "'
+              and b.id_ubicacion  = '" . $_POST["_ubicacion"][$i] . "' 
+              and b.cod_almacen = '" . $_POST["_id_almacen"][$i] . "' 
+              and b.lote='" . $_POST["_nlote"][$i] . "' 
+              and b.id_marca='" . $_POST["_marca"][$i] . "' 
+              and b.id_proveedor='{$_POST["id_proveedor"]}' order by a.id_transaccion_detalle desc limit 1";
+        $costo=$almacen->ObtenerFilasBySqlSelect($sql);
+        
+        if(isset($costo[0]['costo_declarado']))
+        {
+            $sql="select id_item, cod_item, iva, descripcion1 from item where precio1=-1";
+            $contarservicio=$almacen->ObtenerFilasBySqlSelect($sql);
+            if($clienteseguro==0)
+            {
+                if($contarservicio!=null)
+                {
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = (($_POST["_peso"][0]*$costo[0]['costo_declarado']) * 0.005); //$contarservicio[0]['precio1'];
+                    $total[$contador] =( (($_POST["_peso"][0]*$costo[0]['costo_declarado']) * 0.005) + (((($_POST["_peso"][0]*$costo[0]['costo_declarado']) * 0.005)*$contarservicio[0]['iva']) / 100) ) ;
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
+            }
+            else
+            {
+                if($contarservicio!=null)
+                {
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = (($_POST["_peso"][0]*$datospadre[0]['costo_declarado']) * 0.0075); //$contarservicio[0]['precio1'];
+                    $total[$contador] =( (($_POST["_peso"][0]*$datospadre[0]['costo_declarado']) * 0.0075) + (((($_POST["_peso"][0]*$datospadre[0]['costo_declarado']) * 0.0075)*$contarservicio[0]['iva']) / 100) ) ;
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
+            }
+        }
+        /**************************************************/
         //fin del cobro de movimiento, ahora se cobra la ubicacion 
         $sql="select id_servicio from ubicacion_servicio where id_ubicacion in ('".$_POST['ubicacion_entrada']."')";
         $buscarserviciosubicacion=$almacen->ObtenerFilasBySqlSelect($sql);
