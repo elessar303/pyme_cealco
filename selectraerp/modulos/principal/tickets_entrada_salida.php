@@ -1,13 +1,13 @@
 <?php
 
 $comunes = new Comunes();
-$tabla = $name_form = "tickets_entrada_salida a, transporte_conductores b";
+$tabla = $name_form = "tickets_entrada_salida a left join kardex_almacen c on a.id =c.ticket_entrada INNER join transporte_conductores b on a.id_conductor=b.id";
 $tipob=@$_GET['tipo'];
 $des=@$_GET['des'];
 $pagina=@$_GET['pagina'];
 $busqueda = @$_GET['busqueda'];
-$where= " and a.id_conductor=b.id";
-$cols="a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*";
+$where= " and a.hora_entrada<>'' ";
+$cols="a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion_calidad as id_transaccion";
 $order=$where." ORDER BY a.id DESC";
 if(isset($_POST['buscar']) || $tipob!=NULL){
 	if(!$tipob){
@@ -31,10 +31,13 @@ if(isset($_POST['buscar']) || $tipob!=NULL){
 	}
 
 }else{
-    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.* FROM ".$tabla." WHERE a.hora_entrada<>'' ".$where." ORDER BY a.id DESC";
-
+    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion_calidad as id_transaccion FROM tickets_entrada_salida a 
+    left join kardex_almacen c on a.id =c.ticket_entrada
+    INNER join transporte_conductores b on a.id_conductor=b.id
+    WHERE a.hora_entrada<>'' 
+    ORDER BY a.id DESC";
 }
-
+//echo $instruccion; exit;
 $num_paginas=$comunes->obtener_num_paginas($instruccion);
 $pagina=$comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos=$comunes->paginacion($pagina, $instruccion);
