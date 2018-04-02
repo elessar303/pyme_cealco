@@ -410,22 +410,26 @@ $comunes = new ConexionComun();
 $array_parametros_generales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_generales");
 
 $operacion="Entrada";
-$sql="SELECT *, REPLACE(REPLACE(pv1.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep1, REPLACE(REPLACE(pv2.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep2, sum(kad.cantidad) as cantidad_item, k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion,kad.observacion as observacion_dif, cli.nombre as nombre_cliente, cli.rif as rif_cliente, cli.direccion as direccion_cliente, kad.precio as precio_hist, ite.iva as iva, prove.nombre as nombre_proveedor,
-    concat(ite.descripcion1,' - ',m.marca,' ',ite.pesoxunidad,um.nombre_unidad) AS descripcion1, k.observacion as observacion_cabecera, k.fecha_creacion
-    from calidad_almacen_detalle as kad  
+$sql="SELECT *, REPLACE(REPLACE(pv1.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep1, REPLACE(REPLACE(pv2.nombre_punto, 'PUNTO DE VENTA - ', ''), 'CENTRO DE DISTRIBUCION -','') as nombre_punto_rep2, sum(kad.cantidad) as cantidad_item,sum(kad.peso) as peso_total, k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion,kad.observacion as observacion_dif, cli.nombre as nombre_cliente, cli.rif as rif_cliente, cli.direccion as direccion_cliente, kad.precio as precio_hist, ite.iva as iva, k.marca as marca_vehiculo, prove.nombre as nombre_proveedor,
+    concat(ite.descripcion1,' - ',m.marca,' ',ite.pesoxunidad,um.nombre_unidad) AS descripcion1, k.observacion as observacion_cabecera, k.fecha_creacion, tp.descripcion as tipo_despacho
+    from kardex_almacen_detalle as kad  
     left join almacen as alm on kad.id_almacen_entrada=alm.cod_almacen  
     left join ubicacion as ubi on kad.id_ubi_entrada=ubi.id 
-    left join calidad_almacen as k on k.id_transaccion=kad.id_transaccion 
+    left join kardex_almacen as k on k.id_transaccion=kad.id_transaccion 
     left join item as ite on kad.id_item=ite.id_item 
     left join conductores AS con ON k.id_conductor = con.id_conductor
     left join puntos_venta AS pv1 ON k.almacen_destino = pv1.codigo_siga_punto
     left join puntos_venta AS pv2 ON k.almacen_procedencia = pv2.codigo_siga_punto
-    left join clientes AS cli ON k.id_proveedor = cli.id_cliente
+    left join clientes AS cli ON k.id_cliente = cli.id_cliente
     left join marca m on m.id = ite.id_marca 
     left join unidad_medida um on um.id = ite.unidadxpeso
-    left join clientes as prove on k.id_proveedor=prove.id_cliente
-    where k.id_transaccion=".$id_transaccion."
+    left join clientes as prove on k.id_cliente=prove.id_cliente
+    left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
+    left join calidad_almacen as cali on k.id_transaccion_calidad=cali.id_transaccion
+    where k.id_transaccion_calidad=".$id_transaccion."
     group by kad.id_item";
+
+
     //echo $sql; exit;
 $array_movimiento = $comunes->ObtenerFilasBySqlSelect($sql);
 
