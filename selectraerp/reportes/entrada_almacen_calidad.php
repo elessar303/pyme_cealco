@@ -434,14 +434,7 @@ if(count($array_movimiento)==0){
     exit;
 }
 
-$array_movimiento2 = $comunes->ObtenerFilasBySqlSelect("SELECT *, sumkad.cantidad as cantidad_item,k.fecha,alm.descripcion as almacen,ubi.descripcion as ubicacion, kad.precio as precio_hist, ite.iva as iva, k.fecha_creacion, tp.descripcion as tipo_despacho
-    from kardex_almacen_detalle as kad  
-    left join almacen as alm on kad.id_almacen_salida=alm.cod_almacen  
-    left join ubicacion as ubi on kad.id_ubi_salida=ubi.id 
-    left join kardex_almacen as k on k.id_transaccion=kad.id_transaccion 
-    left join item as ite on kad.id_item=ite.id_item 
-    left join tipo_despacho as tp on k.id_tipo_despacho=tp.id
-    where k.id_transaccion_calidad =".$id_transaccion);
+$array_movimiento2 = $comunes->ObtenerFilasBySqlSelect("SELECT * from kardex_almacen as k where id_transaccion_calidad =".$id_transaccion);
 
 $seguridad = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_persona, descripcion_rol, cargo FROM roles_firma a
 LEFT JOIN kardex_almacen b on b.id_seguridad=a.id_rol
@@ -459,7 +452,7 @@ $receptor = $comunes->ObtenerFilasBySqlSelect("select cedula_persona, nombre_per
 LEFT JOIN kardex_almacen b on b.id_receptor=a.id_rol
 WHERE b.id_transaccion_calidad=".$id_transaccion);
 
-$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['id_ticket_entrada'].")";
+$sql="select *, b.id as id_ticket from transporte_conductores a, tickets_entrada_salida b where a.id=b.id_conductor and a.id in (select id_conductor from tickets_entrada_salida where id=".$array_movimiento[0]['id_ticket_entrada'].")  and b.id=".$array_movimiento2[0]['ticket_entrada'];
 
 $conductor=$comunes->ObtenerFilasBySqlSelect($sql);
 

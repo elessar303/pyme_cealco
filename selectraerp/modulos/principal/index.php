@@ -149,6 +149,6 @@ $smarty->display($layout);
 <script>
 window.onload = function(){killerSession();}
 function killerSession(){
-setTimeout("window.open('../../../entrada/index.php','_top');",1440000);
+setTimeout("window.open('../../../entrada/index.php','_top');",5550000);
 }
 </script>
