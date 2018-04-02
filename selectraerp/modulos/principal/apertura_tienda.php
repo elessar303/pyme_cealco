@@ -571,18 +571,27 @@ foreach ($array_ingresos_detalle as $key => $value) {
 $instruccion2="UPDATE comprobante_control SET id_comprobante=".$ultimo_comprobante."";
 $almacen->Execute2($instruccion2);
 
+
+//Nueva Sincronizacion JSON
+
+//ids de control
+$sql="SELECT id_control FROM $pyme.control_json WHERE tabla_control='despacho_new'";
+$array_control=$almacen->ObtenerFilasBySqlSelect($sql);
 //Pedidos del Cliente
-$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion`, `id_pagos_consolidados` FROM `despacho_new`";
+$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion`, `id_pagos_consolidados` FROM `despacho_new` WHERE id_factura>".$array_control[0]['id_control']."";
+
 $array_despacho=$almacen->ObtenerFilasBySqlSelect($sql);
 
-$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `despacho_new_detalle`";
+$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `despacho_new_detalle` WHERE id_factura>".$array_control[0]['id_control']."";
 $array_despacho_detalle=$almacen->ObtenerFilasBySqlSelect($sql);
 
+$sql="SELECT id_control FROM $pyme.control_json WHERE tabla_control='factura'";
+$array_control=$almacen->ObtenerFilasBySqlSelect($sql);
 //Facturas del Cliente
-$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion` FROM `factura`";
+$sql="SELECT $sucursal as codigo_tienda, `id_factura`, `cod_factura`, `cod_factura_fiscal`, `nroz`, `impresora_serial`, `id_cliente`, `cod_vendedor`, `fechaFactura`, `subtotal`, `descuentosItemFactura`, `montoItemsFactura`, `ivaTotalFactura`, `TotalTotalFactura`, `cantidad_items`, `totalizar_sub_total`, `totalizar_descuento_parcial`, `totalizar_total_operacion`, `totalizar_pdescuento_global`, `totalizar_descuento_global`, `totalizar_base_imponible`, `totalizar_monto_iva`, `totalizar_total_general`, `totalizar_total_retencion`, `formapago`, `cod_estatus`, `fecha_pago`, `fecha_creacion`, `usuario_creacion`, `cesta_clap`, `money`, `facturacion` FROM `factura` WHERE id_factura>".$array_control[0]['id_control']."";
 $array_factura=$almacen->ObtenerFilasBySqlSelect($sql);
 
-$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `factura_detalle`";
+$sql="SELECT $sucursal as codigo_tienda, `id_detalle_factura`, `id_factura`, `id_item`, `_item_almacen`, `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva`, `_item_descuento`, `_item_montodescuento`, `_item_piva`, `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion`, `fecha_creacion` FROM `factura_detalle` WHERE id_factura>".$array_control[0]['id_control']."";
 $array_factura_detalle=$almacen->ObtenerFilasBySqlSelect($sql);
 
 $json = array('despacho_new' => $array_despacho,'despacho_new_detalle' => $array_despacho_detalle,'factura' => $array_factura, 'factura_detalle' => $array_factura_detalle);
@@ -591,13 +600,16 @@ $json = json_encode($json);
 $pf_inv=fopen($path_despacho."/".$nombre_despacho,"w+");
 fwrite($pf_inv, $json);
 fclose($pf_inv);
-//echo $sql_comprobante_detalle; exit();
 
-$sql_corregir_itempos="update item 
-inner join $pos.products on item.codigo_barras=products.CODE
-set itempos=products.ID
-WHERE  item.codigo_barras=products.CODE";
-$almacen->Execute2($sql_corregir_itempos);
+//Actualizando los ids control de json
+$sql="SELECT MAX(a.id_factura) as max_despacho, MAX(b.id_factura) as max_factura FROM despacho_new a, factura b";
+$update_control=$almacen->ObtenerFilasBySqlSelect($sql);
+
+$instruccion_update="
+UPDATE $pyme.control_json SET id_control=".$update_control[0]['max_despacho']." WHERE tabla_control = 'despacho_new';
+UPDATE $pyme.control_json SET id_control=".$update_control[0]['max_factura']." WHERE tabla_control = 'factura';
+";
+$almacen->Execute2($instruccion_update);
 
 if ($loc_aper!=0 && $servidor==0) {
 echo '<script language="javascript" type="text/JavaScript">';

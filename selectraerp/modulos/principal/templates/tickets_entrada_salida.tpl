@@ -58,7 +58,7 @@
                         {foreach from=$cabecera key=i item=campos}
                             <td><b>{$campos}</b></td>
                         {/foreach}
-                            <td  style="text-align:center;"><b>Opciones</b></td>
+                            <td  style="text-align:center;" colspan="2"><b>Opciones</b></td>
                         </tr>
                         {if $cantidadFilas == 0}
                         <tr>
@@ -92,6 +92,17 @@
                             {if $campos.hora_salida != "0000-00-00 00:00:00"}
                             <td style="cursor:pointer; width:30px; text-align:center;">
                                 <img class="ver" onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=view&amp;cod={$campos.id_ticket}&amp;pagina={$pagina}'" title="Ver" src="../../libs/imagenes/view.gif"/>
+                            </td>
+                            {/if}
+
+                            {if $campos.id_transaccion != ""}
+                            <td style="cursor: pointer; width: 30px; text-align:center">
+                                <img class="impresion" onclick="javascript:window.open('../../reportes/entrada_almacen_calidad.php?id_transaccion={$campos.id_transaccion}', '');" title="Imprimir Detalle de Movimiento" src="../../../includes/imagenes/ico_print.gif"/>
+                            </td>
+                            {/if}
+                            {if $campos.id_transaccion == ""}
+                            <td style="cursor: pointer; width: 30px; text-align:center">
+                                <img class="impresion" title="Sin Movimiento Asociado" src="../../../includes/imagenes/ico_note.gif"/>
                             </td>
                             {/if}
                         </tr>
