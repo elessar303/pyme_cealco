@@ -221,6 +221,7 @@
           <thead>
             <tr>
               <th align="left">Almacen</th>
+              <th align="left">Ubicacion</th>
               <th align="left">Cantidad</th>
             </tr>
           </thead>
@@ -229,6 +230,7 @@
            {foreach from = $campos_item  item =campos}
            <tr>
             <td>{$campos.nom_almacen}</td>
+            <td>{$campos.nom_ubicacion}</td>
             <td align="right">
               {if $campos.cantidad_almacen < "1"}
               <span style="color:red"> {$campos.cantidad_almacen}</span>
