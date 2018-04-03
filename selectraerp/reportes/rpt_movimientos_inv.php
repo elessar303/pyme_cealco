@@ -33,13 +33,13 @@ class PDF extends FPDF {
         $this->SetFont('Arial', 'I', 8);
         $this->Cell(0, 0, utf8_decode("Fecha Emisión: ") . date("d-m-Y"), 0, 0, 'R');
         $this->SetFont('Arial', 'B', 8);
-        $this->Ln(10);
+        $this->Ln(5);
         $this->SetFont('Arial', 'B', 14);
         $this->Cell(0, 0, utf8_decode("REPORTE DE MOVIMIENTOS"), 0, 0, 'C');
         $this->SetFont('Arial', '', 12);
         $this->Ln(5);
         $this->Cell(0, 0, @$_GET["fecha"] != @$_GET["fecha2"] ? "Desde {$fecha_ini} Hasta {$fecha_fin}" : $fecha_ini, 0, 0, 'C');
-        $this->Ln(10);
+        $this->Ln(5);
 
         // if (isset($_GET["cod_cliente"]) && $_GET["cod_cliente"] != "") {
         //     $this->SetFont('Arial', 'B', 10);
@@ -57,11 +57,10 @@ class PDF extends FPDF {
         //     $this->SetFont('Arial', '', 10);
         //     $this->Cell(165, 0, utf8_decode(strtoupper($this->array_factura[0]["item_descripcion"])), 0, 0, 'L');
         // }
-        $this->Ln(10);
         $this->SetFont('Arial', 'B', 8);
         $this->SetLineWidth(0.1);
         $this->SetWidths(array(20,30, 80, 15, 15, 18, 25, 25,25,25));
-        $this->SetAligns(array("C","C", "C", "C", "C", "C", "C"));
+        $this->SetAligns(array("C","C", "C", "C", "C", "C", "C","C","C","C"));
         $this->Row(array('Fecha',utf8_decode('Código'), utf8_decode('Descripción'), 'Unid.','Lote','Tipo', 'Almacen Ent', 'Almacen Sal', 'Ubicacion Ent','Ubicacion Sal'), 1);
     }
 
@@ -118,7 +117,6 @@ class PDF extends FPDF {
             // }
         
             // aqui se imprime los datos en la tabla
-          $this->Ln(5);
         foreach ($this->array_factura as $value) {
            if($value["tipo_movimiento_almacen"]==2){
             $tipo="Venta";
@@ -138,7 +136,7 @@ class PDF extends FPDF {
             $this->SetFont('Arial', '', 8);
                 $this->SetLineWidth(0.1);
                 $this->SetWidths(array(20,30, 80, 15, 15, 18, 25, 25,25,25));
-                $this->SetAligns(array("C","C","c","C","C","C","c","C"));
+                $this->SetAligns(array("C","C", "C", "C", "C", "C", "C","C","C","C"));
                 $this->Row(array(
                     $value["fecha"],
                     $value["codigo_barras"],
@@ -146,12 +144,13 @@ class PDF extends FPDF {
                     $value["cantidad"],
                     $value["lote"],
                     $tipo,
-                    ucfirst(strtolower($value["almacen_entrada"])),
-                    ucfirst(strtolower($value["almacen_salida"])),
-                    ucfirst(strtolower($value["ubicacion_entrada"])),
-                    ucfirst(strtolower($value["ubicacion_salida"]))
+                    ucfirst(strtoupper($value["almacen_entrada"])),
+                    ucfirst(strtoupper($value["almacen_salida"])),
+                    ucfirst(strtoupper($value["ubicacion_entrada"])),
+                    ucfirst(strtoupper($value["ubicacion_salida"]))
                     
                    ));
+                $this->SetLeftMargin(10);
         }
             // while ($this->array_factura[$i]) {
             //     // $iva = $this->array_factura[$i]["totalconiva"] > 0 ? $this->array_factura[$i]["totalconiva"] - $this->array_factura[$i]["totalsiniva"] : $this->array_factura[$i]["totalconiva"];
