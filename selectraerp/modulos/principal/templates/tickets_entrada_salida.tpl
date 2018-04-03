@@ -74,7 +74,7 @@
                         <tr bgcolor="{$color}">
                             <td align="center">{$campos.id_ticket}</td>
                             <td align="center">{$campos.cedula}</td>
-                            <td align="center">{$campos.nombres} {$campos.apellidos}</td>
+                            <td align="center">{$campos.nombres|upper} {$campos.apellidos|upper}</td>
                             <td align="center">{$campos.hora_entrada|date_format:"%d-%m-%Y %I:%M %p"}</td>
                             <td align="center">{$campos.peso_entrada}</td>
                                 {if $campos.hora_salida == "0000-00-00 00:00:00"}

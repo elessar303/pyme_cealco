@@ -31,7 +31,7 @@ if(isset($_POST['buscar']) || $tipob!=NULL){
 	}
 
 }else{
-    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion_calidad as id_transaccion FROM tickets_entrada_salida a 
+    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion as id_transaccion FROM tickets_entrada_salida a 
     left join kardex_almacen c on a.id =c.ticket_entrada
     INNER join transporte_conductores b on a.id_conductor=b.id
     WHERE a.hora_entrada<>'' 
