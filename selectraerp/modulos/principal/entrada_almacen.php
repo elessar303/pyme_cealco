@@ -60,8 +60,8 @@ $smarty->assign("campo_seccion", $campos);
 //**************************************************************************
 //Criterios de Busqueda ****************************************************
 //**************************************************************************
-$smarty->assign("option_values", array("cod_acta_calidad", "observacion", "id_almacen"));
-$smarty->assign("option_output", array("Cod. Movimiento", "Observacion", "Almacen"));
+$smarty->assign("option_values", array("nombre","cod_acta_calidad", "observacion", "id_almacen"));
+$smarty->assign("option_output", array("Cliente", "Cod. Movimiento", "Observacion", "Almacen"));
 $smarty->assign("option_selected", $busqueda);
 //**************************************************************************
 //**************************************************************************
