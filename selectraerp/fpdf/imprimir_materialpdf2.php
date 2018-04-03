@@ -13,8 +13,9 @@ class PDF extends FPDFSelectra {
         $this->Cell(15, 7, utf8_decode('N'), 'LTB', 0, 'C');
         $this->Cell(35, 7, utf8_decode('Proveedor'), 'LTB', 0, 'C');
         $this->Cell(25, 7, utf8_decode('Codigo Barra'), 'LTB', 0, 'C');
-        $this->Cell(70, 7, utf8_decode('Descripcion'), 'LTB', 0, 'C');
+        $this->Cell(60, 7, utf8_decode('Descripcion'), 'LTB', 0, 'C');
         $this->Cell(15, 7, 'Exist.', 'LTB', 0, 'C');
+        $this->Cell(15, 7, 'Peso', 'LTB', 0, 'C');
         $this->Cell(10, 7, 'Lote', 'LTB', 0, 'C');
         $this->Cell(20, 7, "Precio S/Iva", 'LTBR', 0, 'C');
         $this->Cell(15, 7, "IVA (%)", 'LTBR', 0, 'C');
@@ -96,6 +97,7 @@ class PDF extends FPDFSelectra {
             $var_codigo = $row_rs['codigo_barras'];
             $var_descrip = utf8_decode($row_rs['descripcion1']);
             $var_exi = number_format($row_rs['cantidad'], 2, ',', '.');
+            $var_peso = number_format($row_rs['peso'], 2, ',', '.');
             $lote = $row_rs['lote'];
             $var_preciosiva = number_format($preciosiva, 2, ',', '.');
             $var_preciociva = number_format($preciociva, 2, ',', '.');
@@ -110,11 +112,11 @@ class PDF extends FPDFSelectra {
 
             $this->SetFont("Arial", "I", 9);
             // llamado para hacer multilinea sin que haga salto de linea
-            $this->SetWidths(array(15,25, 35,70,15, 10, 20, 15, 20,25,25));
-            $this->SetAligns(array('C','C', 'C','L', 'R', 'R', 'R','R', 'R','R','R'));
+            $this->SetWidths(array(15,25, 35,60,15,15, 10, 20, 15, 20,25,25));
+            $this->SetAligns(array('C','C', 'C','C','L', 'R', 'R', 'R','R', 'R','R','R'));
             $this->Setceldas(array(0,0, 0, 0, 0, 0, 0));
             $this->Setancho(array(5,5, 5, 5, 5, 5, 5, 5,5,5));
-            $this->Row(array($contador,$nombre_proveedor,$var_codigo,$var_descrip, $var_exi, $lote,$var_preciosiva, $iva."%", $var_preciociva, $var_precio_sub,$var_precio_total));
+            $this->Row(array($contador,$nombre_proveedor,$var_codigo,$var_descrip, $var_exi, $var_peso,$lote,$var_preciosiva, $iva."%", $var_preciociva, $var_precio_sub,$var_precio_total));
 
             if ($cont == $cantidad_registros) {
                 // $this->Ln(80);
