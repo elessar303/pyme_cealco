@@ -36,7 +36,7 @@ Ext.onReady(function(){
                 $("#ubicacion").append("<option value=''>Seleccione..</option>");
                 for (i = 0; i <= this.vcampos.length; i++)
                 {
-                    $("#ubicacion").append("<option value='" + this.vcampos[i].id + "'>" + this.vcampos[i].descripcion + "</option>");
+                    $("#ubicacion").append("<option value='" + this.vcampos[i].id + "'>Lote:"+this.vcampos[i].lote+" - " + this.vcampos[i].descripcion + " - Cantidad: "+this.vcampos[i].cantidad+" - Peso: "+this.vcampos[i].peso+"</option>");
                 }
             }
         });

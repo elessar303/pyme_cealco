@@ -7410,7 +7410,7 @@ order by mb.cod_movimiento_ban";
                $cliente=$_POST["cliente"];
                if(isset($_POST['cliente']) && $_POST['cliente']!=null)
                 {
-                    $sql="select a.id, a.descripcion, a.orden from ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion  where a.id_almacen='".$almacen."' and b.id_proveedor='".$cliente."'";
+                    $sql="select a.id, a.descripcion, a.orden, b.lote, b.cantidad, b.peso from ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion  where a.id_almacen='".$almacen."' and b.id_proveedor='".$cliente."'";
                     $campos = $conn->ObtenerFilasBySqlSelect($sql);
                 }
                 else
