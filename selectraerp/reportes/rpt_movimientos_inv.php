@@ -59,9 +59,9 @@ class PDF extends FPDF {
         // }
         $this->SetFont('Arial', 'B', 8);
         $this->SetLineWidth(0.1);
-        $this->SetWidths(array(20,30, 80, 15, 15, 18, 25, 25,25,25));
-        $this->SetAligns(array("C","C", "C", "C", "C", "C", "C","C","C","C"));
-        $this->Row(array('Fecha',utf8_decode('Código'), utf8_decode('Descripción'), 'Unid.','Lote','Tipo', 'Almacen Ent', 'Almacen Sal', 'Ubicacion Ent','Ubicacion Sal'), 1);
+        $this->SetWidths(array(20,30,20, 60, 15, 15, 18, 25, 25,25,25));
+        $this->SetAligns(array("C","C","C", "C", "C", "C", "C", "C","C","C","C"));
+        $this->Row(array('Fecha',utf8_decode('Código'), 'Movimiento',utf8_decode('Descripción'), 'Unid.','Lote','Tipo', 'Almacen Ent', 'Almacen Sal', 'Ubicacion Ent','Ubicacion Sal'), 1);
     }
 
     function Footer() {
@@ -135,11 +135,12 @@ class PDF extends FPDF {
            }
             $this->SetFont('Arial', '', 8);
                 $this->SetLineWidth(0.1);
-                $this->SetWidths(array(20,30, 80, 15, 15, 18, 25, 25,25,25));
-                $this->SetAligns(array("C","C", "C", "C", "C", "C", "C","C","C","C"));
+                $this->SetWidths(array(20,30, 20,60, 15, 15, 18, 25, 25,25,25));
+                $this->SetAligns(array("C","C","C", "C", "C", "C", "C", "C","C","C","C"));
                 $this->Row(array(
                     $value["fecha"],
                     $value["codigo_barras"],
+                    $value["cod_movimiento"],
                     utf8_decode($value["descripcion1"]),
                     $value["cantidad"],
                     $value["lote"],
@@ -265,7 +266,7 @@ $filtro.=" and ite.codigo_barras='".$producto."'";
 if($lote!=''){
 $filtro.=" and kad.lote='".$lote."'";
 }
-$sql = "SELECT k.tipo_movimiento_almacen,  ite.descripcion1, ite.codigo_barras, kad.cantidad AS cantidad, alm.descripcion AS almacen_entrada, a.descripcion AS almacen_salida, ubi.descripcion AS ubicacion_entrada, u.descripcion AS ubicacion_salida, k.fecha, kad.lote
+$sql = "SELECT k.tipo_movimiento_almacen,  ite.descripcion1, ite.codigo_barras, kad.cantidad AS cantidad, alm.descripcion AS almacen_entrada, a.descripcion AS almacen_salida, ubi.descripcion AS ubicacion_entrada, u.descripcion AS ubicacion_salida, k.fecha, kad.lote, k.cod_movimiento
 FROM kardex_almacen_detalle AS kad
 LEFT JOIN almacen AS alm ON kad.id_almacen_entrada = alm.cod_almacen
 LEFT JOIN almacen AS a ON kad.id_almacen_salida = a.cod_almacen
