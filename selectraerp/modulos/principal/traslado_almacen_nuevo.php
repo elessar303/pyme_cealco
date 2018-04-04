@@ -309,6 +309,7 @@ if (isset($_POST["input_cantidad_items"]))
         }
         /*************************************************/
         /**********COBRANDO SEGURO ***************/
+        /*
         //busco primero el costo, este costo sale da la ubicacion de la salida.//
         $sql="select a.costo_declarado from kardex_almacen_detalle as a inner join kardex_almacen as c on a.id_transaccion=c.id_transaccion, item_existencia_almacen as b where
               a.id_ubi_entrada=b.id_ubicacion
@@ -352,7 +353,7 @@ if (isset($_POST["input_cantidad_items"]))
                     $contador++;
                 }
             }
-        }
+        }*/
         /**************************************************/
         //fin del cobro de movimiento, ahora se cobra la ubicacion 
         $sql="select id_servicio from ubicacion_servicio where id_ubicacion in ('".$_POST['ubicacion_entrada']."')";
