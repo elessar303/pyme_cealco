@@ -7,7 +7,7 @@ $des=@$_GET['des'];
 $pagina=@$_GET['pagina'];
 $busqueda = @$_GET['busqueda'];
 $where= " and a.hora_entrada<>'' ";
-$cols="a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion_calidad as id_transaccion";
+$cols="a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion_calidad as id_transaccion, c.tipo_movimiento_almacen as tipo_movimiento";
 $order=$where." ORDER BY a.id DESC";
 if(isset($_POST['buscar']) || $tipob!=NULL){
 	if(!$tipob){
@@ -31,7 +31,7 @@ if(isset($_POST['buscar']) || $tipob!=NULL){
 	}
 
 }else{
-    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion as id_transaccion FROM tickets_entrada_salida a 
+    $instruccion = "SELECT a.id as id_ticket, a.hora_entrada, a.hora_salida as hora_salida, a.peso_entrada, a.peso_salida, b.*, c.id_transaccion as id_transaccion, c.id_transaccion_calidad as id_calidad, c.tipo_movimiento_almacen as tipo_movimiento FROM tickets_entrada_salida a 
     left join kardex_almacen c on a.id =c.ticket_entrada
     INNER join transporte_conductores b on a.id_conductor=b.id
     WHERE a.hora_entrada<>'' 
@@ -43,7 +43,7 @@ $pagina=$comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos=$comunes->paginacion($pagina, $instruccion);
 
 $smarty->assign("registros",$campos);
-$smarty->assign("cabecera",array("Ticket","Cedula Conductor", "Nombre y Apellido", "Hora Entrada", "Peso Entrada", "Hora Salida", "Peso Salida"));
+$smarty->assign("cabecera",array("Ticket","Cedula Conductor", "Nombre y Apellido", "Hora Entrada", "Peso Entrada", "Hora Salida", "Peso Salida", "Tipo de Movimiento"));
 $smarty->assign("limitePaginacion",$comunes->LimitePaginaciones);
 $smarty->assign("num_paginas",$num_paginas);
 $smarty->assign("pagina",$pagina);
