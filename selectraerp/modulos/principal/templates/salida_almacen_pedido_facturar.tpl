@@ -13,7 +13,7 @@
         if(confirm('¿Esta seguro de realizar el cierre de cliente?'))
         {
         
-            window.open('cron_cargosautomaticos.php?despacho=id','window','menubar=1,resizable=1,fullscreen=yes');
+            window.open('cron_cargosautomaticos.php?despacho=' + id,'window','menubar=1,resizable=1,fullscreen=yes');
         }
         else
         {
