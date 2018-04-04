@@ -8,6 +8,21 @@
         <script language="JavaScript" type="text/javascript" src="../../libs/js/funciones.js"></script>
         {literal}
         <script type="text/javascript">//<![CDATA[
+        $("#cerrarpedido").live("click", function(e) {
+        id=$(this).parents("td").find("input[name='cerrarpedido']").val();
+        if(confirm('¿Esta seguro de realizar el cierre de cliente?'))
+        {
+        
+            window.open('cron_cargosautomaticos.php?despacho=id','window','menubar=1,resizable=1,fullscreen=yes');
+        }
+        else
+        {
+            return false;
+        }
+        });
+            
+            
+            
             function eliminar( factura, id)
             {
                 if(confirm("¿Esta seguro de querer eliminar la factura "+ factura + " de id " + id + "?"))
@@ -92,9 +107,11 @@
                                         <input type="hidden" name="id_cliente" value="{$campos.id_cliente}"/>
                                         <input type="hidden" name="id_tipo_movimiento_almacen" value="{$campos.id_tipo_movimiento_almacen}"/>
                                     </td>
-                                    <td style="cursor:pointer; width:30px; text-align:center" >
+                                    <td style="cursor:pointer; width:30px; text-align:center" name="{$campos.id_cliente}">
                                         {if $campos.facturado eq 0}
-                                           <img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('cron_cargosautomaticos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Cerrar Pedido" src="../../../includes/imagenes/factu.png"/>
+                                           <!--<img style="cursor: pointer;" class="newfactura" onclick="javascript: window.open('cron_cargosautomaticos.php?despacho={$campos.id_cliente}','window','menubar=1,resizable=1,fullscreen=yes');" title="Cerrar Pedido" src="../../../includes/imagenes/factu.png"/>-->
+                                           <input type="hidden" name="cerrarpedido" value="{$campos.id_cliente}"/>
+                                           <img style="cursor: pointer;" class="newfactura" name="{$campos.id_cliente}" id="cerrarpedido" title="Cerrar Pedido" src="../../../includes/imagenes/factu.png" />
                                         {/if}
                                     </td>
                                 </tr>
