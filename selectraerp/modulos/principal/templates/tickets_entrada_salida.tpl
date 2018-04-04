@@ -83,6 +83,17 @@
                                 <td align="center">{$campos.hora_salida|date_format:"%d-%m-%Y %I:%M %p"}</td>
                                 {/if}
                             <td align="center">{$campos.peso_salida}</td>
+                            <td align="center">
+                            {if $campos.tipo_movimiento == 3}
+                            Recepcion
+                            {/if}
+                            {if $campos.tipo_movimiento == 4}
+                            Despacho
+                            {/if}
+                            {if $campos.tipo_movimiento == ''}
+                            Sin Movimiento Asociado
+                            {/if}
+                            </td>
 
                             {if $campos.hora_salida == "0000-00-00 00:00:00"}
                             <td style="cursor:pointer; width:30px; text-align:center;">
@@ -95,16 +106,22 @@
                             </td>
                             {/if}
 
-                            {if $campos.id_transaccion != ""}
+                            {if $campos.tipo_movimiento == 3}
                             <td style="cursor: pointer; width: 30px; text-align:center">
-                                <img class="impresion" onclick="javascript:window.open('../../reportes/entrada_almacen_calidad.php?id_transaccion={$campos.id_transaccion}', '');" title="Imprimir Detalle de Movimiento" src="../../../includes/imagenes/ico_print.gif"/>
+                                <img class="impresion" onclick="javascript:window.open('../../reportes/entrada_almacen_calidad.php?id_transaccion={$campos.id_calidad}', '');" title="Imprimir Recepcion" src="../../../includes/imagenes/ico_print.gif"/>
                             </td>
                             {/if}
-                            {if $campos.id_transaccion == ""}
+                            {if $campos.tipo_movimiento == 4}
+                            <td style="cursor: pointer; width: 30px; text-align:center">
+                                <img class="impresion" onclick="javascript:window.open('../../reportes/salida_almacen_calidad.php?id_transaccion={$campos.id_transaccion}', '');" title="Imprimir Despacho" src="../../../includes/imagenes/ico_print.gif"/>
+                            </td>
+                            {/if}
+                            {if $campos.tipo_movimiento == ''}
                             <td style="cursor: pointer; width: 30px; text-align:center">
                                 <img class="impresion" title="Sin Movimiento Asociado" src="../../../includes/imagenes/ico_note.gif"/>
                             </td>
                             {/if}
+
                         </tr>
                             {assign var = ultimo_cod_valor value=$campos.cod_especialidad}
                             {/foreach}
