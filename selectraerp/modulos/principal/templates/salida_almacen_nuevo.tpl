@@ -149,6 +149,7 @@
     <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}"/>
     <input type="hidden" name="opt_seccion" value="{$smarty.get.opt_seccion}"/>
     <input type="hidden" name="opt_subseccion" value="{$smarty.get.opt_subseccion}"/>
+    <input type="hidden" name="pesooculto" id="pesooculto" value="0">
     <table width="100%">
         <tr class="row-br">
             <td>
@@ -311,6 +312,7 @@
                                     <th class="tb-tit">Codigo</th>
                                     <th class="tb-tit">Descripcion</th>
                                     <th class="tb-tit">Cantidad</th>
+                                    <th class="tb-tit">Peso</th>
                                     <th class="tb-tit">Opt</th>
                                 </tr>
                             </thead>

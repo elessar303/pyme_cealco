@@ -50,6 +50,7 @@ function solonumeros(evt)
 </script>
 {/literal}
 <form name="formulario" id="formulario" method="post" action="">
+    <input type="hidden" name="pesooculto" id="pesooculto" value="0">
     <input type="hidden" name="Datosproveedor" value="">
     <input type="hidden" name="codigo_empresa" value="{$DatosEmpresa[0].codigo}">
     <input type="hidden" name="opt_menu" value="{$smarty.get.opt_menu}">
@@ -172,6 +173,7 @@ function solonumeros(evt)
                                         <th class="tb-tit">Codigo</th>
                                         <th class="tb-tit">Descripcion</th>
                                         <th class="tb-tit">Cantidad</th>
+                                        <th class="tb-tit">Peso</th>
                                         <th class="tb-tit">Opt</th>
                                     </tr>
                                 </thead>

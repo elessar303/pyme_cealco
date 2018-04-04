@@ -123,9 +123,18 @@ var eventos_form = {
                 html += "		<td title=\"Haga click aqui para ver el detalle del Item\" class=\"info_detalle\" style=\"cursor:pointer;background-color:#507e95;color:white;\"><a class=\"codigo\" rel=\"facebox\" style=\"color:white;\" href=\"#info\">" + options.id_item + "</a></td>";
                 html += "		<td>" + options.descripcion + "</td>";
                 html += "		<td>" + options.cantidad + "</td>";
+                html += "		<td>" + options.peso + "</td>";
                 html += "		<td class=\"eliminar_serial\"><a  rel=\"borrar_serial\" style=\"color:white;\" href=\"#info\"><img style=\"cursor: pointer; float: center;\" class=\"eliminar\"  title=\"Eliminar Item\" src=\"../../libs/imagenes/delete.png\">"+ options.id_item + "</a>" + campos + "</td>";
                 html += "           </tr>";
                 $(".grid table.lista tbody").append(html);
+                totalpesooculto=$("#pesooculto").val();
+                if(isNaN(totalpesooculto))
+                {
+                    totalpesooculto=0;
+                }
+                total=0;
+                total+=parseFloat(totalpesooculto) + parseFloat(options.peso);
+                $("#pesooculto").val(total);
                 eventos_form.CargarDisplayMontos();
                 win.hide();
             }
@@ -147,10 +156,15 @@ var eventos_form = {
     },
     CargarDisplayMontos: function() {
         cantidad_ = $(".grid table.lista tbody").find("tr").length;
+        var pesooculto_ = $("#pesooculto").val();
+        if(isNaN(pesooculto_))
+        {
+            pesooculto_=0;
+        }
         //alert(cantidad_)
         $(".span_cantidad_items").html("<span style=\"font-size: 10px;\">Cantidad de Items: " + (cantidad_) + "</span>");
         $("input[name='input_cantidad_items']").attr("value", cantidad_);
-        var stringDisplay = "<span style='color:green'><b>Cantidad Items(" + cantidad_ + ")</b></span>";
+        var stringDisplay = "<span style='color:green'><b>Cantidad Items(" + cantidad_ + ")</b></span><span style='color:green'> <b> - Total Peso(" + pesooculto_ + ")</b></span>";
         $("#displaytotal, #displaytotal2").html(stringDisplay);
 
     },
