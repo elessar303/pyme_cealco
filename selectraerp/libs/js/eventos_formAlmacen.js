@@ -179,6 +179,11 @@ var eventos_form = {
             $("#id_proveedor").css("border-width",$(this).val()===""?"1px":"");
             Ext.Msg.alert("Alerta!", "Debe Ingresar el Proveedor");
         }
+        else if ($("#cliente").val() === "") {
+            $("#cliente").css("border-color",$(this).val()===""?"red":"");
+            $("#cliente").css("border-width",$(this).val()===""?"1px":"");
+            Ext.Msg.alert("Alerta!", "Debe Seleccionar al Cliente");
+        }
         else if ($("#nro_documento").val() === "") {
             $("#nro_documento").css("border-color",$(this).val()===""?"red":"");
             $("#nro_documento").css("border-width",$(this).val()===""?"1px":"");
@@ -238,8 +243,11 @@ var eventos_form = {
             $("#nro_contenedor").css("border-color",$(this).val()===""?"red":"");
             $("#nro_contenedor").css("border-width",$(this).val()===""?"1px":"");
             Ext.Msg.alert("Alerta!", "Debe Ingresar el Nro. de Contenedor");
-        }
-        else if( $("input[name='input_cantidad_items']").val()==0){
+        }else if($("#id_ticket").val()==""){
+            Ext.Msg.alert("Alerta","Debe Seleccionar el ticket del Conductor.");
+            $("#id_ticket").css("border-color",$(this).val()===""?"red":"");
+            $("#id_ticket").css("border-width",$(this).val()===""?"1px":"");
+        }else if( $("input[name='input_cantidad_items']").val()==0){
           Ext.Msg.alert("Alerta!", "Debe Ingresar un Producto antes de registrar el movimiento");
           
         }
@@ -247,6 +255,8 @@ var eventos_form = {
         else{
             $("#formulario").submit();
         }
+        var pruebatab = Ext.getCmp('remove-this-tab');
+        tab.remove(pruebatab);
         return false;
     }
 };

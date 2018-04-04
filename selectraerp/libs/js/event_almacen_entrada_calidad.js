@@ -332,6 +332,7 @@ $("#cantidaddeberia").change(function(){
                            return false;
                     }
                 }
+
                 eventos_form.IncluirRegistros({
                     //cod_item:           $("#items").val(),/////// Añadido
                     id_item:            $("#items").val(),
@@ -552,7 +553,7 @@ $("#cantidaddeberia").change(function(){
                     eventos_form.GenerarCompraX();
                     /*Remueve esta pestaña del tab HZ*/
                     var pruebatab = Ext.getCmp('remove-this-tab');
-                    tab.remove(pruebatab);
+                    tab.hide(pruebatab);
                 }
             },
             {

@@ -179,7 +179,7 @@ var eventos_form = {
         else if ($("#id_proveedor").val() === "") {
             $("#id_proveedor").css("border-color",$(this).val()===""?"red":"");
             $("#id_proveedor").css("border-width",$(this).val()===""?"1px":"");
-            Ext.Msg.alert("Alerta!", "Debe Ingresar el Proveedor");
+            Ext.Msg.alert("Alerta!", "Debe Ingresar al Cliente");
         }
         else if ($("#nro_documento").val() === "") {
             $("#nro_documento").css("border-color",$(this).val()===""?"red":"");
@@ -190,12 +190,12 @@ var eventos_form = {
         else if ($("#estado").val() === "") {
             $("#estado").css("border-color",$(this).val()===""?"red":"");
             $("#estado").css("border-width",$(this).val()===""?"1px":"");
-            Ext.Msg.alert("Alerta!", "Debe Agregar Estado De Procedencia");
+            Ext.Msg.alert("Alerta!", "Debe Seleccionar el estado de la Instalacion");
         }
         else if ($("#puntodeventa").val() === "") {
             $("#puntodeventa").css("border-color",$(this).val()===""?"red":"");
             $("#puntodeventa").css("border-width",$(this).val()===""?"1px":"");
-            Ext.Msg.alert("Alerta!", "Debe Agregar Un Punto De Procedencia");
+            Ext.Msg.alert("Alerta!", "Debe Seleccionar la Instalacion");
         }
         else if ($("#ubicacion_entrada").val() === "") {
             $("#ubicacion_entrada").css("border-color",$(this).val()===""?"red":"");
@@ -246,15 +246,17 @@ var eventos_form = {
             $("#nro_factura").css("border-color",$(this).val()===""?"red":"");
             $("#nro_factura").css("border-width",$(this).val()===""?"1px":"");
             Ext.Msg.alert("Alerta!", "Debe Ingresar el Nro. de Factura");
-        }
-        else if( $("input[name='input_cantidad_items']").val()==0){
-          Ext.Msg.alert("Alerta!", "Debe Ingresar un Producto antes de registrar el movimiento");
-          
-        }
-       
-        else{
+        }else if($("#id_ticket").val()==""){
+            Ext.Msg.alert("Alerta","Debe Seleccionar el ticket del Conductor.");
+            $("#id_ticket").css("border-color",$(this).val()===""?"red":"");
+            $("#id_ticket").css("border-width",$(this).val()===""?"1px":"");
+        }else if( $("input[name='input_cantidad_items']").val()==0){
+            Ext.Msg.alert("Alerta!", "Debe Ingresar un Producto antes de registrar el movimiento");
+        }else{
             $("#formulario").submit();
         }
+        var pruebatab = Ext.getCmp('remove-this-tab');
+        tab.show(pruebatab);
         return false;
     }
 };

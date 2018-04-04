@@ -369,7 +369,14 @@ $("#cantidaddeberia").change(function(){
                     Ext.Msg.alert("Alerta","No indica si posee fecha de vencimiento, favor comunicarse con sede central para la actualización previa del mismo");
                     return false;
                 }
-                if($("#cantidadunitaria").val()!=$("#cantidaddeberia").val()){                 
+                if($("#cantidadunitaria").val()!=$("#cantidaddeberia").val()){               
+                    if($.trim($("#observacion1").val()) ==''){
+                           Ext.Msg.alert("Alerta","Debe especificar la observacion de diferencia.");
+                           return false;
+                    }
+                }
+
+                if($("#cantidadunitaria").val()!=$("#cantidaddeberia").val()){               
                     if($.trim($("#observacion1").val()) ==''){
                            Ext.Msg.alert("Alerta","Debe especificar la observacion de diferencia.");
                            return false;
