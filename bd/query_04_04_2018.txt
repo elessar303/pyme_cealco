@@ -1,0 +1,45 @@
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_preciosiniva` `_item_preciosiniva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_preciosiniva` `_item_preciosiniva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_montodescuento` `_item_montodescuento` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_piva` `_item_piva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_totalsiniva` `_item_totalsiniva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_totalconiva` `_item_totalconiva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new_detalle` CHANGE `_item_descuento` `_item_descuento` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+
+ALTER TABLE `factura_detalle` CHANGE `_item_preciosiniva` `_item_preciosiniva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura_detalle` CHANGE `_item_preciosiniva` `_item_preciosiniva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura_detalle` CHANGE `_item_montodescuento` `_item_montodescuento` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura_detalle` CHANGE `_item_piva` `_item_piva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura_detalle` CHANGE `_item_totalsiniva` `_item_totalsiniva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura_detalle` CHANGE `_item_totalconiva` `_item_totalconiva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura_detalle` CHANGE `_item_descuento` `_item_descuento` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+
+ALTER TABLE `factura` CHANGE `subtotal` `subtotal` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `descuentosItemFactura` `descuentosItemFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `montoItemsFactura` `montoItemsFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `ivaTotalFactura` `ivaTotalFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `TotalTotalFactura` `TotalTotalFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_sub_total` `totalizar_sub_total` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_descuento_parcial` `totalizar_descuento_parcial` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_total_operacion` `totalizar_total_operacion` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_pdescuento_global` `totalizar_pdescuento_global` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_descuento_global` `totalizar_descuento_global` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_base_imponible` `totalizar_base_imponible` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_monto_iva` `totalizar_monto_iva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_total_general` `totalizar_total_general` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `factura` CHANGE `totalizar_total_retencion` `totalizar_total_retencion` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+
+ALTER TABLE `despacho_new` CHANGE `subtotal` `subtotal` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `descuentosItemFactura` `descuentosItemFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `montoItemsFactura` `montoItemsFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `ivaTotalFactura` `ivaTotalFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `TotalTotalFactura` `TotalTotalFactura` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_sub_total` `totalizar_sub_total` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_descuento_parcial` `totalizar_descuento_parcial` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_total_operacion` `totalizar_total_operacion` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_pdescuento_global` `totalizar_pdescuento_global` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_descuento_global` `totalizar_descuento_global` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_base_imponible` `totalizar_base_imponible` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_monto_iva` `totalizar_monto_iva` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_total_general` `totalizar_total_general` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
+ALTER TABLE `despacho_new` CHANGE `totalizar_total_retencion` `totalizar_total_retencion` DECIMAL(15,2) NOT NULL DEFAULT '0.00';
