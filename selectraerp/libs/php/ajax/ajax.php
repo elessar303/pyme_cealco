@@ -579,114 +579,194 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 
             }
             
-           
-            $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
-            $formateo_nro_factura = $nro_factura;
-            #obtenemos el money actual
-            $money=$conn->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
-        
-            $sql = "INSERT INTO `despacho_new` (
-                `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
-                `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
-                `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
-                `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
-                `totalizar_pdescuento_global`,`totalizar_descuento_global`,
-                `totalizar_base_imponible`,`totalizar_monto_iva`,
-                `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
-                `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
-                )
-            VALUES(
-                {$datospadre[0]['id_proveedor']}, '{$nro_factura}', '{$login->getUsuario()}', now(),
-                ". $subtotal . ", 0 ," . $subtotal . ","
-                    . $ivatotal . "," . $totaltotal . "," . $itemstotal . ","
-                    . $subtotal . ", 0," . $totaltotal . ", 0 ,  
-                    0," . $subtotal . ","
-                    . $ivatotal . ", " . $totaltotal . ",0 ,CURRENT_TIMESTAMP,'" . $login->getUsuario() . "',
-                    '" . $cod_estatus = 1 . "', 'contado', '".impresora_serial."' , '".$money[0]['money']."',''
-                );";
-            $conn->ExecuteTrans($sql);
-            $id_facturaTrans = $conn->getInsertID();
-                    $kardex_almacen_instruccion = "
-                        INSERT INTO kardex_almacen (
+           // debemos ver si hay pedido pendiente, para eso verificamos la fecha de pago
+            $sql="select * from despacho_new where fecha_pago='0000-00-00' and id_cliente='{$datospadre[0]['id_proveedor']}' limit 1";
+            $cargosoriginal=$conn->ObtenerFilasBySqlSelect($sql);
+            if($cargosoriginal==null)
+            {
+                //es su primer cargo por lo que hay que crear el despacho new padre.
+                $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+                $formateo_nro_factura = $nro_factura;
+                #obtenemos el money actual
+                $money=$conn->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
+            
+                $sql = "INSERT INTO `despacho_new` (
+                    `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
+                    `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
+                    `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
+                    `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
+                    `totalizar_pdescuento_global`,`totalizar_descuento_global`,
+                    `totalizar_base_imponible`,`totalizar_monto_iva`,
+                    `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
+                    `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
+                    )
+                VALUES(
+                    {$datospadre[0]['id_proveedor']}, '{$nro_factura}', '{$login->getUsuario()}', now(),
+                    ". $subtotal . ", 0 ," . $subtotal . ","
+                        . $ivatotal . "," . $totaltotal . "," . $itemstotal . ","
+                        . $subtotal . ", 0," . $totaltotal . ", 0 ,  
+                        0," . $subtotal . ","
+                        . $ivatotal . ", " . $totaltotal . ",0 ,CURRENT_TIMESTAMP,'" . $login->getUsuario() . "',
+                        '" . $cod_estatus = 1 . "', 'contado', '".impresora_serial."' , '".$money[0]['money']."',''
+                    );";
+                    $conn->ExecuteTrans($sql);
+                $id_facturaTrans = $conn->getInsertID();
+                        $kardex_almacen_instruccion = "
+                            INSERT INTO kardex_almacen (
+                            `id_transaccion` ,
+                            `tipo_movimiento_almacen` ,
+                            `autorizado_por` ,
+                            `observacion` ,
+                            `fecha` ,
+                            `usuario_creacion`,
+                            `fecha_creacion`,
+                            `estado`,
+                            `fecha_ejecucion`,
+                            id_cliente, 
+                            nro_factura
+                            )
+                            VALUES (
+                            NULL ,
+                            '8',
+                            '" . $login->getUsuario() . "',
+                            'Salida por Ventas',
+                            now(),
+                            '" . $login->getUsuario() . "',
+                            CURRENT_TIMESTAMP,
+                            'Pendiente',
+                            now(),
+                            {$datospadre[0]['id_proveedor']},
+                            '{$nro_factura}'
+                            );";
+            
+                $conn->ExecuteTrans($kardex_almacen_instruccion);
+                $id_transaccion = $conn->getInsertID();
+                for($i=0; $i<count($total); $i++)
+                {
+                    if($total[$i]!=null)
+                    {
+                        $descripcion =  $nombreservicio[$i];
+                       
+                        $detalle_item_instruccion = "
+                        INSERT INTO despacho_new_detalle (
+                        `id_factura`, `id_item`,
+                        `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                        `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                        `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                        `fecha_creacion`, `_item_almacen`
+                        )
+                        VALUES (
+                        '{$id_facturaTrans}', '{$idservicios[$i]}',
+                        '{$descripcion}', '1', '{$base[$i]}',
+                        0, 0, '{$iva[$i]}',
+                        '{$base[$i]}', '{$total[$i]}', '{$usuario}',
+                        CURRENT_TIMESTAMP, '1'
+                        );";
+                        $conn->ExecuteTrans($detalle_item_instruccion);
+                        
+                        $kardex_almacen_detalle_instruccion = "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` ,
                         `id_transaccion` ,
-                        `tipo_movimiento_almacen` ,
-                        `autorizado_por` ,
-                        `observacion` ,
-                        `fecha` ,
-                        `usuario_creacion`,
-                        `fecha_creacion`,
-                        `estado`,
-                        `fecha_ejecucion`,
-                        id_cliente, 
-                        nro_factura
+                        `id_almacen_entrada` ,
+                        `id_almacen_salida` ,
+                        `id_item` ,
+                        `precio` ,
+                        `cantidad`
                         )
                         VALUES (
                         NULL ,
-                        '8',
-                        '" . $login->getUsuario() . "',
-                        'Salida por Ventas',
-                        now(),
-                        '" . $login->getUsuario() . "',
-                        CURRENT_TIMESTAMP,
-                        'Pendiente',
-                        now(),
-                        {$datospadre[0]['id_proveedor']},
-                        '{$nro_factura}'
+                        '" . $id_transaccion . "',
+                        '{$_POST['ubicacion_principal']}',
+                        '',
+                        '" . $idservicios[$i] . "',
+                        '" . $base[$i] . "',
+                        1
                         );";
-        
-            $conn->ExecuteTrans($kardex_almacen_instruccion);
-            $id_transaccion = $conn->getInsertID();
-            for($i=0; $i<count($total); $i++)
-            {
-                if($total[$i]!=null)
-                {
-                    $descripcion =  $nombreservicio[$i];
-                   
-                    $detalle_item_instruccion = "
-                    INSERT INTO despacho_new_detalle (
-                    `id_factura`, `id_item`,
-                    `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
-                    `_item_descuento`, `_item_montodescuento`, `_item_piva`,
-                    `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
-                    `fecha_creacion`, `_item_almacen`
-                    )
-                    VALUES (
-                    '{$id_facturaTrans}', '{$idservicios[$i]}',
-                    '{$descripcion}', '1', '{$base[$i]}',
-                    0, 0, '{$iva[$i]}',
-                    '{$base[$i]}', '{$total[$i]}', '{$usuario}',
-                    CURRENT_TIMESTAMP, '1'
-                    );";
-                    $conn->ExecuteTrans($detalle_item_instruccion);
-                    
-                    $kardex_almacen_detalle_instruccion = "
-                    INSERT INTO kardex_almacen_detalle (
-                    `id_transaccion_detalle` ,
-                    `id_transaccion` ,
-                    `id_almacen_entrada` ,
-                    `id_almacen_salida` ,
-                    `id_item` ,
-                    `precio` ,
-                    `cantidad`
-                    )
-                    VALUES (
-                    NULL ,
-                    '" . $id_transaccion . "',
-                    '{$_POST['ubicacion_principal']}',
-                    '',
-                    '" . $idservicios[$i] . "',
-                    '" . $base[$i] . "',
-                    1
-                    );";
-                    $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                        $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                    }
                 }
-            }
-            
                 $nro_facturaOLD = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
                 $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
                 $conn->ExecuteTrans("update correlativos set contador = '" . $nro_pedido . "' where campo = 'cod_pedido'");
                 $conn->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_factura}' WHERE campo = 'cod_factura';");
-            //Fin pedido
+                //Fin pedido
+            }
+            else
+            { // cuando existe pedido pendiente
+                $kardexoriginal=$conn->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
+                if($kardexoriginal==null)
+                { 
+                    echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador"; exit();
+                }
+                $sql="UPDATE
+                        `despacho_new`
+                    SET
+                        `subtotal` =  (subtotal + ". $subtotal . "),
+                        `descuentosItemFactura` = 0,
+                        `montoItemsFactura` = (montoItemsFactura + ". $subtotal . "),
+                        `ivaTotalFactura` = (ivaTotalFactura + ".$ivatotal."),
+                        `TotalTotalFactura` =(TotalTotalFactura + ".$totaltotal."),
+                        `cantidad_items` = (cantidad_items + ".$itemstotal."),
+                        `totalizar_sub_total` = (totalizar_sub_total + ". $subtotal . "),
+                        `totalizar_descuento_parcial` = totalizar_descuento_parcial,
+                        `totalizar_total_operacion` = (totalizar_total_operacion + ".$totaltotal.") ,
+                        `totalizar_pdescuento_global` = totalizar_pdescuento_global ,
+                        `totalizar_descuento_global` = totalizar_descuento_global,
+                        `totalizar_base_imponible` = (totalizar_base_imponible + ".$subtotal."),
+                        `totalizar_monto_iva` = (totalizar_monto_iva + ".$ivatotal."),
+                        `totalizar_total_general` = (totalizar_total_general + ".$totaltotal."),
+                        `totalizar_total_retencion` = totalizar_total_retencion
+                    WHERE
+                        id_factura='".$cargosoriginal[0]['id_factura'] ."'";
+                $conn->ExecuteTrans($sql);
+
+                for($i=0; $i<count($total); $i++)
+                {
+                    if($total[$i]!=null)
+                    {
+                        $descripcion =  $nombreservicio[$i];
+                       
+                        $detalle_item_instruccion = "
+                        INSERT INTO despacho_new_detalle (
+                        `id_factura`, `id_item`,
+                        `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                        `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                        `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                        `fecha_creacion`, `_item_almacen`
+                        )
+                        VALUES (
+                        '".$cargosoriginal[0]['id_factura'] ."', '{$idservicios[$i]}',
+                        '{$descripcion}', '1', '{$base[$i]}',
+                        0, 0, '{$iva[$i]}',
+                        '{$base[$i]}', '{$total[$i]}', '{$usuario}',
+                        CURRENT_TIMESTAMP, '1'
+                        );";
+                        $conn->ExecuteTrans($detalle_item_instruccion);
+                        
+                        $kardex_almacen_detalle_instruccion = "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` ,
+                        `id_transaccion` ,
+                        `id_almacen_entrada` ,
+                        `id_almacen_salida` ,
+                        `id_item` ,
+                        `precio` ,
+                        `cantidad`
+                        )
+                        VALUES (
+                        NULL ,
+                        '" . $kardexoriginal[0]['id_transaccion'] . "',
+                        '{$_POST['ubicacion_principal']}',
+                        '',
+                        '" . $idservicios[$i] . "',
+                        '" . $base[$i] . "',
+                        1
+                        );";
+                        $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                    }
+                }
+            }
             if ($conn->errorTransaccion == 1)
             {    
                 echo "1";
