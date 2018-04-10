@@ -22,6 +22,25 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "cargaUbicacionsalidasTraslado":
+            $almacen=$_POST["idAlmacen"];
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 ");
+            if (count($campos) == 0) 
+            {
+                echo "[{band:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+        break;
+        case "cargasalidasTraslado":
+           $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM almacen");
+            if (count($campos) == 0) 
+            {
+                echo "[{band:'-1'}]";
+            } else {
+                echo json_encode($campos);
+            }
+        break;
         case "EliminarPaleta" :
             $sql="select * from kardex_almacen_detalle as a where a.id_transaccion_detalle='".$_POST["v1"]."'";
             $maestro= $conn->ObtenerFilasBySqlSelect($sql);

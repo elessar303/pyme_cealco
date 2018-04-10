@@ -53,425 +53,671 @@ if (isset($_POST["transaccion"])) {
         $marca = "P";
         $cod_estatus = "1"; // cod_estatus = 1 indicada que esta en Proceso.
     }
-    # obtenemos el correlativo de la factura
-    $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
-    $formateo_nro_factura = $nro_factura;
-    #obtenemos el money actual
-    $money=$clientes->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
-
-    $sql = "INSERT INTO `despacho_new` (
-        `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
-        `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
-        `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
-        `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
-        `totalizar_pdescuento_global`,`totalizar_descuento_global`,
-        `totalizar_base_imponible`,`totalizar_monto_iva`,
-        `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
-        `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
-        )
-    VALUES(
-        {$_POST["id_cliente"]}, '{$nro_factura}', '{$usuario_vende}', '{$_POST["input_fechaFactura"]}',
-        {$_POST["input_subtotal"]}, {$_POST["input_descuentosItemFactura"]}, {$_POST["input_montoItemsFactura"]},
-        {$_POST["input_ivaTotalFactura"]}, {$_POST["input_totalizar_total_general"]}, {$_POST["input_cantidad_items"]},
-        {$_POST["input_totalizar_sub_total"]}, {$_POST["input_totalizar_descuento_parcial"]}, {$_POST["input_totalizar_total_operacion"]},
-        {$_POST["input_totalizar_pdescuento_global"]}, {$_POST["input_totalizar_descuento_global"]},
-        {$_POST["totalizar_base_imponible"]}, {$_POST["input_totalizar_monto_iva"]},
-        {$_POST["input_totalizar_total_general"]}, {$_POST["totalizar_total_retencion"]}, CURRENT_TIMESTAMP,
-        '{$usuario}', '{$cod_estatus}', '{$_POST["forma_pago"]}', '".impresora_serial."' , '".$money[0]['money']."','{$_POST["facturacion"]}'
-        );";
-    $factura->ExecuteTrans($sql);
-    $id_facturaTrans = $factura->getInsertID();
-
-    // insertar sql en caja
-  /*  $insert_modulo_caja = "INSERT INTO 
-        `caja_ing_cob_sal_x_cli` 
-            (`id_caja_ing_cob_sal_x_cli`, `fecha`, `comprobante`, `numero`, `saldo`,`monto`, `id_cliente`) 
-        VALUES (NULL, '".date("Y-m-d")."', 'FACT', '{$nro_factura}', {$_POST["input_totalizar_total_general"]},0, {$_POST["id_cliente"]});";
+    // debemos ver si hay pedido pendiente, para eso verificamos la fecha de pago
+    $sql="select * from despacho_new where fecha_pago='0000-00-00' and id_cliente='{$_POST['id_cliente']}' limit 1";
+    $cargosoriginal=$clientes->ObtenerFilasBySqlSelect($sql);
+    if($cargosoriginal==null)
+    { 
+        # obtenemos el correlativo de la factura
+        $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+        $formateo_nro_factura = $nro_factura;
+        
+        #obtenemos el money actual
+        $money=$clientes->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
     
-    $factura->ExecuteTrans($insert_modulo_caja);*/
-
-    /*
-     * Codigo fuente añadido para la facturacion de pedidos, notas de entrega y cotizaciones.
-     * Se cambia el status del documento mercantil respectivo que se facturara y se le asocia la factura
-     */
-    $tienePedido = $factura->ObtenerFilasBySqlSelect("SELECT * FROM pedido WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_pedido = {$_POST['pedido_seleccionado']};");
-    $tieneNotaEntrega = $factura->ObtenerFilasBySqlSelect("SELECT * FROM nota_entrega WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_nota_entrega = {$_POST['nota_entrega_seleccionada']};");
-    $tieneCotizacion = $factura->ObtenerFilasBySqlSelect("SELECT * FROM cotizacion_presupuesto WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_cotizacion = {$_POST['cotizacion_seleccionada']};");
-
-    if ($tienePedido) {
-        $factura->ExecuteTrans("UPDATE pedido SET cod_estatus = 2, id_factura = {$id_facturaTrans} WHERE id_cliente = {$_GET['cod']} AND id_pedido = {$_POST['pedido_seleccionado']};");
-    }
-    if ($tieneNotaEntrega) {
-        $factura->ExecuteTrans("UPDATE nota_entrega SET cod_estatus = 2, id_factura = {$id_facturaTrans} WHERE id_cliente = {$_GET['cod']} AND id_nota_entrega = {$_POST['nota_entrega_seleccionada']};");
-    }
-    if ($tieneCotizacion) {
-        $factura->ExecuteTrans("UPDATE cotizacion_presupuesto SET cod_estatus = 2, id_factura = {$id_facturaTrans} WHERE id_cliente = {$_GET['cod']} AND id_cotizacion = {$_POST['cotizacion_seleccionada']};");
-    }
-    if($_POST["fecha_vencimiento"] == "")
-        $_POST["fecha_vencimiento"] = "NULL";
-    else
-        $_POST["fecha_vencimiento"] = "'".$_POST["fecha_vencimiento"]."'";
-     $_POST["fecha_vencimiento"];   
-    $SQLdetalle_formapago = "INSERT INTO despacho_new_detalle_formapago (
-        `id_factura` ,`totalizar_monto_cancelar` ,
-        `totalizar_saldo_pendiente` ,`totalizar_cambio` ,`totalizar_monto_efectivo` ,
-        `opt_cheque` ,`totalizar_monto_cheque` ,`totalizar_nro_cheque` ,
-        `totalizar_nombre_banco` ,`opt_tarjeta` ,`totalizar_monto_tarjeta` ,
-        `totalizar_nro_tarjeta` ,`totalizar_tipo_tarjeta` ,`opt_deposito` ,
-        `totalizar_monto_deposito` ,`totalizar_nro_deposito` ,
-        `totalizar_banco_deposito` ,`opt_otrodocumento` ,`totalizar_monto_otrodocumento` ,
-        `totalizar_nro_otrodocumento` ,`totalizar_banco_otrodocumento` ,`fecha_vencimiento` ,
-        `observacion` ,`persona_contacto` ,`telefono` ,`fecha_creacion` ,`usuario_creacion`)
-    VALUES ({$id_facturaTrans}, '{$_POST["input_totalizar_monto_cancelar"]}',
-            '{$_POST["input_totalizar_saldo_pendiente"]}', '{$_POST["input_totalizar_cambio"]}', '{$_POST["input_totalizar_monto_efectivo"]}',
-            '{$_POST["opt_cheque"]}', '{$_POST["input_totalizar_monto_cheque"]}', '{$_POST["input_totalizar_nro_cheque"]}',
-            '{$_POST["input_totalizar_nombre_banco"]}', '{$_POST["opt_tarjeta"]}', '{$_POST["input_totalizar_monto_tarjeta"]}',
-            '{$_POST["input_totalizar_nro_tarjeta"]}', '{$_POST["input_totalizar_tipo_tarjeta"]}', '{$_POST["opt_deposito"]}',
-            '{$_POST["input_totalizar_monto_deposito"]}', '{$_POST["input_totalizar_nro_deposito"]}',
-            '{$_POST["input_totalizar_banco_deposito"]}', '{$_POST["opt_otrodocumento"]}',
-            '{$_POST["totalizar_monto_otrodocumento"]}', '{$_POST["totalizar_nro_otrodocumento"]}',
-            '{$_POST["totalizar_banco_otrodocumento"]}', '{$_POST["fecha_vencimiento"]}',
-            '{$_POST["observacion"]}', '{$_POST["persona_contacto"]}', '{$_POST["telefono"]}', CURRENT_TIMESTAMP, '{$usuario}');";
-
-    $factura->ExecuteTrans($SQLdetalle_formapago);
-
-    $consulta = "INSERT INTO factura_impuestos (
-            `id_factura` ,`totalizar_base_retencion` ,
-            `totalizar_pbase_retencion` ,`totalizar_descripcion_base_retencion` ,
-            `cod_impuesto_iva` , `totalizar_monto_iva2` ,`totalizar_monto_1x1000`,`usuario_creacion`,`fecha_creacion`)
-        VALUES (
-            '{$id_facturaTrans}', '{$_POST["totalizar_base_retencion"]}', '{$_POST["totalizar_pbase_retencion"]}',
-            '{$_POST["totalizar_descripcion_base_retencion"]}', '{$_POST["cod_impuesto_iva"]}',
-            '{$_POST["totalizar_monto_iva2"]}', '{$_POST["totalizar_monto_1x1000"]}', '{$usuario}', CURRENT_TIMESTAMP);";
-
-    $factura->ExecuteTrans($consulta);
-
-
-
-   /* $consulta = "INSERT INTO `factura_gasto` 
-        (   `id_factura`, 
-            `transporte_salida`,
-            `transporte`, 
-            `empaques`, 
-            `seguro`, 
-            `flete`, 
-            `comisiones`, 
-            `manejo`, 
-            `otros`, 
-            `total_fob_gasto`,
-            `copias`
-            ) 
-    VALUES (
-        {$id_facturaTrans}, 
-        {$_POST["transpaso_salida"]}, 
-        {$_POST["transporte"]}, 
-        {$_POST["empaques"]}, 
-        {$_POST["seguro"]}, 
-        {$_POST["flete"]}, 
-        {$_POST["comisiones"]}, 
-        {$_POST["manejo"]}, 
-        {$_POST["otros"]}, 
-        {$_POST["total_fob_gatos"]},
-        {$_POST["copias"]}
-        );";
-    $factura->ExecuteTrans($consulta);*/
-
-    // tabla: factura_formato_salida
-    /*$consulta = "
-    INSERT INTO  `factura_formato_salida` (
-        `id_factura` ,
-        `tipo` ,
-        `id_cliente` ,
-        `via` ,
-        `marca`
-    )
-    VALUES (
-        {$id_facturaTrans}, 
-        '{$_POST["forma_salida_tipo"]}',
-        '{$_POST["forma_salida_id_cliente"]}',
-        '{$_POST["forma_salida_via"]}',
-        '{$_POST["forma_salida_marca"]}'
-    );
-    ";
-    $factura->ExecuteTrans($consulta);
-    */
-
-    # Insertamos en la tabla de cuentas por cobrar la cabecera del asiento.
-    $SQL_CXC = "INSERT INTO cxc_edocuenta (
-            `id_cliente`, `documento`, `numero`, `monto`,
-            `fecha_emision`, `observacion`, `vencimiento_fecha`,
-            `vencimiento_persona_contacto`, `vencimiento_telefono`,
-            `vencimiento_descripcion`, `usuario_creacion`, `fecha_creacion`, `marca`)
-        VALUES (
-            '{$_POST["id_cliente"]}', 'FAC', '{$nro_factura}',
-            '{$_POST["input_totalizar_total_general"]}', '" . date("Y-m-d") . "',
-            'FACTURA {$nro_factura}', '{$_POST["fecha_vencimiento"]}',
-            '{$_POST["persona_contacto"]}', '{$_POST["telefono"]}',
-            '{$_POST["observacion"]}', '{$usuario}', CURRENT_TIMESTAMP, '{$marca}');";
-
-    $factura->ExecuteTrans($SQL_CXC);
-    $id_cxc = $factura->getInsertID();
-
-    $SQL_CXC_DET = "INSERT INTO cxc_edocuenta_detalle (
-            `cod_edocuenta` ,`documento` ,`numero` ,
-            `descripcion` ,`tipo` ,`monto`,
-            `usuario_creacion`, `fecha_creacion`,`fecha_emision_edodet`)
-        VALUES (
-            '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}R',
-            'Factura {$nro_factura}', 'd', '{$_POST["input_totalizar_total_general"]}',
-            '{$usuario}', CURRENT_TIMESTAMP, '" . date("Y-m-d") . "');";
-    # Se inserta el detalle de la CxC en este caso el asiento del DEBITO.
-    $factura->ExecuteTrans($SQL_CXC_DET);
-    $cod_edocuenta_detalle = $factura->getInsertID();
-    /**
-     * Aumentamos el valor del correlativo del Pago o Abono de Factura.
-     * $factura->ExecuteTrans("update correlativos set contador = '".$correlativos->getUltimoCorrelativo("cod_pago_o_abono",1)."' where campo = 'cod_pago_o_abono'");
-     */
-    /**
-     * Obtenemos el siguiente numero de correlativo de Pago x Abono a Factura.
-     * $cod_pago_o_abono = $correlativos->getUltimoCorrelativo("cod_pago_o_abono",0,"si","");
-     */
-    # Verificamos el pago fue completo, un abono o fue un credito
-    $monto_cxc = 0;
-    if ($_POST["totalizar_monto_cancelar"] > 0 && $_POST["totalizar_monto_cancelar"] <= $_POST["input_totalizar_total_general"]) {
-        $monto_cxc = $_POST["totalizar_monto_cancelar"];
-    } elseif ($_POST["totalizar_monto_cancelar"] > $_POST["input_totalizar_total_general"]) {
-        # verificamos si el monto a cancelar es mayor al general a pagar
-        $monto_cxc = $_POST["input_totalizar_total_general"];
-    }
-    $SQL_CXC_DET = "INSERT INTO cxc_edocuenta_detalle (
-            `cod_edocuenta`, `documento`, `numero`, `descripcion`,
-                `tipo`, `monto`, `usuario_creacion`,
-            `fecha_creacion`, `fecha_emision_edodet`)
+        $sql = "INSERT INTO `despacho_new` (
+            `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
+            `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
+            `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
+            `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
+            `totalizar_pdescuento_global`,`totalizar_descuento_global`,
+            `totalizar_base_imponible`,`totalizar_monto_iva`,
+            `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
+            `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
+            )
+        VALUES(
+            {$_POST["id_cliente"]}, '{$nro_factura}', '{$usuario_vende}', '{$_POST["input_fechaFactura"]}',
+            {$_POST["input_subtotal"]}, {$_POST["input_descuentosItemFactura"]}, {$_POST["input_montoItemsFactura"]},
+            {$_POST["input_ivaTotalFactura"]}, {$_POST["input_totalizar_total_general"]}, {$_POST["input_cantidad_items"]},
+            {$_POST["input_totalizar_sub_total"]}, {$_POST["input_totalizar_descuento_parcial"]}, {$_POST["input_totalizar_total_operacion"]},
+            {$_POST["input_totalizar_pdescuento_global"]}, {$_POST["input_totalizar_descuento_global"]},
+            {$_POST["totalizar_base_imponible"]}, {$_POST["input_totalizar_monto_iva"]},
+            {$_POST["input_totalizar_total_general"]}, {$_POST["totalizar_total_retencion"]}, CURRENT_TIMESTAMP,
+            '{$usuario}', '{$cod_estatus}', '{$_POST["forma_pago"]}', '".impresora_serial."' , '".$money[0]['money']."','{$_POST["facturacion"]}'
+            );";
+        $factura->ExecuteTrans($sql);
+        $id_facturaTrans = $factura->getInsertID();
+    
+        // insertar sql en caja
+      /*  $insert_modulo_caja = "INSERT INTO 
+            `caja_ing_cob_sal_x_cli` 
+                (`id_caja_ing_cob_sal_x_cli`, `fecha`, `comprobante`, `numero`, `saldo`,`monto`, `id_cliente`) 
+            VALUES (NULL, '".date("Y-m-d")."', 'FACT', '{$nro_factura}', {$_POST["input_totalizar_total_general"]},0, {$_POST["id_cliente"]});";
+        
+        $factura->ExecuteTrans($insert_modulo_caja);*/
+    
+        /*
+         * Codigo fuente añadido para la facturacion de pedidos, notas de entrega y cotizaciones.
+         * Se cambia el status del documento mercantil respectivo que se facturara y se le asocia la factura
+         */
+        $tienePedido = $factura->ObtenerFilasBySqlSelect("SELECT * FROM pedido WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_pedido = {$_POST['pedido_seleccionado']};");
+        $tieneNotaEntrega = $factura->ObtenerFilasBySqlSelect("SELECT * FROM nota_entrega WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_nota_entrega = {$_POST['nota_entrega_seleccionada']};");
+        $tieneCotizacion = $factura->ObtenerFilasBySqlSelect("SELECT * FROM cotizacion_presupuesto WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_cotizacion = {$_POST['cotizacion_seleccionada']};");
+    
+        if ($tienePedido) {
+            $factura->ExecuteTrans("UPDATE pedido SET cod_estatus = 2, id_factura = {$id_facturaTrans} WHERE id_cliente = {$_GET['cod']} AND id_pedido = {$_POST['pedido_seleccionado']};");
+        }
+        if ($tieneNotaEntrega) {
+            $factura->ExecuteTrans("UPDATE nota_entrega SET cod_estatus = 2, id_factura = {$id_facturaTrans} WHERE id_cliente = {$_GET['cod']} AND id_nota_entrega = {$_POST['nota_entrega_seleccionada']};");
+        }
+        if ($tieneCotizacion) {
+            $factura->ExecuteTrans("UPDATE cotizacion_presupuesto SET cod_estatus = 2, id_factura = {$id_facturaTrans} WHERE id_cliente = {$_GET['cod']} AND id_cotizacion = {$_POST['cotizacion_seleccionada']};");
+        }
+        if($_POST["fecha_vencimiento"] == "")
+            $_POST["fecha_vencimiento"] = "NULL";
+        else
+            $_POST["fecha_vencimiento"] = "'".$_POST["fecha_vencimiento"]."'";
+         $_POST["fecha_vencimiento"];   
+        $SQLdetalle_formapago = "INSERT INTO despacho_new_detalle_formapago (
+            `id_factura` ,`totalizar_monto_cancelar` ,
+            `totalizar_saldo_pendiente` ,`totalizar_cambio` ,`totalizar_monto_efectivo` ,
+            `opt_cheque` ,`totalizar_monto_cheque` ,`totalizar_nro_cheque` ,
+            `totalizar_nombre_banco` ,`opt_tarjeta` ,`totalizar_monto_tarjeta` ,
+            `totalizar_nro_tarjeta` ,`totalizar_tipo_tarjeta` ,`opt_deposito` ,
+            `totalizar_monto_deposito` ,`totalizar_nro_deposito` ,
+            `totalizar_banco_deposito` ,`opt_otrodocumento` ,`totalizar_monto_otrodocumento` ,
+            `totalizar_nro_otrodocumento` ,`totalizar_banco_otrodocumento` ,`fecha_vencimiento` ,
+            `observacion` ,`persona_contacto` ,`telefono` ,`fecha_creacion` ,`usuario_creacion`)
+        VALUES ({$id_facturaTrans}, '{$_POST["input_totalizar_monto_cancelar"]}',
+                '{$_POST["input_totalizar_saldo_pendiente"]}', '{$_POST["input_totalizar_cambio"]}', '{$_POST["input_totalizar_monto_efectivo"]}',
+                '{$_POST["opt_cheque"]}', '{$_POST["input_totalizar_monto_cheque"]}', '{$_POST["input_totalizar_nro_cheque"]}',
+                '{$_POST["input_totalizar_nombre_banco"]}', '{$_POST["opt_tarjeta"]}', '{$_POST["input_totalizar_monto_tarjeta"]}',
+                '{$_POST["input_totalizar_nro_tarjeta"]}', '{$_POST["input_totalizar_tipo_tarjeta"]}', '{$_POST["opt_deposito"]}',
+                '{$_POST["input_totalizar_monto_deposito"]}', '{$_POST["input_totalizar_nro_deposito"]}',
+                '{$_POST["input_totalizar_banco_deposito"]}', '{$_POST["opt_otrodocumento"]}',
+                '{$_POST["totalizar_monto_otrodocumento"]}', '{$_POST["totalizar_nro_otrodocumento"]}',
+                '{$_POST["totalizar_banco_otrodocumento"]}', '{$_POST["fecha_vencimiento"]}',
+                '{$_POST["observacion"]}', '{$_POST["persona_contacto"]}', '{$_POST["telefono"]}', CURRENT_TIMESTAMP, '{$usuario}');";
+    
+        $factura->ExecuteTrans($SQLdetalle_formapago);
+    
+        $consulta = "INSERT INTO factura_impuestos (
+                `id_factura` ,`totalizar_base_retencion` ,
+                `totalizar_pbase_retencion` ,`totalizar_descripcion_base_retencion` ,
+                `cod_impuesto_iva` , `totalizar_monto_iva2` ,`totalizar_monto_1x1000`,`usuario_creacion`,`fecha_creacion`)
             VALUES (
-            '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}R', 'Pago Factura {$nro_factura}',
-                'c', '{$monto_cxc}', '{$usuario}',
-            CURRENT_TIMESTAMP, '{$_POST["input_fechaFactura"]}');";
-    # Se inserta el detalle de la CxC en este caso el asiento del CREDITO.
-    $factura->ExecuteTrans($SQL_CXC_DET);
-
-    # SQL para generar el detalle de forma pago en la tabla de cxc_edocuenta_formapago.
-    $SQL_cxc_formapago = "INSERT INTO cxc_edocuenta_formapago (
-            `cod_edocuenta_detalle`, `totalizar_monto_cancelar`,
-            `totalizar_saldo_pendiente`, `totalizar_cambio`, `totalizar_monto_efectivo`,
-            `opt_cheque`, `totalizar_monto_cheque`, `totalizar_nro_cheque`,
-            `totalizar_nombre_banco`, `opt_tarjeta`, `totalizar_monto_tarjeta`,
-            `totalizar_nro_tarjeta`, `totalizar_tipo_tarjeta`, `opt_deposito`,
-            `totalizar_monto_deposito`, `totalizar_nro_deposito`, `totalizar_banco_deposito`,
-            `opt_otrodocumento`, `totalizar_monto_otrodocumento`, `totalizar_nro_otrodocumento`,
-            `totalizar_banco_otrodocumento`, `fecha_creacion`, `usuario_creacion`)
-        VALUES (
-            '{$cod_edocuenta_detalle}', '{$_POST["input_totalizar_monto_cancelar"]}',
-            '{$_POST["input_totalizar_saldo_pendiente"]}', '{$_POST["input_totalizar_cambio"]}', '{$_POST["input_totalizar_monto_efectivo"]}',
-            '{$_POST["opt_cheque"]}', '{$_POST["input_totalizar_monto_tarjeta"]}', '{$_POST["input_totalizar_nro_cheque"]}',
-            '{$_POST["input_totalizar_nombre_banco"]}', '{$_POST["opt_tarjeta"]}', '{$_POST["input_totalizar_monto_tarjeta"]}',
-            '{$_POST["input_totalizar_nro_tarjeta"]}', '{$_POST["input_totalizar_tipo_tarjeta"]}', '{$_POST["opt_deposito"]}',
-            '{$_POST["input_totalizar_banco_deposito"]}', '{$_POST["input_totalizar_nro_deposito"]}', '{$_POST["input_totalizar_banco_deposito"]}',
-            '{$_POST["opt_otrodocumento"]}', '{$_POST["totalizar_banco_otrodocumento"]}', '{$_POST["totalizar_nro_otrodocumento"]}',
-            '{$_POST["totalizar_banco_otrodocumento"]}', CURRENT_TIMESTAMP , '{$usuario}');";
-    $factura->ExecuteTrans($SQL_cxc_formapago);
-    # Insert en la tabla de impuestos
-    # echo $_POST["cantidad_impuesto"]."<br>";
-    for ($i = 1; $i <= (int) $_POST["cantidad_impuesto"]; $i++) {
-        if ($_POST["cod_impuesto$i"] != "" && $_POST["totalizar_monto_retencion$i"] > 0 && $_POST["totalizar_monto_cancelar"] > 0 && $_POST["totalizar_monto_cancelar"] < $_POST["input_totalizar_total_general"]) {
-
-            $base_imponible = $_POST["cod_tipo_impuesto$i"] == 1 ? $_POST["totalizar_monto_iva"] : $_POST["totalizar_base_imponible"];
-
-            $detalle_tabla_impuesto = "INSERT INTO tabla_impuestos (
-                    `id_documento`, `tipo_documento`, `numero_control_factura`,
-                    `id_fiscal`, `id_cliente`, `cod_tipo_impuesto`, `cod_impuesto`,
-                    `totalizar_pbase_retencion`, `totalizar_monto_retencion`, `totalizar_base_imponible`,
-                    `totalizar_monto_exento`, `usuario_creacion`, `fecha_creacion`)
+                '{$id_facturaTrans}', '{$_POST["totalizar_base_retencion"]}', '{$_POST["totalizar_pbase_retencion"]}',
+                '{$_POST["totalizar_descripcion_base_retencion"]}', '{$_POST["cod_impuesto_iva"]}',
+                '{$_POST["totalizar_monto_iva2"]}', '{$_POST["totalizar_monto_1x1000"]}', '{$usuario}', CURRENT_TIMESTAMP);";
+    
+        $factura->ExecuteTrans($consulta);
+         # Insertamos en la tabla de cuentas por cobrar la cabecera del asiento.
+        $SQL_CXC = "INSERT INTO cxc_edocuenta (
+                `id_cliente`, `documento`, `numero`, `monto`,
+                `fecha_emision`, `observacion`, `vencimiento_fecha`,
+                `vencimiento_persona_contacto`, `vencimiento_telefono`,
+                `vencimiento_descripcion`, `usuario_creacion`, `fecha_creacion`, `marca`)
+            VALUES (
+                '{$_POST["id_cliente"]}', 'FAC', '{$nro_factura}',
+                '{$_POST["input_totalizar_total_general"]}', '" . date("Y-m-d") . "',
+                'FACTURA {$nro_factura}', '{$_POST["fecha_vencimiento"]}',
+                '{$_POST["persona_contacto"]}', '{$_POST["telefono"]}',
+                '{$_POST["observacion"]}', '{$usuario}', CURRENT_TIMESTAMP, '{$marca}');";
+    
+        $factura->ExecuteTrans($SQL_CXC);
+        $id_cxc = $factura->getInsertID();
+    
+        $SQL_CXC_DET = "INSERT INTO cxc_edocuenta_detalle (
+                `cod_edocuenta` ,`documento` ,`numero` ,
+                `descripcion` ,`tipo` ,`monto`,
+                `usuario_creacion`, `fecha_creacion`,`fecha_emision_edodet`)
+            VALUES (
+                '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}R',
+                'Factura {$nro_factura}', 'd', '{$_POST["input_totalizar_total_general"]}',
+                '{$usuario}', CURRENT_TIMESTAMP, '" . date("Y-m-d") . "');";
+        # Se inserta el detalle de la CxC en este caso el asiento del DEBITO.
+        $factura->ExecuteTrans($SQL_CXC_DET);
+        $cod_edocuenta_detalle = $factura->getInsertID();
+        /**
+         * Aumentamos el valor del correlativo del Pago o Abono de Factura.
+         * $factura->ExecuteTrans("update correlativos set contador = '".$correlativos->getUltimoCorrelativo("cod_pago_o_abono",1)."' where campo = 'cod_pago_o_abono'");
+         */
+        /**
+         * Obtenemos el siguiente numero de correlativo de Pago x Abono a Factura.
+         * $cod_pago_o_abono = $correlativos->getUltimoCorrelativo("cod_pago_o_abono",0,"si","");
+         */
+        # Verificamos el pago fue completo, un abono o fue un credito
+        $monto_cxc = 0;
+        if ($_POST["totalizar_monto_cancelar"] > 0 && $_POST["totalizar_monto_cancelar"] <= $_POST["input_totalizar_total_general"]) {
+            $monto_cxc = $_POST["totalizar_monto_cancelar"];
+        } elseif ($_POST["totalizar_monto_cancelar"] > $_POST["input_totalizar_total_general"]) {
+            # verificamos si el monto a cancelar es mayor al general a pagar
+            $monto_cxc = $_POST["input_totalizar_total_general"];
+        }
+        $SQL_CXC_DET = "INSERT INTO cxc_edocuenta_detalle (
+                `cod_edocuenta`, `documento`, `numero`, `descripcion`,
+                    `tipo`, `monto`, `usuario_creacion`,
+                `fecha_creacion`, `fecha_emision_edodet`)
                 VALUES (
-                    '{$id_facturaTrans}', 'f', '{$_POST["numero_control_factura"]}', '{$_POST["id_fiscal"]}',
-                    '{$_POST["id_cliente"]}', '{$_POST["cod_tipo_impuesto$i"]}', '{$_POST["cod_impuesto$i"]}',
-                    '{$_POST["totalizar_pbase_retencion$i"]}', '{$_POST["totalizar_monto_retencion$i"]}',
-                    '{$base_imponible}', '{$_POST["totalizar_monto_exento$i"]}',
-                    '{$usuario}',CURRENT_TIMESTAMP);";
-            $factura->ExecuteTrans($detalle_tabla_impuesto);
-
-            //if($_POST["totalizar_monto_cancelar"]>0&&$_POST["totalizar_monto_cancelar"]<$_POST["input_totalizar_total_general"]){
-            $SQL_CXC_DET2 = "INSERT INTO cxc_edocuenta_detalle (
-                    `cod_edocuenta`, `documento`, `numero`, `descripcion`,
-                    `tipo`, `monto`, `usuario_creacion`, `fecha_creacion`, `fecha_emision_edodet`)
-                VALUES (
-                    '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}', 'Retenciones de Impuesto a Factura {$nro_factura}',
-                    'c', '{$_POST["totalizar_monto_retencion$i"]}', '{$usuario}', CURRENT_TIMESTAMP, '{$_POST["input_fechaFactura"]}');";
-            # Se inserta el detalle de la CxC en este caso el asiento de lDEBITO.
-            $factura->ExecuteTrans($SQL_CXC_DET2);
-            //}// FIN DEL IF DE NSERTAR DETALLE DE IMPUESTOS EN ESTADO DE CUENTA
-        } // FIN DEL IF DE INSERTAR IMPUESTOS EN LA TABLA IMPUESTOS
-    }
-
-    if(!isset($_POST["puntodeventa"])){
-    $kardex_almacen_instruccion = "INSERT INTO kardex_almacen (
-            `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
-            `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, id_cliente, nro_factura)
-       VALUES (
-            '8', '{$usuario}', 'Pedido',
-            '{$_POST["input_fechaFactura"]}', '{$usuario}', CURRENT_TIMESTAMP,
-            '{$_POST["estado_entrega"]}', '{$_POST["input_fechaFactura"]}', {$_POST["id_cliente"]},'{$nro_factura}');";
-    }elseif($_POST["puntodeventa"]!=''){
+                '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}R', 'Pago Factura {$nro_factura}',
+                    'c', '{$monto_cxc}', '{$usuario}',
+                CURRENT_TIMESTAMP, '{$_POST["input_fechaFactura"]}');";
+        # Se inserta el detalle de la CxC en este caso el asiento del CREDITO.
+        $factura->ExecuteTrans($SQL_CXC_DET);
+    
+        # SQL para generar el detalle de forma pago en la tabla de cxc_edocuenta_formapago.
+        $SQL_cxc_formapago = "INSERT INTO cxc_edocuenta_formapago (
+                `cod_edocuenta_detalle`, `totalizar_monto_cancelar`,
+                `totalizar_saldo_pendiente`, `totalizar_cambio`, `totalizar_monto_efectivo`,
+                `opt_cheque`, `totalizar_monto_cheque`, `totalizar_nro_cheque`,
+                `totalizar_nombre_banco`, `opt_tarjeta`, `totalizar_monto_tarjeta`,
+                `totalizar_nro_tarjeta`, `totalizar_tipo_tarjeta`, `opt_deposito`,
+                `totalizar_monto_deposito`, `totalizar_nro_deposito`, `totalizar_banco_deposito`,
+                `opt_otrodocumento`, `totalizar_monto_otrodocumento`, `totalizar_nro_otrodocumento`,
+                `totalizar_banco_otrodocumento`, `fecha_creacion`, `usuario_creacion`)
+            VALUES (
+                '{$cod_edocuenta_detalle}', '{$_POST["input_totalizar_monto_cancelar"]}',
+                '{$_POST["input_totalizar_saldo_pendiente"]}', '{$_POST["input_totalizar_cambio"]}', '{$_POST["input_totalizar_monto_efectivo"]}',
+                '{$_POST["opt_cheque"]}', '{$_POST["input_totalizar_monto_tarjeta"]}', '{$_POST["input_totalizar_nro_cheque"]}',
+                '{$_POST["input_totalizar_nombre_banco"]}', '{$_POST["opt_tarjeta"]}', '{$_POST["input_totalizar_monto_tarjeta"]}',
+                '{$_POST["input_totalizar_nro_tarjeta"]}', '{$_POST["input_totalizar_tipo_tarjeta"]}', '{$_POST["opt_deposito"]}',
+                '{$_POST["input_totalizar_banco_deposito"]}', '{$_POST["input_totalizar_nro_deposito"]}', '{$_POST["input_totalizar_banco_deposito"]}',
+                '{$_POST["opt_otrodocumento"]}', '{$_POST["totalizar_banco_otrodocumento"]}', '{$_POST["totalizar_nro_otrodocumento"]}',
+                '{$_POST["totalizar_banco_otrodocumento"]}', CURRENT_TIMESTAMP , '{$usuario}');";
+        $factura->ExecuteTrans($SQL_cxc_formapago);
+        # Insert en la tabla de impuestos
+        # echo $_POST["cantidad_impuesto"]."<br>";
+        for ($i = 1; $i <= (int) $_POST["cantidad_impuesto"]; $i++) {
+            if ($_POST["cod_impuesto$i"] != "" && $_POST["totalizar_monto_retencion$i"] > 0 && $_POST["totalizar_monto_cancelar"] > 0 && $_POST["totalizar_monto_cancelar"] < $_POST["input_totalizar_total_general"]) {
+    
+                $base_imponible = $_POST["cod_tipo_impuesto$i"] == 1 ? $_POST["totalizar_monto_iva"] : $_POST["totalizar_base_imponible"];
+    
+                $detalle_tabla_impuesto = "INSERT INTO tabla_impuestos (
+                        `id_documento`, `tipo_documento`, `numero_control_factura`,
+                        `id_fiscal`, `id_cliente`, `cod_tipo_impuesto`, `cod_impuesto`,
+                        `totalizar_pbase_retencion`, `totalizar_monto_retencion`, `totalizar_base_imponible`,
+                        `totalizar_monto_exento`, `usuario_creacion`, `fecha_creacion`)
+                    VALUES (
+                        '{$id_facturaTrans}', 'f', '{$_POST["numero_control_factura"]}', '{$_POST["id_fiscal"]}',
+                        '{$_POST["id_cliente"]}', '{$_POST["cod_tipo_impuesto$i"]}', '{$_POST["cod_impuesto$i"]}',
+                        '{$_POST["totalizar_pbase_retencion$i"]}', '{$_POST["totalizar_monto_retencion$i"]}',
+                        '{$base_imponible}', '{$_POST["totalizar_monto_exento$i"]}',
+                        '{$usuario}',CURRENT_TIMESTAMP);";
+                $factura->ExecuteTrans($detalle_tabla_impuesto);
+    
+                //if($_POST["totalizar_monto_cancelar"]>0&&$_POST["totalizar_monto_cancelar"]<$_POST["input_totalizar_total_general"]){
+                $SQL_CXC_DET2 = "INSERT INTO cxc_edocuenta_detalle (
+                        `cod_edocuenta`, `documento`, `numero`, `descripcion`,
+                        `tipo`, `monto`, `usuario_creacion`, `fecha_creacion`, `fecha_emision_edodet`)
+                    VALUES (
+                        '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}', 'Retenciones de Impuesto a Factura {$nro_factura}',
+                        'c', '{$_POST["totalizar_monto_retencion$i"]}', '{$usuario}', CURRENT_TIMESTAMP, '{$_POST["input_fechaFactura"]}');";
+                # Se inserta el detalle de la CxC en este caso el asiento de lDEBITO.
+                $factura->ExecuteTrans($SQL_CXC_DET2);
+                //}// FIN DEL IF DE NSERTAR DETALLE DE IMPUESTOS EN ESTADO DE CUENTA
+            } // FIN DEL IF DE INSERTAR IMPUESTOS EN LA TABLA IMPUESTOS
+        }
+    
+        if(!isset($_POST["puntodeventa"])){
         $kardex_almacen_instruccion = "INSERT INTO kardex_almacen (
-            `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
-            `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, id_cliente, nro_factura, almacen_destino)
-       VALUES (
-            '8', '{$usuario}', 'Pedido',
-            '{$_POST["input_fechaFactura"]}', '{$usuario}', CURRENT_TIMESTAMP,
-            '{$_POST["estado_entrega"]}', '{$_POST["input_fechaFactura"]}', {$_POST["id_cliente"]},'{$nro_factura}', '{$_POST["puntodeventa"]}');";
-    }
-
-
-    $id_transaccion = 0;
-    if (!$tienePedido && !$tieneNotaEntrega) {
-        $almacen->ExecuteTrans($kardex_almacen_instruccion);
-        $id_transaccion = $almacen->getInsertID();
-    }
-
-    $lineas = array();
-    #$lineas_tfhka = array();
-
-    $total = $_POST["input_totalizar_total_general"];
-    $efectivo = $_POST["input_totalizar_monto_efectivo"];
-    $cheque = $_POST["input_totalizar_monto_cheque"];
-    $tarjeta = $_POST["input_totalizar_monto_tarjeta"];
-    $deposito = $_POST["input_totalizar_monto_deposito"];
-    $otro = $_POST["opt_otrodocumento"];
-
-    for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
-        /*$detalle_item_instruccion = "
-            INSERT INTO factura_detalle (
-                `id_factura`, `id_item`,
-                `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
-                `_item_descuento`, `_item_montodescuento`, `_item_piva`,
-                `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
-                `fecha_creacion`, `_item_almacen`, 
-                `_cantidad_bulto`,
-                `_cantidad_bulto_kilos`, 
-                `_unidad_empaque`,
-                `_ganancia_item_individual`,
-                `_porcentaje_ganancia`,
-                `_totalm3`,
-                `_totalft3`
-                )
-            VALUES (
-                '{$id_facturaTrans}', '{$_POST["_item_codigo"][$i]}',
-                '{$_POST["_item_descripcion"][$i]}', '{$_POST["_item_cantidad"][$i]}', '{$_POST["_item_preciosiniva"][$i]}',
-                '{$_POST["_item_descuento"][$i]}', '{$_POST["_item_montodescuento"][$i]}', '{$_POST["_item_piva"][$i]}',
-                '{$_POST["_item_totalsiniva"][$i]}', '{$_POST["_item_totalconiva"][$i]}', '{$usuario}',
-                CURRENT_TIMESTAMP, '{$_POST["_item_almacen"][$i]}',
-                '{$_POST["_cantidad_bulto"][$i]}',
-                '{$_POST["_cantidad_bulto_kilos"][$i]}',
-                '{$_POST["_unidad_empaque"][$i]}',
-                '{$_POST["_ganancia_item_individual"][$i]}',
-                '{$_POST["_porcentaje_ganancia"][$i]}',
-                '{$_POST["_totalm3"][$i]}',
-                '{$_POST["_totalft3"][$i]}'
-                );";*/
-                $detalle_item_instruccion = "
-            INSERT INTO despacho_new_detalle (
-                `id_factura`, `id_item`,
-                `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
-                `_item_descuento`, `_item_montodescuento`, `_item_piva`,
-                `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
-                `fecha_creacion`, `_item_almacen`
-                )
-            VALUES (
-                '{$id_facturaTrans}', '{$_POST["_item_codigo"][$i]}',
-                '{$_POST["_item_descripcion"][$i]}', '{$_POST["_item_cantidad"][$i]}', '{$_POST["_item_preciosiniva"][$i]}',
-                '{$_POST["_item_descuento"][$i]}', '{$_POST["_item_montodescuento"][$i]}', '{$_POST["_item_piva"][$i]}',
-                '{$_POST["_item_totalsiniva"][$i]}', '{$_POST["_item_totalconiva"][$i]}', '{$usuario}',
-                CURRENT_TIMESTAMP, '{$_POST["_item_almacen"][$i]}'
-                );";
-        $factura->ExecuteTrans($detalle_item_instruccion);
-
-        $descrip_producto = strlen($_POST["_item_descripcion"][$i]) < 39 ? str_pad($_POST["_item_descripcion"][$i], 39) : substr($_POST["_item_descripcion"][$i], 0, 39);
-        $item = $factura->ObtenerFilasBySqlSelect("SELECT cod_item, descripcion2 , seriales FROM item WHERE id_item = {$_POST["_item_codigo"][$i]}");
-        $codigo_item = $item[0]['cod_item'];
-        $cantidad = number_format($_POST["_item_cantidad"][$i], 2, ",", "");
-        $precio = number_format($_POST["_item_preciosiniva"][$i], 2, ",", "");
-        $iva = number_format($_POST["_item_piva"][$i], 2, ",", "");
-        $descuento_item = number_format($_POST["_item_descuento"][$i], 2, ",", "");
-        $seriales = $item[0]['seriales'];
-        /* $espacios = 30 - (strlen($codigo_item) + strlen($cantidad));
-          for ($j = 0; $j < $espacios; $j++) {
-          $codigo_item .= " ";
-          } */
-        $codigo_item = str_pad($codigo_item, 30 - strlen($cantidad), " ", STR_PAD_RIGHT);
-        #$linea_producto.=$descrip_producto . " " . $codigo_item . $cantidad . str_pad($precio, 12, ' ', STR_PAD_LEFT) . str_pad($iva, 7, ' ', STR_PAD_LEFT) . "\n";
-        $lineas[$i] = array("descripcion" => $descrip_producto, "codigo" => $codigo_item, "cantidad" => $cantidad, "precio" => $precio, "iva" => $iva, "descuento_item" => $descuento_item);
-
-        if ($item[0]['descripcion2'] != "") {# antes $descrip_producto[0]['descripcion2']
-            #$linea_producto.=$item[0]['descripcion2'] . "\n"; # antes $descrip_producto[0]['descripcion2']
-            #$lineas["descripcion2"] = $item[0]['descripcion2'];
-        }
-        #fwrite($archivo_spooler, $linea_producto);
-        if (!$tienePedido && !$tieneNotaEntrega) {
-            $ubicacion_venta= $id_ubicacion[0]['id_ubicacion'];
-
-            //Se consulta el precio actual para dejar el historico en kardex (Junior)
-            $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$_POST["_item_codigo"][$i]}'";
-            $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
-
-            $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
-            
-            $kardex_almacen_detalle_instruccion = "
-            INSERT INTO kardex_almacen_detalle (
-                `id_transaccion` , `id_almacen_entrada` ,
-                `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`, precio)
-            VALUES (
-                '{$id_transaccion}', '', '{$_POST["_item_almacen"][$i]}',
-                '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_cantidad"][$i]}', $ubicacion_venta, $precioconiva);";
-            
-            $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
-
-            if ($_POST["estado_entrega"] == 'Entregado' || $_POST["estado_entrega"] =='Pendiente') {
-                $campos = $factura->ObtenerFilasBySqlSelect("
-                        SELECT cantidad FROM item_existencia_almacen
-                        WHERE id_item  = '{$_POST["_item_codigo"][$i]}' AND cod_almacen = '{$_POST["_item_almacen"][$i]}' AND id_ubicacion='{$_POST["_item_ubicacion"][$i]}';");
-                # Verificar que se esta facturando para no descontar de la existencia,
-                # ya que el propio pedido desconto
-                #if (!$tienePedido) {
-                $factura->ExecuteTrans("
-                    UPDATE item_existencia_almacen
-                    SET cantidad = '" . ($campos[0]["cantidad"] - $_POST["_item_cantidad"][$i]) . "'
-                    WHERE id_item  = '{$_POST["_item_codigo"][$i]}' AND cod_almacen = '{$_POST["_item_almacen"][$i]}' AND id_ubicacion='{$_POST["_item_ubicacion"][$i]}';");
-                #}
-                $factura->ExecuteTrans("DELETE FROM item_precompromiso WHERE cod_item_precompromiso = '{$_POST["_cod_item_precompromiso"][$i]}';");
-            }
-        }
-        /* Funcionalidad adicionada como requisito especifico del CCP */
-        if ($_POST["_id_cuota"][$i] != 'undefined') {
-            $factura->ExecuteTrans("UPDATE `cuota_cliente` SET estatus = 1 WHERE id = {$_POST["_id_cuota"][$i]};");
-            $cuota_generada = $factura->ObtenerFilasBySqlSelect("SELECT id_cuota_generada FROM `cuota_cliente` WHERE id = {$_POST["_id_cuota"][$i]};");
-            $factura->ExecuteTrans("INSERT INTO `cuota_cliente_movimientos` (id_cuota_generada, id_cliente, tipo, monto) VALUES ({$cuota_generada[0]["id_cuota_generada"]}, {$_POST["id_cliente"]}, 1, {$_POST["_item_preciosiniva"][$i]})");
+                `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
+                `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, id_cliente, nro_factura)
+           VALUES (
+                '8', '{$usuario}', 'Pedido',
+                '{$_POST["input_fechaFactura"]}', '{$usuario}', CURRENT_TIMESTAMP,
+                '{$_POST["estado_entrega"]}', '{$_POST["input_fechaFactura"]}', {$_POST["id_cliente"]},'{$nro_factura}');";
+        }elseif($_POST["puntodeventa"]!=''){
+            $kardex_almacen_instruccion = "INSERT INTO kardex_almacen (
+                `tipo_movimiento_almacen`, `autorizado_por`, `observacion`,
+                `fecha`, `usuario_creacion`, `fecha_creacion`, `estado`, `fecha_ejecucion`, id_cliente, nro_factura, almacen_destino)
+           VALUES (
+                '8', '{$usuario}', 'Pedido',
+                '{$_POST["input_fechaFactura"]}', '{$usuario}', CURRENT_TIMESTAMP,
+                '{$_POST["estado_entrega"]}', '{$_POST["input_fechaFactura"]}', {$_POST["id_cliente"]},'{$nro_factura}', '{$_POST["puntodeventa"]}');";
         }
     
-        if($seriales==1)
-        {
-            $cantt=$_POST["_item_cantidad"][$i];
+    
+        $id_transaccion = 0;
+        if (!$tienePedido && !$tieneNotaEntrega) {
+            $almacen->ExecuteTrans($kardex_almacen_instruccion);
+            $id_transaccion = $almacen->getInsertID();
+        }
+    
+        $lineas = array();
+        #$lineas_tfhka = array();
+    
+        $total = $_POST["input_totalizar_total_general"];
+        $efectivo = $_POST["input_totalizar_monto_efectivo"];
+        $cheque = $_POST["input_totalizar_monto_cheque"];
+        $tarjeta = $_POST["input_totalizar_monto_tarjeta"];
+        $deposito = $_POST["input_totalizar_monto_deposito"];
+        $otro = $_POST["opt_otrodocumento"];
+    
+        for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
             
-            if($kk==0)
-            {
-                //nuevo 17
-                $correlativos = new Correlativos();
-                $nro_correlativo = $correlativos->getUltimoCorrelativo("cod_despacho", 1, "si");
-                 $factura->ExecuteTrans("insert into despacho (cod_despacho, id_factura, fecha_creacion, usuario, cantidad_item, estatus) values ('".$nro_correlativo."', '$id_facturaTrans', CURRENT_TIMESTAMP, '{$usuario}','$cantt',0)");
-                    $id_despacho = $factura->getInsertID();              
-                 $kk=1;
-                 
+                    $detalle_item_instruccion = "
+                INSERT INTO despacho_new_detalle (
+                    `id_factura`, `id_item`,
+                    `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                    `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                    `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                    `fecha_creacion`, `_item_almacen`
+                    )
+                VALUES (
+                    '{$id_facturaTrans}', '{$_POST["_item_codigo"][$i]}',
+                    '{$_POST["_item_descripcion"][$i]}', '{$_POST["_item_cantidad"][$i]}', '{$_POST["_item_preciosiniva"][$i]}',
+                    '{$_POST["_item_descuento"][$i]}', '{$_POST["_item_montodescuento"][$i]}', '{$_POST["_item_piva"][$i]}',
+                    '{$_POST["_item_totalsiniva"][$i]}', '{$_POST["_item_totalconiva"][$i]}', '{$usuario}',
+                    CURRENT_TIMESTAMP, '{$_POST["_item_almacen"][$i]}'
+                    );";
+            $factura->ExecuteTrans($detalle_item_instruccion);
+    
+            $descrip_producto = strlen($_POST["_item_descripcion"][$i]) < 39 ? str_pad($_POST["_item_descripcion"][$i], 39) : substr($_POST["_item_descripcion"][$i], 0, 39);
+            $item = $factura->ObtenerFilasBySqlSelect("SELECT cod_item, descripcion2 , seriales FROM item WHERE id_item = {$_POST["_item_codigo"][$i]}");
+            $codigo_item = $item[0]['cod_item'];
+            $cantidad = number_format($_POST["_item_cantidad"][$i], 2, ",", "");
+            $precio = number_format($_POST["_item_preciosiniva"][$i], 2, ",", "");
+            $iva = number_format($_POST["_item_piva"][$i], 2, ",", "");
+            $descuento_item = number_format($_POST["_item_descuento"][$i], 2, ",", "");
+            $seriales = $item[0]['seriales'];
+            /* $espacios = 30 - (strlen($codigo_item) + strlen($cantidad));
+              for ($j = 0; $j < $espacios; $j++) {
+              $codigo_item .= " ";
+              } */
+            $codigo_item = str_pad($codigo_item, 30 - strlen($cantidad), " ", STR_PAD_RIGHT);
+            #$linea_producto.=$descrip_producto . " " . $codigo_item . $cantidad . str_pad($precio, 12, ' ', STR_PAD_LEFT) . str_pad($iva, 7, ' ', STR_PAD_LEFT) . "\n";
+            $lineas[$i] = array("descripcion" => $descrip_producto, "codigo" => $codigo_item, "cantidad" => $cantidad, "precio" => $precio, "iva" => $iva, "descuento_item" => $descuento_item);
+    
+            if ($item[0]['descripcion2'] != "") {# antes $descrip_producto[0]['descripcion2']
+                #$linea_producto.=$item[0]['descripcion2'] . "\n"; # antes $descrip_producto[0]['descripcion2']
+                #$lineas["descripcion2"] = $item[0]['descripcion2'];
             }
-            else 
-            {
-                 $factura->ExecuteTrans("update despacho set cantidad_item=cantidad_item+$cantt where id='$id_despacho'");
+            #fwrite($archivo_spooler, $linea_producto);
+            if (!$tienePedido && !$tieneNotaEntrega) {
+                $ubicacion_venta= $id_ubicacion[0]['id_ubicacion'];
+    
+                //Se consulta el precio actual para dejar el historico en kardex (Junior)
+                $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$_POST["_item_codigo"][$i]}'";
+                $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
+    
+                $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
+                
+                $kardex_almacen_detalle_instruccion = "
+                INSERT INTO kardex_almacen_detalle (
+                    `id_transaccion` , `id_almacen_entrada` ,
+                    `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`, precio)
+                VALUES (
+                    '{$id_transaccion}', '', '{$_POST["_item_almacen"][$i]}',
+                    '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_cantidad"][$i]}', $ubicacion_venta, $precioconiva);";
+                
+                $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
+    
+                if ($_POST["estado_entrega"] == 'Entregado' || $_POST["estado_entrega"] =='Pendiente') {
+                    $campos = $factura->ObtenerFilasBySqlSelect("
+                            SELECT cantidad FROM item_existencia_almacen
+                            WHERE id_item  = '{$_POST["_item_codigo"][$i]}' AND cod_almacen = '{$_POST["_item_almacen"][$i]}' AND id_ubicacion='{$_POST["_item_ubicacion"][$i]}';");
+                    # Verificar que se esta facturando para no descontar de la existencia,
+                    # ya que el propio pedido desconto
+                    #if (!$tienePedido) {
+                    $factura->ExecuteTrans("
+                        UPDATE item_existencia_almacen
+                        SET cantidad = '" . ($campos[0]["cantidad"] - $_POST["_item_cantidad"][$i]) . "'
+                        WHERE id_item  = '{$_POST["_item_codigo"][$i]}' AND cod_almacen = '{$_POST["_item_almacen"][$i]}' AND id_ubicacion='{$_POST["_item_ubicacion"][$i]}';");
+                    #}
+                    $factura->ExecuteTrans("DELETE FROM item_precompromiso WHERE cod_item_precompromiso = '{$_POST["_cod_item_precompromiso"][$i]}';");
+                }
             }
-            
-            for($ii=1; $ii<=$cantt; $ii++) 
+            /* Funcionalidad adicionada como requisito especifico del CCP */
+            if ($_POST["_id_cuota"][$i] != 'undefined') {
+                $factura->ExecuteTrans("UPDATE `cuota_cliente` SET estatus = 1 WHERE id = {$_POST["_id_cuota"][$i]};");
+                $cuota_generada = $factura->ObtenerFilasBySqlSelect("SELECT id_cuota_generada FROM `cuota_cliente` WHERE id = {$_POST["_id_cuota"][$i]};");
+                $factura->ExecuteTrans("INSERT INTO `cuota_cliente_movimientos` (id_cuota_generada, id_cliente, tipo, monto) VALUES ({$cuota_generada[0]["id_cuota_generada"]}, {$_POST["id_cliente"]}, 1, {$_POST["_item_preciosiniva"][$i]})");
+            }
+        
+            if($seriales==1)
             {
-             $factura->ExecuteTrans("insert into despacho_detalle (id_despacho, id_item, item_descripcion) values ('$id_despacho', '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_descripcion"][$i]}')");
-            }   
+                $cantt=$_POST["_item_cantidad"][$i];
+                
+                if($kk==0)
+                {
+                    //nuevo 17
+                    $correlativos = new Correlativos();
+                    $nro_correlativo = $correlativos->getUltimoCorrelativo("cod_despacho", 1, "si");
+                     $factura->ExecuteTrans("insert into despacho (cod_despacho, id_factura, fecha_creacion, usuario, cantidad_item, estatus) values ('".$nro_correlativo."', '$id_facturaTrans', CURRENT_TIMESTAMP, '{$usuario}','$cantt',0)");
+                        $id_despacho = $factura->getInsertID();              
+                     $kk=1;
+                     
+                }
+                else 
+                {
+                     $factura->ExecuteTrans("update despacho set cantidad_item=cantidad_item+$cantt where id='$id_despacho'");
+                }
+                
+                for($ii=1; $ii<=$cantt; $ii++) 
+                {
+                 $factura->ExecuteTrans("insert into despacho_detalle (id_despacho, id_item, item_descripcion) values ('$id_despacho', '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_descripcion"][$i]}')");
+                }   
+            }
         }
     }
+    else
+    {
+        $usuario=$login->getUsuario();
+        // cuando existe pedido pendiente
+        $kardexoriginal=$clientes->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
+        if($kardexoriginal==null)
+        { 
+            echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador"; exit();
+        }
+        $sql = 
+        "update `despacho_new` set
+            `subtotal`=(subtotal+{$_POST["input_subtotal"]}),
+            `descuentosItemFactura`=(descuentosItemFactura+{$_POST["input_descuentosItemFactura"]}),
+            `montoItemsFactura`=(montoItemsFactura+{$_POST["input_montoItemsFactura"]}),
+            `ivaTotalFactura`=(ivaTotalFactura+{$_POST["input_ivaTotalFactura"]}),
+            `TotalTotalFactura`=(TotalTotalFactura+{$_POST["input_totalizar_total_general"]}),
+            `cantidad_items`=(cantidad_items+{$_POST["input_cantidad_items"]}),
+            `totalizar_sub_total`=(totalizar_sub_total+{$_POST["input_totalizar_sub_total"]}),
+            `totalizar_descuento_parcial`=(totalizar_descuento_parcial+{$_POST["input_totalizar_descuento_parcial"]}),
+            `totalizar_total_operacion`=(totalizar_total_operacion+{$_POST["input_totalizar_total_operacion"]}),
+            `totalizar_pdescuento_global`=(totalizar_pdescuento_global+{$_POST["input_totalizar_pdescuento_global"]}),
+            `totalizar_descuento_global`=(totalizar_descuento_global+{$_POST["input_totalizar_descuento_global"]}),
+            `totalizar_base_imponible`=(totalizar_base_imponible+{$_POST["totalizar_base_imponible"]}),
+            `totalizar_monto_iva`=(totalizar_monto_iva+{$_POST["input_totalizar_monto_iva"]}),
+            `totalizar_total_general`=(totalizar_total_general+{$_POST["input_totalizar_total_general"]}),
+            `totalizar_total_retencion`=(totalizar_total_retencion+{$_POST["totalizar_total_retencion"]})
+            where id_factura='".$cargosoriginal[0]['id_factura'] ."'";
+        $factura->ExecuteTrans($sql);
+                // insertar sql en caja
+      /*  $insert_modulo_caja = "INSERT INTO 
+            `caja_ing_cob_sal_x_cli` 
+                (`id_caja_ing_cob_sal_x_cli`, `fecha`, `comprobante`, `numero`, `saldo`,`monto`, `id_cliente`) 
+            VALUES (NULL, '".date("Y-m-d")."', 'FACT', '{$nro_factura}', {$_POST["input_totalizar_total_general"]},0, {$_POST["id_cliente"]});";
+        
+        $factura->ExecuteTrans($insert_modulo_caja);*/
+    
+        /*
+         * Codigo fuente añadido para la facturacion de pedidos, notas de entrega y cotizaciones.
+         * Se cambia el status del documento mercantil respectivo que se facturara y se le asocia la factura
+         */
+        $tienePedido = $factura->ObtenerFilasBySqlSelect("SELECT * FROM pedido WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_pedido = {$_POST['pedido_seleccionado']};");
+        $tieneNotaEntrega = $factura->ObtenerFilasBySqlSelect("SELECT * FROM nota_entrega WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_nota_entrega = {$_POST['nota_entrega_seleccionada']};");
+        $tieneCotizacion = $factura->ObtenerFilasBySqlSelect("SELECT * FROM cotizacion_presupuesto WHERE id_cliente= {$_GET["cod"]} AND cod_estatus = 1 AND id_factura = 0 AND id_cotizacion = {$_POST['cotizacion_seleccionada']};");
+    
+        if ($tienePedido) {
+            $factura->ExecuteTrans("UPDATE pedido SET cod_estatus = 2, id_factura = {$cargosoriginal[0]['id_factura']} WHERE id_cliente = {$_GET['cod']} AND id_pedido = {$_POST['pedido_seleccionado']};");
+        }
+        if ($tieneNotaEntrega) {
+            $factura->ExecuteTrans("UPDATE nota_entrega SET cod_estatus = 2, id_factura = {$cargosoriginal[0]['id_factura']} WHERE id_cliente = {$_GET['cod']} AND id_nota_entrega = {$_POST['nota_entrega_seleccionada']};");
+        }
+        if ($tieneCotizacion) {
+            $factura->ExecuteTrans("UPDATE cotizacion_presupuesto SET cod_estatus = 2, id_factura = {$cargosoriginal[0]['id_factura']} WHERE id_cliente = {$_GET['cod']} AND id_cotizacion = {$_POST['cotizacion_seleccionada']};");
+        }
+        if($_POST["fecha_vencimiento"] == "")
+            $_POST["fecha_vencimiento"] = "NULL";
+        else
+            $_POST["fecha_vencimiento"] = "'".$_POST["fecha_vencimiento"]."'";
+         $_POST["fecha_vencimiento"];   
+        $SQLdetalle_formapago = "INSERT INTO despacho_new_detalle_formapago (
+            `id_factura` ,`totalizar_monto_cancelar` ,
+            `totalizar_saldo_pendiente` ,`totalizar_cambio` ,`totalizar_monto_efectivo` ,
+            `opt_cheque` ,`totalizar_monto_cheque` ,`totalizar_nro_cheque` ,
+            `totalizar_nombre_banco` ,`opt_tarjeta` ,`totalizar_monto_tarjeta` ,
+            `totalizar_nro_tarjeta` ,`totalizar_tipo_tarjeta` ,`opt_deposito` ,
+            `totalizar_monto_deposito` ,`totalizar_nro_deposito` ,
+            `totalizar_banco_deposito` ,`opt_otrodocumento` ,`totalizar_monto_otrodocumento` ,
+            `totalizar_nro_otrodocumento` ,`totalizar_banco_otrodocumento` ,`fecha_vencimiento` ,
+            `observacion` ,`persona_contacto` ,`telefono` ,`fecha_creacion` ,`usuario_creacion`)
+        VALUES ({$cargosoriginal[0]['id_factura']}, '{$_POST["input_totalizar_monto_cancelar"]}',
+                '{$_POST["input_totalizar_saldo_pendiente"]}', '{$_POST["input_totalizar_cambio"]}', '{$_POST["input_totalizar_monto_efectivo"]}',
+                '{$_POST["opt_cheque"]}', '{$_POST["input_totalizar_monto_cheque"]}', '{$_POST["input_totalizar_nro_cheque"]}',
+                '{$_POST["input_totalizar_nombre_banco"]}', '{$_POST["opt_tarjeta"]}', '{$_POST["input_totalizar_monto_tarjeta"]}',
+                '{$_POST["input_totalizar_nro_tarjeta"]}', '{$_POST["input_totalizar_tipo_tarjeta"]}', '{$_POST["opt_deposito"]}',
+                '{$_POST["input_totalizar_monto_deposito"]}', '{$_POST["input_totalizar_nro_deposito"]}',
+                '{$_POST["input_totalizar_banco_deposito"]}', '{$_POST["opt_otrodocumento"]}',
+                '{$_POST["totalizar_monto_otrodocumento"]}', '{$_POST["totalizar_nro_otrodocumento"]}',
+                '{$_POST["totalizar_banco_otrodocumento"]}', '{$_POST["fecha_vencimiento"]}',
+                '{$_POST["observacion"]}', '{$_POST["persona_contacto"]}', '{$_POST["telefono"]}', CURRENT_TIMESTAMP, '{$usuario}');";
+    
+        $factura->ExecuteTrans($SQLdetalle_formapago);
+    
+        $consulta = "INSERT INTO factura_impuestos (
+                `id_factura` ,`totalizar_base_retencion` ,
+                `totalizar_pbase_retencion` ,`totalizar_descripcion_base_retencion` ,
+                `cod_impuesto_iva` , `totalizar_monto_iva2` ,`totalizar_monto_1x1000`,`usuario_creacion`,`fecha_creacion`)
+            VALUES (
+                '{$cargosoriginal[0]['id_factura']}', '{$_POST["totalizar_base_retencion"]}', '{$_POST["totalizar_pbase_retencion"]}',
+                '{$_POST["totalizar_descripcion_base_retencion"]}', '{$_POST["cod_impuesto_iva"]}',
+                '{$_POST["totalizar_monto_iva2"]}', '{$_POST["totalizar_monto_1x1000"]}', '{$usuario}', CURRENT_TIMESTAMP);";
+    
+        $factura->ExecuteTrans($consulta);
+         # Insertamos en la tabla de cuentas por cobrar la cabecera del asiento.
+        $SQL_CXC = "INSERT INTO cxc_edocuenta (
+                `id_cliente`, `documento`, `numero`, `monto`,
+                `fecha_emision`, `observacion`, `vencimiento_fecha`,
+                `vencimiento_persona_contacto`, `vencimiento_telefono`,
+                `vencimiento_descripcion`, `usuario_creacion`, `fecha_creacion`, `marca`)
+            VALUES (
+                '{$_POST["id_cliente"]}', 'FAC', '{$nro_factura}',
+                '{$_POST["input_totalizar_total_general"]}', '" . date("Y-m-d") . "',
+                'FACTURA {$nro_factura}', '{$_POST["fecha_vencimiento"]}',
+                '{$_POST["persona_contacto"]}', '{$_POST["telefono"]}',
+                '{$_POST["observacion"]}', '{$usuario}', CURRENT_TIMESTAMP, '{$marca}');";
+    
+        $factura->ExecuteTrans($SQL_CXC);
+        $id_cxc = $factura->getInsertID();
+    
+        $SQL_CXC_DET = "INSERT INTO cxc_edocuenta_detalle (
+                `cod_edocuenta` ,`documento` ,`numero` ,
+                `descripcion` ,`tipo` ,`monto`,
+                `usuario_creacion`, `fecha_creacion`,`fecha_emision_edodet`)
+            VALUES (
+                '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}R',
+                'Factura {$nro_factura}', 'd', '{$_POST["input_totalizar_total_general"]}',
+                '{$usuario}', CURRENT_TIMESTAMP, '" . date("Y-m-d") . "');";
+        # Se inserta el detalle de la CxC en este caso el asiento del DEBITO.
+        $factura->ExecuteTrans($SQL_CXC_DET);
+        $cod_edocuenta_detalle = $factura->getInsertID();
+        /**
+         * Aumentamos el valor del correlativo del Pago o Abono de Factura.
+         * $factura->ExecuteTrans("update correlativos set contador = '".$correlativos->getUltimoCorrelativo("cod_pago_o_abono",1)."' where campo = 'cod_pago_o_abono'");
+         */
+        /**
+         * Obtenemos el siguiente numero de correlativo de Pago x Abono a Factura.
+         * $cod_pago_o_abono = $correlativos->getUltimoCorrelativo("cod_pago_o_abono",0,"si","");
+         */
+        # Verificamos el pago fue completo, un abono o fue un credito
+        $monto_cxc = 0;
+        if ($_POST["totalizar_monto_cancelar"] > 0 && $_POST["totalizar_monto_cancelar"] <= $_POST["input_totalizar_total_general"]) {
+            $monto_cxc = $_POST["totalizar_monto_cancelar"];
+        } elseif ($_POST["totalizar_monto_cancelar"] > $_POST["input_totalizar_total_general"]) {
+            # verificamos si el monto a cancelar es mayor al general a pagar
+            $monto_cxc = $_POST["input_totalizar_total_general"];
+        }
+        $SQL_CXC_DET = "INSERT INTO cxc_edocuenta_detalle (
+                `cod_edocuenta`, `documento`, `numero`, `descripcion`,
+                    `tipo`, `monto`, `usuario_creacion`,
+                `fecha_creacion`, `fecha_emision_edodet`)
+                VALUES (
+                '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}R', 'Pago Factura {$nro_factura}',
+                    'c', '{$monto_cxc}', '{$usuario}',
+                CURRENT_TIMESTAMP, '{$_POST["input_fechaFactura"]}');";
+        # Se inserta el detalle de la CxC en este caso el asiento del CREDITO.
+        $factura->ExecuteTrans($SQL_CXC_DET);
+    
+        # SQL para generar el detalle de forma pago en la tabla de cxc_edocuenta_formapago.
+        $SQL_cxc_formapago = "INSERT INTO cxc_edocuenta_formapago (
+                `cod_edocuenta_detalle`, `totalizar_monto_cancelar`,
+                `totalizar_saldo_pendiente`, `totalizar_cambio`, `totalizar_monto_efectivo`,
+                `opt_cheque`, `totalizar_monto_cheque`, `totalizar_nro_cheque`,
+                `totalizar_nombre_banco`, `opt_tarjeta`, `totalizar_monto_tarjeta`,
+                `totalizar_nro_tarjeta`, `totalizar_tipo_tarjeta`, `opt_deposito`,
+                `totalizar_monto_deposito`, `totalizar_nro_deposito`, `totalizar_banco_deposito`,
+                `opt_otrodocumento`, `totalizar_monto_otrodocumento`, `totalizar_nro_otrodocumento`,
+                `totalizar_banco_otrodocumento`, `fecha_creacion`, `usuario_creacion`)
+            VALUES (
+                '{$cod_edocuenta_detalle}', '{$_POST["input_totalizar_monto_cancelar"]}',
+                '{$_POST["input_totalizar_saldo_pendiente"]}', '{$_POST["input_totalizar_cambio"]}', '{$_POST["input_totalizar_monto_efectivo"]}',
+                '{$_POST["opt_cheque"]}', '{$_POST["input_totalizar_monto_tarjeta"]}', '{$_POST["input_totalizar_nro_cheque"]}',
+                '{$_POST["input_totalizar_nombre_banco"]}', '{$_POST["opt_tarjeta"]}', '{$_POST["input_totalizar_monto_tarjeta"]}',
+                '{$_POST["input_totalizar_nro_tarjeta"]}', '{$_POST["input_totalizar_tipo_tarjeta"]}', '{$_POST["opt_deposito"]}',
+                '{$_POST["input_totalizar_banco_deposito"]}', '{$_POST["input_totalizar_nro_deposito"]}', '{$_POST["input_totalizar_banco_deposito"]}',
+                '{$_POST["opt_otrodocumento"]}', '{$_POST["totalizar_banco_otrodocumento"]}', '{$_POST["totalizar_nro_otrodocumento"]}',
+                '{$_POST["totalizar_banco_otrodocumento"]}', CURRENT_TIMESTAMP , '{$usuario}');";
+        $factura->ExecuteTrans($SQL_cxc_formapago);
+        # Insert en la tabla de impuestos
+        # echo $_POST["cantidad_impuesto"]."<br>";
+        for ($i = 1; $i <= (int) $_POST["cantidad_impuesto"]; $i++) {
+            if ($_POST["cod_impuesto$i"] != "" && $_POST["totalizar_monto_retencion$i"] > 0 && $_POST["totalizar_monto_cancelar"] > 0 && $_POST["totalizar_monto_cancelar"] < $_POST["input_totalizar_total_general"]) {
+    
+                $base_imponible = $_POST["cod_tipo_impuesto$i"] == 1 ? $_POST["totalizar_monto_iva"] : $_POST["totalizar_base_imponible"];
+    
+                $detalle_tabla_impuesto = "INSERT INTO tabla_impuestos (
+                        `id_documento`, `tipo_documento`, `numero_control_factura`,
+                        `id_fiscal`, `id_cliente`, `cod_tipo_impuesto`, `cod_impuesto`,
+                        `totalizar_pbase_retencion`, `totalizar_monto_retencion`, `totalizar_base_imponible`,
+                        `totalizar_monto_exento`, `usuario_creacion`, `fecha_creacion`)
+                    VALUES (
+                        '{$cargosoriginal[0]['id_factura']}', 'f', '{$_POST["numero_control_factura"]}', '{$_POST["id_fiscal"]}',
+                        '{$_POST["id_cliente"]}', '{$_POST["cod_tipo_impuesto$i"]}', '{$_POST["cod_impuesto$i"]}',
+                        '{$_POST["totalizar_pbase_retencion$i"]}', '{$_POST["totalizar_monto_retencion$i"]}',
+                        '{$base_imponible}', '{$_POST["totalizar_monto_exento$i"]}',
+                        '{$usuario}',CURRENT_TIMESTAMP);";
+                $factura->ExecuteTrans($detalle_tabla_impuesto);
+    
+                //if($_POST["totalizar_monto_cancelar"]>0&&$_POST["totalizar_monto_cancelar"]<$_POST["input_totalizar_total_general"]){
+                $SQL_CXC_DET2 = "INSERT INTO cxc_edocuenta_detalle (
+                        `cod_edocuenta`, `documento`, `numero`, `descripcion`,
+                        `tipo`, `monto`, `usuario_creacion`, `fecha_creacion`, `fecha_emision_edodet`)
+                    VALUES (
+                        '{$id_cxc}', 'PAGOxFAC', '{$nro_factura}', 'Retenciones de Impuesto a Factura {$nro_factura}',
+                        'c', '{$_POST["totalizar_monto_retencion$i"]}', '{$usuario}', CURRENT_TIMESTAMP, '{$_POST["input_fechaFactura"]}');";
+                # Se inserta el detalle de la CxC en este caso el asiento de lDEBITO.
+                $factura->ExecuteTrans($SQL_CXC_DET2);
+                //}// FIN DEL IF DE NSERTAR DETALLE DE IMPUESTOS EN ESTADO DE CUENTA
+            } // FIN DEL IF DE INSERTAR IMPUESTOS EN LA TABLA IMPUESTOS
+            
+        }
+    
+        $lineas = array();
+        #$lineas_tfhka = array();
+    
+        $total = $_POST["input_totalizar_total_general"];
+        $efectivo = $_POST["input_totalizar_monto_efectivo"];
+        $cheque = $_POST["input_totalizar_monto_cheque"];
+        $tarjeta = $_POST["input_totalizar_monto_tarjeta"];
+        $deposito = $_POST["input_totalizar_monto_deposito"];
+        $otro = $_POST["opt_otrodocumento"];
+        
+        
+        for ($i = 0; $i < (int) $_POST["input_cantidad_items"]; $i++) {
+            
+                    $detalle_item_instruccion = "
+                INSERT INTO despacho_new_detalle (
+                    `id_factura`, `id_item`,
+                    `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                    `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                    `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                    `fecha_creacion`, `_item_almacen`
+                    )
+                VALUES (
+                    '{$cargosoriginal[0]['id_factura']}', '{$_POST["_item_codigo"][$i]}',
+                    '{$_POST["_item_descripcion"][$i]}', '{$_POST["_item_cantidad"][$i]}', '{$_POST["_item_preciosiniva"][$i]}',
+                    '{$_POST["_item_descuento"][$i]}', '{$_POST["_item_montodescuento"][$i]}', '{$_POST["_item_piva"][$i]}',
+                    '{$_POST["_item_totalsiniva"][$i]}', '{$_POST["_item_totalconiva"][$i]}', '{$usuario}',
+                    CURRENT_TIMESTAMP, '{$_POST["_item_almacen"][$i]}'
+                    );";
+            $factura->ExecuteTrans($detalle_item_instruccion);
+    
+            $descrip_producto = strlen($_POST["_item_descripcion"][$i]) < 39 ? str_pad($_POST["_item_descripcion"][$i], 39) : substr($_POST["_item_descripcion"][$i], 0, 39);
+            $item = $factura->ObtenerFilasBySqlSelect("SELECT cod_item, descripcion2 , seriales FROM item WHERE id_item = {$_POST["_item_codigo"][$i]}");
+            $codigo_item = $item[0]['cod_item'];
+            $cantidad = number_format($_POST["_item_cantidad"][$i], 2, ",", "");
+            $precio = number_format($_POST["_item_preciosiniva"][$i], 2, ",", "");
+            $iva = number_format($_POST["_item_piva"][$i], 2, ",", "");
+            $descuento_item = number_format($_POST["_item_descuento"][$i], 2, ",", "");
+            $seriales = $item[0]['seriales'];
+            /* $espacios = 30 - (strlen($codigo_item) + strlen($cantidad));
+              for ($j = 0; $j < $espacios; $j++) {
+              $codigo_item .= " ";
+              } */
+            $codigo_item = str_pad($codigo_item, 30 - strlen($cantidad), " ", STR_PAD_RIGHT);
+            #$linea_producto.=$descrip_producto . " " . $codigo_item . $cantidad . str_pad($precio, 12, ' ', STR_PAD_LEFT) . str_pad($iva, 7, ' ', STR_PAD_LEFT) . "\n";
+            $lineas[$i] = array("descripcion" => $descrip_producto, "codigo" => $codigo_item, "cantidad" => $cantidad, "precio" => $precio, "iva" => $iva, "descuento_item" => $descuento_item);
+    
+            if ($item[0]['descripcion2'] != "") {# antes $descrip_producto[0]['descripcion2']
+                #$linea_producto.=$item[0]['descripcion2'] . "\n"; # antes $descrip_producto[0]['descripcion2']
+                #$lineas["descripcion2"] = $item[0]['descripcion2'];
+            }
+            #fwrite($archivo_spooler, $linea_producto);
+            if (!$tienePedido && !$tieneNotaEntrega) {
+                $ubicacion_venta= $id_ubicacion[0]['id_ubicacion'];
+    
+                //Se consulta el precio actual para dejar el historico en kardex (Junior)
+                $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$_POST["_item_codigo"][$i]}'";
+                $precio_actual=$almacen->ObtenerFilasBySqlSelect($sql);
+    
+                $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
+                
+                $kardex_almacen_detalle_instruccion = "
+                INSERT INTO kardex_almacen_detalle (
+                    `id_transaccion` , `id_almacen_entrada` ,
+                    `id_almacen_salida` , `id_item` , `cantidad`, `id_ubi_salida`, precio)
+                VALUES (
+                    '{$kardexoriginal[0]['id_transaccion']}', '', '{$_POST["_item_almacen"][$i]}',
+                    '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_cantidad"][$i]}', $ubicacion_venta, $precioconiva);";
+                
+                $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
+    
+                if ($_POST["estado_entrega"] == 'Entregado' || $_POST["estado_entrega"] =='Pendiente') {
+                    $campos = $factura->ObtenerFilasBySqlSelect("
+                            SELECT cantidad FROM item_existencia_almacen
+                            WHERE id_item  = '{$_POST["_item_codigo"][$i]}' AND cod_almacen = '{$_POST["_item_almacen"][$i]}' AND id_ubicacion='{$_POST["_item_ubicacion"][$i]}';");
+                    # Verificar que se esta facturando para no descontar de la existencia,
+                    # ya que el propio pedido desconto
+                    #if (!$tienePedido) {
+                    $factura->ExecuteTrans("
+                        UPDATE item_existencia_almacen
+                        SET cantidad = '" . ($campos[0]["cantidad"] - $_POST["_item_cantidad"][$i]) . "'
+                        WHERE id_item  = '{$_POST["_item_codigo"][$i]}' AND cod_almacen = '{$_POST["_item_almacen"][$i]}' AND id_ubicacion='{$_POST["_item_ubicacion"][$i]}';");
+                    #}
+                    $factura->ExecuteTrans("DELETE FROM item_precompromiso WHERE cod_item_precompromiso = '{$_POST["_cod_item_precompromiso"][$i]}';");
+                }
+            }
+            /* Funcionalidad adicionada como requisito especifico del CCP */
+            if ($_POST["_id_cuota"][$i] != 'undefined') {
+                $factura->ExecuteTrans("UPDATE `cuota_cliente` SET estatus = 1 WHERE id = {$_POST["_id_cuota"][$i]};");
+                $cuota_generada = $factura->ObtenerFilasBySqlSelect("SELECT id_cuota_generada FROM `cuota_cliente` WHERE id = {$_POST["_id_cuota"][$i]};");
+                $factura->ExecuteTrans("INSERT INTO `cuota_cliente_movimientos` (id_cuota_generada, id_cliente, tipo, monto) VALUES ({$cuota_generada[0]["id_cuota_generada"]}, {$_POST["id_cliente"]}, 1, {$_POST["_item_preciosiniva"][$i]})");
+            }
+        
+            if($seriales==1)
+            {
+                $cantt=$_POST["_item_cantidad"][$i];
+                
+                if($kk==0)
+                {
+                    //nuevo 17
+                    $correlativos = new Correlativos();
+                    $nro_correlativo = $correlativos->getUltimoCorrelativo("cod_despacho", 1, "si");
+                     $factura->ExecuteTrans("insert into despacho (cod_despacho, id_factura, fecha_creacion, usuario, cantidad_item, estatus) values ('".$nro_correlativo."', '$cargosoriginal[0]['id_factura']', CURRENT_TIMESTAMP, '{$usuario}','$cantt',0)");
+                        $id_despacho = $factura->getInsertID();              
+                     $kk=1;
+                     
+                }
+                else 
+                {
+                     $factura->ExecuteTrans("update despacho set cantidad_item=cantidad_item+$cantt where id='$id_despacho'");
+                }
+                
+                for($ii=1; $ii<=$cantt; $ii++) 
+                {
+                 $factura->ExecuteTrans("insert into despacho_detalle (id_despacho, id_item, item_descripcion) values ('$id_despacho', '{$_POST["_item_codigo"][$i]}', '{$_POST["_item_descripcion"][$i]}')");
+                }   
+            }
+        }
+        
+    }//fin del else
     
     $parametros_impresora_fiscal = $parametros->ObtenerFilasBySqlSelect("SELECT tipo_facturacion, swterceroimp, impresora_marca, impresora_serial, porcentaje_impuesto_principal, iva_a, iva_b, iva_c, cod_almacen, precio_menor FROM parametros_generales;");
 

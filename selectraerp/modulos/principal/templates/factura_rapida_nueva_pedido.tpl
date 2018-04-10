@@ -212,7 +212,7 @@
         <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida.js"></script>
         <script type="text/javascript" src="../../libs/js/buscar_clientes_factura_rapida.js"></script>
         <script type="text/javascript" src="../../libs/js/nueva_factura_rapida_scripts.js"></script>
-         <script type="text/javascript" src="../../libs/js/event_almacen_entrada_clap.js"></script>
+        <script type="text/javascript" src="../../libs/js/event_almacen_entrada_clap.js"></script>
         <script type="text/javascript" src="../../libs/js/evento_cestaClap.js"></script>
 
         <script type="text/javascript" src="../../libs/js/factura.js"></script>

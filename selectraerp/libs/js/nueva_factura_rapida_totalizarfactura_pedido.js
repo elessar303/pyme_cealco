@@ -677,7 +677,9 @@ $(function(){
                                 if(data==0){
                                     alert("La impresora Fiscal No puede ejecutar la accion! informe la situacion a un tecnico");                        
                                     return false;                          
-                                }else{
+                                }
+                                else
+                                {
                                 alert("Pedido Registrado");
                                 window.close();                  
                                 }

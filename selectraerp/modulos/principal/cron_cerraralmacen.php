@@ -47,7 +47,6 @@ $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme wher
         and c.id_almacen_entrada='".$_GET['almacen']."'
         and a.nro_factura<>'' group by b.id_cliente";
     $despachos = $almacen->ObtenerFilasBySqlSelect($sql);
-    //print_r($sql); exit();
     $almacen->BeginTrans();
     foreach ($despachos as $key => $arraycliente) 
     {
