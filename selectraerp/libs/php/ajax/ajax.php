@@ -1069,7 +1069,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
         break;
         case "EstadoCuenta" : 
 
-            if ($_GET["id_tipo_movimiento_almacen"] == '8')
+            if ($_GET["id_tipo_movimiento_almacen"] == '8' || $_GET["id_tipo_movimiento_almacen"] == '4')
             {
                 /*
                 $sql="SELECT *,kad.cantidad as cantidad_item, b.id_detalle_factura as id_detalle_f, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, kad.precio, DATE_FORMAT(k.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
@@ -1116,7 +1116,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             if (count($campos) == 0) {
                 exit;
             }
-
+        
             echo '
                     <tr class="detalle_items">
                         <input type="hidden" name="desplegado" value="true"/>
