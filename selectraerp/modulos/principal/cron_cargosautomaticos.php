@@ -120,8 +120,12 @@ if($despacho!='all') //proceso para un solo cliente
     //se busca las ubicaciones de este cliente que esten ocupadas
     $sql=
     "
-        select a.*, c.id as ubicacion from kardex_almacen a inner join kardex_almacen_detalle b on a.id_transaccion=b.id_transaccion
-        inner join ubicacion c on b.id_ubi_entrada=c.id where c.ocupado=1 and id_cliente='".$despacho."'
+        select a.*, c.id as ubicacion 
+        from kardex_almacen a 
+        inner join kardex_almacen_detalle b on a.id_transaccion=b.id_transaccion
+        inner join ubicacion c on b.id_ubi_entrada=c.id 
+        inner join item_existencia_almacen as d on c.id=d.id_ubicacion  
+        where c.ocupado=1 and d.id_proveedor='".$despacho."'
     ";
     $ubicaciones=$almacen->ObtenerFilasBySqlSelect($sql);
     if($ubicaciones!=NULL)
@@ -236,7 +240,7 @@ if($despacho!='all') //proceso para un solo cliente
             $sql="select * from despacho_new where fecha_pago='0000-00-00' and id_cliente='{$despacho}' limit 1";
             $cargosoriginal=$almacen->ObtenerFilasBySqlSelect($sql);
             if($cargosoriginal==null)
-            { 
+            {
                 #obtenemos el money actual
                 $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
     
@@ -528,8 +532,13 @@ else
         //se busca las ubicaciones de este cliente que esten ocupadas
         $sql=
         "
-            select a.*, c.id as ubicacion from kardex_almacen a inner join kardex_almacen_detalle b on a.id_transaccion=b.id_transaccion
-            inner join ubicacion c on b.id_ubi_entrada=c.id where c.ocupado=1 and id_cliente='".$despacho."'
+        select a.*, c.id as ubicacion 
+        from kardex_almacen a 
+        inner join kardex_almacen_detalle b on a.id_transaccion=b.id_transaccion
+        inner join ubicacion c on b.id_ubi_entrada=c.id 
+        inner join item_existencia_almacen as d on c.id=d.id_ubicacion  
+        where c.ocupado=1 and d.id_proveedor='".$despacho."'
+        
         ";
         $ubicaciones=$almacen->ObtenerFilasBySqlSelect($sql);
         if($ubicaciones!=NULL)
