@@ -27,7 +27,7 @@
                  $(document).ready(function(){
                     $("#sincro").click(function(event) {                       
                          
-                   window.location=window.confirm("Aperturar Tienda")?"../principal/apertura_tienda.php?generar=si&bandera=1":"?opt_menu=106";
+                   window.location=window.confirm("Aperturar Planta")?"../principal/apertura_tienda.php?generar=si&bandera=1":"?opt_menu=106";
                      
                     });
                   
@@ -51,11 +51,11 @@
             <div id="cont1">
                {if $usuarioB==1 }
                    <h2>
-                        <div>Para desbloquear el sistema, debe <u>Aperturar Tienda</u> en el Siguiente LINK:
+                        <div>Para desbloquear el sistema, debe <u>Aperturar Planta</u> en el Siguiente LINK:
                         </div>  
                    </h2> 
                     <div id="sincro" style="margin-top:10px;cursor:pointer">
-                       <h3 style="color: green">Apertura de Tienda</h3>
+                       <h3 style="color: green">Apertura de Planta</h3>
                     </div> 
                {else}
                   <h2>
