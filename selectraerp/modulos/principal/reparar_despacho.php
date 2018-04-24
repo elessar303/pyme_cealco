@@ -53,7 +53,7 @@ if($clientes!=null)
         $kardex_maestro=$almacen->ObtenerFilasBySqlSelect($sql);
         foreach ($pedidos_pendientes as $key => $value2) 
         {
-           $sql="select * from kadex_almacen where nro_factura=".$value2['cod_factura'];
+           $sql="select * from kardex_almacen where nro_factura=".$value2['cod_factura'];
            //viejo
            $kardex=$almacen->ObtenerFilasBySqlSelect($sql);
            

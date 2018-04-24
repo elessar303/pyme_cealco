@@ -1091,7 +1091,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 ";
                 */
                 $operacion = "Salida";
-                $sql="SELECT *,a.cantidad_items as cantidad_item, b.id_detalle_factura as id_detalle_f, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, b._item_totalsiniva as precio, DATE_FORMAT(k.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
+                $sql="SELECT *,a.cantidad_items as cantidad_item, b.id_detalle_factura as id_detalle_f, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad, b._item_totalsiniva as precio, DATE_FORMAT(b.fecha_creacion, '%d/%m/%Y %h:%i:%s') as fecha_creacion
                 FROM despacho_new as a
                 INNER JOIN despacho_new_detalle as b on a.id_factura=b.id_factura
                 Inner Join clientes as cli on a.id_cliente=cli.id_cliente
@@ -1116,7 +1116,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             if (count($campos) == 0) {
                 exit;
             }
-        
+
             echo '
                     <tr class="detalle_items">
                         <input type="hidden" name="desplegado" value="true"/>
