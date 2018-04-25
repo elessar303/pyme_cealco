@@ -22,6 +22,16 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "cargaUbicacion3":
+            $almacen=$_POST["idAlmacen"];
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA'" );
+             if (count($campos) == 0) {
+                 echo "[{band:'-1'}]";
+             } else {
+                 echo json_encode($campos);
+             }
+        break;
+
         case "cargaUbicacionsalidasTraslado":
             $almacen=$_POST["idAlmacen"];
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 ");
