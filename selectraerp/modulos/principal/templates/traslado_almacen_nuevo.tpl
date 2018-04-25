@@ -1,5 +1,5 @@
-<script type="text/javascript" src="../../libs/js/event_almacen_traslado2.js"></script>
-<script type="text/javascript" src="../../libs/js/eventos_formAlmacen.js"></script>
+
+
 <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
 <link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" /> {literal}
 <script>
@@ -24,11 +24,73 @@ $(document).ready(function() {
             }
         });
     }
+    function cargarsalidaalmacen() 
+    {
+      
+        if($("#cliente").val()!=null)
+        {
+            cliente = $("#cliente").val();
+        }
+        else
+        {
+            cliente=$("#id_proveedor").val();
+        }
+        
+        $.ajax({
+            type: 'GET',
+            data: 'opt=getAlmacen&cliente='+cliente,
+            url: '../../libs/php/ajax/ajax.php',
+            beforeSend: function() {
+                $("#almacen_salida").find("option").remove();
+                $("#almacen_salida").append("<option value=''>Cargando..</option>");
+            },
+            success: function(data) {
+                $("#almacen_salida").find("option").remove();
+                this.vcampos = eval(data);
+                     $("#almacen_salida").append("<option value='0'>Seleccione...</option>");
+                for (i = 0; i <= this.vcampos.length; i++) {
+                    $("#almacen_salida").append("<option value='" + this.vcampos[i].cod_almacen + "'>" + this.vcampos[i].descripcion + "</option>");
+                }
+            }
+        });
+    }
+    function cargarsalidaubicaciones() {
+        idAlmacen = $("#almacen_salida").val();
+        cliente = $("#id_proveedor").val();
+        $.ajax({
+            type: 'POST',
+            data: 'opt=cargaUbicacionCliente&idAlmacen=' + idAlmacen + '&cliente=' + cliente,
+            url: '../../libs/php/ajax/ajax.php',
+            beforeSend: function() {
+                $("#ubicacion_salida").find("option").remove();
+                $("#ubicacion_salida").append("<option value=''>Cargando..</option>");
+            },
+            success: function(data) {
+                $("#ubicacion_salida").find("option").remove();
+                this.vcampos = eval(data);
+                $("#ubicacion_salida").append("<option value=''>Seleccione..</option>");
+                for (i = 0; i < this.vcampos.length; i++) {
+                    $("#ubicacion_salida").append("<option value='" + this.vcampos[i].id + "'>" + this.vcampos[i].descripcion + "</option>");
+                }
+            }
+        });
+    }
     $("#almacen_entrada").change(function() 
     {
         cargarUbicaciones();
     });
     cargarUbicaciones();
+    $("#id_proveedor").change(function() 
+    {
+        cargarsalidaalmacen();
+    });
+    
+    $("#almacen_salida").change(function() 
+    {
+        cargarsalidaubicaciones();
+    });
+
+    
 
 });
 
@@ -49,6 +111,8 @@ function solonumeros(evt)
 }
 </script>
 {/literal}
+<script type="text/javascript" src="../../libs/js/event_almacen_traslado2.js"></script>
+<script type="text/javascript" src="../../libs/js/eventos_formAlmacentraslado2.js"></script>
 <form name="formulario" id="formulario" method="post" action="">
     <input type="hidden" name="pesooculto" id="pesooculto" value="0">
     <input type="hidden" name="Datosproveedor" value="">
@@ -90,8 +154,8 @@ function solonumeros(evt)
                 <td>
                     <input type="text" maxlength="70" name=" autorizado_por" id="autorizado_por" value="{$nombre_usuario}" class="form-text" readonly>
                 </td>
-            </tr>
-            <tr>
+            
+            
                 <td>
                     <span style="font-family:'Verdana';font-weight:bold;"><b>Cliente (*):</b></span>
                 </td>
@@ -101,8 +165,8 @@ function solonumeros(evt)
                         {html_options values=$option_values_proveedor output=$option_output_proveedor}
                     </select>
                 </td>
-            </tr>
-            <tr>
+            
+            
                 <td>
                     <span style="font-family:'Verdana';"><b>Observaciones</b></span>
                 </td>
@@ -112,11 +176,43 @@ function solonumeros(evt)
             </tr>
             <tr>
                 <td>
-                    <span style="font-family:'Verdana';"><b>Almacen de Entrada:</b></span>
+                    <span style="font-family:'Verdana';"><b>Fecha:</b></span>
                 </td>
                 <td>
+                    <input type="hidden" name="input_fechacompra" id="input_fechacompra" value='{$smarty.now|date_format:"%Y-%m-%d"}'>
+                    <div class="form-text" style="color:#4e6a48" id="fechacompra">{$smarty.now|date_format:"%d-%m-%Y"}</div>
+                </td>
+            </tr>
+            <tr align="center">
+                <th colspan="6" style= "text-align: center;">
+                    
+                    <b><h3>Movimientos</h3></b>
+                    
+                </th>
+            </tr>
+            <tr align="center">
+                <th colspan="3"  style= "text-align: center;">
+                    <b><h3>Entrada</h3></b>
+                </th>
+                <th colspan="3" style= "text-align: center;">
+                    <b><h3>Salida</h3></b>
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-family:'Verdana';"><b>Almacen de Entrada:</b></span>
+                </td>
+                <td colspan="2" align="center">
                     <select name="almacen_entrada" id="almacen_entrada" class="form-text">
                         {html_options output=$option_output_almacen values=$option_values_almacen}
+                    </select>
+                </td>
+                <td>
+                    <span style="font-family:'Verdana';"><b>Almacen de Salida:</b></span>
+                </td>
+                <td colspan="2">
+                    <select name="almacen_salida" id="almacen_salida" class="form-text">
+                        
                     </select>
                 </td>
             </tr>
@@ -124,18 +220,17 @@ function solonumeros(evt)
                 <td>
                     <span style="font-family:'Verdana';"><b>Ubicacion de Entrada:</b></span>
                 </td>
-                <td>
+                
+                <td colspan="2" align="center">
                     <select name="ubicacion_entrada" id="ubicacion_entrada" class="form-text">
                     </select>
                 </td>
-            </tr>
-            <tr>
                 <td>
-                    <span style="font-family:'Verdana';"><b>Fecha:</b></span>
+                    <span style="font-family:'Verdana';"><b>Ubicacion de Salida:</b></span>
                 </td>
-                <td>
-                    <input type="hidden" name="input_fechacompra" id="input_fechacompra" value='{$smarty.now|date_format:"%Y-%m-%d"}'>
-                    <div class="form-text" style="color:#4e6a48" id="fechacompra">{$smarty.now|date_format:"%d-%m-%Y"}</div>
+                <td colspan="2">
+                    <select name="ubicacion_salida" id="ubicacion_salida" class="form-text">
+                    </select>
                 </td>
             </tr>
             <tr>
@@ -210,7 +305,7 @@ function solonumeros(evt)
     <div id="displaytotal2" class="x-hide-display"></div>
 </form>
 <div id="incluirproducto" class="x-hide-display">
-    <label>
+    <!--<label>
         <p><b>Almacen de Salida</b></p>
         <p>
             <select id="almacen" name="almacen"></select>
@@ -222,6 +317,7 @@ function solonumeros(evt)
             <select id="ubicacion" name="ubicacion"></select>
         </p>
     </label>
+    -->
     <p>
         <label><b>Codigo de barra</b></label>
         <br/>
@@ -269,3 +365,4 @@ function solonumeros(evt)
         </p>
     </label>
 </div>
+

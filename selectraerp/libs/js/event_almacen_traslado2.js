@@ -1,6 +1,7 @@
 var win;
 var existencia_pos = ""; //declarando variable para ver si hay en el pos
-Ext.onReady(function() {
+Ext.onReady(function() 
+{
     $("input[name='cantidadunitaria'], input[name='cantidad_existente']").numeric();
     $.setValoresInput = function(nombreObjetoDestino, nombreObjetoActual) {
         $(nombreObjetoDestino).attr("value", $(nombreObjetoActual).val());
@@ -127,8 +128,8 @@ Ext.onReady(function() {
     }
     //walter
     function traerdatos() {
-        codAlmacen = $("select[name='almacen']").val();
-        id = $("#ubicacion").val();
+        codAlmacen = $("select[name='almacen_salida']").val();
+        id = $("#ubicacion_salida").val();
         cliente = $("#id_proveedor").val();
         if (id != null && isNaN(id) == false) {
             $.ajax({
@@ -250,7 +251,7 @@ Ext.onReady(function() {
     $("#items").change(function() {
         cargarCantidad();
     });
-    $("#ubicacion").change(function() {
+    $("#ubicacion_salida").change(function() {
         cargarCantidad();
         traerdatos();
     });
@@ -390,14 +391,14 @@ Ext.onReady(function() {
                         return false;
                     }
 
-                    if (bandera == 1 && existencia_pos != "") 
+                    /*if (bandera == 1 && existencia_pos != "") 
                     {
                         if (solicitada > existencia_pos) {
 
                             Ext.Msg.alert("Alerta", "La cantidad a descargar no puede ser mayor a la existente en el POS");
                             return false;
                         }
-                    }
+                    }*/
 
                     if (solicitada <= 0) 
                     {
@@ -418,8 +419,10 @@ Ext.onReady(function() {
                     eventos_form.IncluirRegistros({
                         id_item: $("#items").val(),
                         descripcion: $("#items :selected").text() == "" ? $("#items_descripcion").val() : $("#items :selected").text(),
-                        id_almacen: $("#almacen").val(),
-                        id_ubicacion: $("#ubicacion").val(),
+                        id_almacen_entrada: $("#almacen_entrada").val(),
+                        id_ubicacion_entrada: $("#ubicacion_entrada").val(),
+                        id_almacen_salida: $("#almacen_salida").val(),
+                        id_ubicacion_salida: $("#ubicacion_salida").val(),
                         cantidad: $("#cantidadunitaria").val(),
                         peso: $("#peso").val(),
                         marca:  $("#marca").val(),
@@ -471,8 +474,8 @@ Ext.onReady(function() {
                         icon: '../../libs/imagenes/add.gif',
                         handler: function() {
                             eventos_form.init();
-                            $("#ubicacion").empty();
-                            $("#cantidad_existente").val("");
+                           // $("#ubicacion").empty();
+                            //$("#cantidad_existente").val("");
                             //solo debe mostrarse si no existen registros.
                             if($(".grid table.lista tbody").find("tr").length == 0)
                             {
@@ -480,8 +483,9 @@ Ext.onReady(function() {
                             }
                             else
                             {
-                                Ext.Msg.alert("Alerta", "Solo se permite un traslado por vez");
-                                return false;
+                               win.show();
+                              //  Ext.Msg.alert("Alerta", "Solo se permite un traslado por vez");
+                               // return false;
                             }
                         }
                     },
