@@ -433,7 +433,7 @@ if (isset($_POST["input_cantidad_items"]))
                 $kardexoriginal=$almacen->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
                 if($kardexoriginal==null)
                 { 
-                    echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador, ".$cargosoriginal[0]['cod_factura']; exit();
+                    echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador"; exit();
                 }
                 $sql="UPDATE
                         `despacho_new`

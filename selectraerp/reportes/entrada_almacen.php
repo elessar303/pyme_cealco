@@ -70,7 +70,7 @@ class PDF extends FPDF {
         $this->SetFont('Arial','B',12);
         //3 es igual a entrada
             if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3){
-        $this->Cell(0,0, "ENTRADA DE ALMACEN",0,0,'C');
+        $this->Cell(0,0, "ENTRADA DE ALMACEN - DETALLE",0,0,'C');
              }
              if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==8){
         $this->Cell(0,0, "GUIA DE DESPACHO (PEDIDO)",0,0,'C');

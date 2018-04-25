@@ -1,6 +1,8 @@
 <?php
 ob_start();
 session_start();
+
+
 require_once("../../../generalp.config.inc.php");
 require_once("../../libs/php/adodb5/adodb.inc.php");
 require_once("../../libs/php/configuracion/config.php");
@@ -58,6 +60,8 @@ $ano=date("y");
 $hora=date("H");
 $nombre_arc="sincronizacion_data".'_'.$dia.$mes.$ano.$hora.".zip";
 $nombre_archivo="000".$sucursal.'_'.$dia.$mes.$ano.$hora."_data";
+
+
 
 if ($zip->open($path_descarga.'/'.$nombre_arc,ZIPARCHIVE::CREATE) === TRUE) {
 
