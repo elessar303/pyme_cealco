@@ -22,6 +22,550 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "EntradaTunelNuevaAlmacen":
+            //buscamos los datos básicos en calidad y a su vez nos aseguramos  que no se ha registrado en kardex almacen
+            $sql=
+            "
+                Select 
+                a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
+                a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
+                a.placa, a.guia_sunagro, a.prescintos, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
+                a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado, b.id_marca, b.id_presentacion
+                from calidad_almacen as a 
+                inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+                where b.id_transaccion_detalle=".$_POST['id_movimiento']." 
+                AND  a.id_transaccion not in (select id_transaccion_calidad from kardex_almacen where tipo_movimiento_almacen=3)
+            ";
+            $datospadre=$conn->ObtenerFilasBySqlSelect($sql);
+            
+            if($datospadre==null)
+            {
+                //si es null es por que ya existe
+                $sql=
+                "
+                    select 
+                    a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
+                    a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
+                    a.placa, a.guia_sunagro, a.prescintos, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
+                    a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado,  b.id_marca, b.id_presentacion
+                    from kardex_almacen as a
+                    inner join calidad_almacen_detalle as b on a.id_transaccion_calidad=b.id_transaccion
+                    where b.id_transaccion_detalle=".$_POST['id_movimiento']." and a.tipo_movimiento_almacen=3";
+                $maestro=$conn->ObtenerFilasBySqlSelect($sql);
+                if($maestro==null)
+                {
+                    //error
+                    echo "-1"; exit();
+                }
+                else
+                {
+                    $datospadre=$maestro;
+                    $conn->BeginTrans();
+                    //Se consulta el precio actual para dejar el historico en kardex (Junior)
+                    $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$datospadre[0]['id_item']}'";
+                    $precio_actual=$conn->ObtenerFilasBySqlSelect($sql);
+                    $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
+                    //correlativo de ticket
+                    $sql="Select contador from correlativos where campo='id_ticket'";
+                    $idticket=$conn->ObtenerFilasBySqlSelect($sql);
+                    //sql kardex_detalle
+                    $kardex_almacen_detalle_instruccion = 
+                    "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
+                        VALUES (
+                        NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
+                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .", ".$datospadre[0]['id_presentacion'] .", '{$_POST["observacion_limite"]}');
+                    ";
+                    $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                    //actualizo correlativo
+                    $sql="update correlativos set contador=(contador+1) where campo='id_ticket'";
+                    $conn->ExecuteTrans($sql);
+                    //bloqueando las ubicaciones
+                    $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
+                    $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
+                    if($ocupado[0]['ocupado']!=1)
+                    {
+                        $sql=
+                        "
+                            update ubicacion set ocupado=1 where id=".$_POST['ubicacion_detalle'];
+                        $conn->ExecuteTrans($sql);
+                    }
+                    else
+                    {
+                        echo "-1"; exit();
+                    }
+        
+                    $sql=
+                    "
+                        SELECT * FROM item_existencia_almacen WHERE
+                        id_item  = '{$datospadre[0]['id_item']}' 
+                        AND id_ubicacion = '{$_POST['ubicacion_detalle']}'
+                        AND lote='{$datospadre[0]['lote']}' 
+                        AND id_marca='{$datospadre[0]['id_marca']}' 
+                        AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                    ";
+                    $campos = $conn->ObtenerFilasBySqlSelect($sql);
+        
+                    if (count($campos) > 0) 
+                    {
+                        $cantidadExistente = $campos[0]["cantidad"];
+                        $pesoExistente = $campos[0]["peso"];
+                        $conn->ExecuteTrans(
+                        "
+                            UPDATE item_existencia_almacen 
+                            SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "', peso = '" . ($pesoExistente + $POST["peso"]) . "'
+                            WHERE id_item  = '{$datospadre[0]['id_item']}' 
+                            AND id_ubicacion = '{$_POST['ubicacion_detalle']}' 
+                            AND lote='{$datospadre[0]['lote']}' 
+                            AND id_marca='{$datospadre[0]['id_marca']}' 
+                            AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                        ");
+                    } 
+                    else 
+                    {
+                        $instruccion = 
+                        "
+                            INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`, `peso`, `id_ubicacion`, `lote`, `id_proveedor`, `id_marca`)
+                            VALUES 
+                            ('{$_POST['ubicacion_principal']}',
+                            '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['peso']}',  '{$_POST['ubicacion_detalle']}',
+                            '{$datospadre[0]['lote']}', '{$datospadre[0]['id_proveedor']}', '{$datospadre[0]['id_marca']}');
+                        ";
+                        $conn->ExecuteTrans($instruccion);
+                    }    
+                }//fin del else
+            }
+            else
+            {
+                //se comienza a realizar el insert maestro(kardex_almacen=calidad_almacen)
+                $conn->BeginTrans();
+                $kardex_almacen_instruccion = 
+                "
+                    INSERT INTO kardex_almacen (
+                    `id_transaccion_calidad` , `tipo_movimiento_almacen`, `autorizado_por`,
+                    `observacion`, `fecha`, `usuario_creacion`,
+                    `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, 
+                    `guia_sunagro`, `prescintos`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,  `id_seguridad`, `id_aprobado`,
+                    `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`)
+                    VALUES (
+                    {$datospadre[0]['id_transaccion']} , '13', '{$datospadre[0]['autorizado_por']}',
+                    '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
+                    CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_datospadre[0]['id_documento']}', '{$datospadre[0]['empresa_transporte']}',
+                    '{$datospadre[0]['id_conductor']}', '{$datospadre[0]['placa']}', '{$datospadre[0]['guia_sunagro']}', '{$datospadre[0]['prescintos']}',
+                    '{$datospadre[0]['orden_despacho']}',
+                    '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
+                    '{$datospadre[0]['id_aprobado']}',
+                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}', '{$datospadre[0]['id_proveedor']}');
+                ";
+                
+                //print_r($kardex_almacen_instruccion); exit();
+                $conn->ExecuteTrans($kardex_almacen_instruccion);
+                $id_transaccion = $conn->getInsertID();
+                //Se consulta el precio actual para dejar el historico en kardex (Junior)
+                $sql="SELECT precio1, iva FROM item WHERE id_item  = '{$datospadre[0]['id_item']}'";
+                $precio_actual=$conn->ObtenerFilasBySqlSelect($sql);
+                $precioconiva=$precio_actual[0]['precio1']+($precio_actual[0]['precio1']*$precio_actual[0]['iva']/100);
+                //correlativo de ticket
+                $sql="Select contador from correlativos where campo='id_ticket'";
+                $idticket=$conn->ObtenerFilasBySqlSelect($sql);
+                //sql kardex_detalle
+                $kardex_almacen_detalle_instruccion = 
+                "
+                    INSERT INTO kardex_almacen_detalle (
+                    `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
+                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
+                    VALUES (
+                    NULL, '{$id_transaccion}', '{$_POST["ubicacion_principal"]}',
+                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                    '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}', '{$datospadre[0]['id_presentacion']}', '{$_POST["observacion_limite"]}');
+                ";
+                $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                //actualizo correlativo
+                $sql="update correlativos set contador=(contador+1) where campo='id_ticket'";
+                $conn->ExecuteTrans($sql);
+                //bloqueando las ubicaciones
+                $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
+                $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
+                if($ocupado[0]['ocupado']!=1)
+                {
+                    $sql=
+                    "
+                        update ubicacion set ocupado=1 where id=".$_POST['ubicacion_detalle'];
+                    $conn->ExecuteTrans($sql);
+                }
+                else
+                {
+                    echo "-1"; exit();
+                }
+                $sql=
+                "
+                    SELECT * FROM item_existencia_almacen WHERE
+                    id_item  = '{$datospadre[0]['id_item']}' 
+                    AND id_ubicacion = '{$_POST['ubicacion_detalle']}'
+                    AND lote='{$datospadre[0]['lote']}' 
+                    AND id_marca='{$datospadre[0]['id_marca']}' 
+                    AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                ";
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+    
+                if (count($campos) > 0) 
+                {
+                    $cantidadExistente = $campos[0]["cantidad"];
+                    $pesoExistente = $campos[0]["peso"];
+                    $conn->ExecuteTrans(
+                    "
+                        UPDATE item_existencia_almacen 
+                        SET cantidad = '" . ($cantidadExistente + $POST["cantidad"]) . "', peso = '" . ($pesoExistente + $POST["peso"]) . "'
+                        WHERE id_item  = '{$datospadre[0]['id_item']}' 
+                        AND id_ubicacion = '{$_POST['ubicacion_detalle']}' 
+                        AND lote='{$datospadre[0]['lote']}' 
+                        AND id_marca='{$datospadre[0]['id_marca']}' 
+                        AND id_proveedor='{$datospadre[0]['id_proveedor']}';
+                    ");
+                } 
+                else 
+                {
+                    $instruccion = 
+                    "
+                        INSERT INTO item_existencia_almacen (`cod_almacen`, `id_item`, `cantidad`, `peso`, `id_ubicacion`, `lote`, `id_proveedor`,`id_marca`)
+                        VALUES 
+                        ('{$_POST['ubicacion_principal']}',
+                        '{$datospadre[0]['id_item']}', '{$_POST['cantidad']}' , '{$_POST['peso']}',  '{$_POST['ubicacion_detalle']}',
+                        '{$datospadre[0]['lote']}', '{$datospadre[0]['id_proveedor']}', '{$datospadre[0]['id_marca']}');
+                    ";
+                    $conn->ExecuteTrans($instruccion);
+                }
+            }
+            //se procede a realizar el commit(quedaría pendiente realizar el pedido por entrada)
+            //se comienza hacer la facturacion
+            
+            //tipo cliente
+            $sql="select cod_tipo_cliente from clientes where id_cliente={$datospadre[0]['id_proveedor']}";
+            $clienteseguro=0;
+            $tipocliente=$conn->ObtenerFilasBySqlSelect($sql);
+            if($tipocliente[0]['cod_tipo_cliente']==1)
+            {
+                //privada
+                $precio='precio1';
+                $clienteseguro=1;
+            }
+            elseif ($tipocliente[0]['cod_tipo_cliente']==2) 
+            {
+                //publica
+                $precio='precio2';
+            }
+            else
+            {
+                //minpal
+                $precio='precio3';
+            }
+            
+            //busco el id del movimiento cargo
+            $sql="select id_tipo_movimiento_almacen from tipo_movimiento_almacen where descripcion= 'Cargo Tunel'";
+            $id_movimiento=$conn->ObtenerFilasBySqlSelect($sql);
+            //primero se buscar el movimiento "cargo" y se agrega el costo de los servicios de dicho movimiento
+            $iva[]="";
+            $base[]="";
+            $total[]="";
+            $idservicios[]="";
+            $codservicio[]="";
+            $nombreservicio[]="";
+            $contador=0;
+            $cobrar="";
+            //guardando los servicios
+            $cajas=json_decode($_POST['cajas']);
+            foreach($cajas as $key => $valueser)
+            {
+                $cobrar.="'".$valueser->value."', ";
+            }
+            $cobrar=substr($cobrar, 0, -2);
+            foreach ($id_movimiento as $key => $idmovimiento)
+            {
+                $sql="select id_movimiento_almacen, id_servicio from movimiento_almacen_servicio where id_movimiento_almacen = ".$idmovimiento['id_tipo_movimiento_almacen']." and id_servicio in (".$cobrar.")";
+                $buscarservicios=$conn->ObtenerFilasBySqlSelect($sql);
+                foreach($buscarservicios as $key2 => $servicios)
+                {
+                    
+                    $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                    //echo $sql; exit();
+                    $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = $contarservicio[0][$precio];
+                    $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
+                //echo $sql; exit();
+            }
+            
+            //fin del cobro de movimiento, ahora se cobra la ubicacion
+            $sql="select id_servicio from ubicacion_servicio where id_ubicacion=".$_POST['ubicacion_detalle'];
+            $buscarserviciosubicacion=$conn->ObtenerFilasBySqlSelect($sql);
+            foreach($buscarserviciosubicacion as $key => $servicios)
+            {
+                $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
+                $iva[$contador] = $contarservicio[0]['iva'];
+                $base[$contador] = $contarservicio[0][$precio];
+                $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
+                $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                $idservicios[$contador]= $contarservicio[0]['id_item'];
+                $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                $contador++;
+            }
+            //ahora a realizar el cobro del seguro******
+            $sql="select id_item, cod_item, iva, descripcion1 from item where precio1=-1";
+            $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
+            if($clienteseguro==0)
+            {
+                if($contarservicio!=null)
+                {
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005); //$contarservicio[0]['precio1'];
+                    $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.005)*$contarservicio[0]['iva']) / 100) ) ;
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
+            }
+            else
+            {
+                if($contarservicio!=null)
+                {
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.0075); //$contarservicio[0]['precio1'];
+                    $total[$contador] =( (($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.0075) + (((($_POST["peso"]*$datospadre[0]['costo_declarado']) * 0.0075)*$contarservicio[0]['iva']) / 100) ) ;
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
+            }
+            //se comienza hacer el pedido por la entrada.
+            //obtener correlativo:
+            //obtenemos el correlativo de la factura
+            $correlativos = new Correlativos();
+            $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "si");
+            $formateo_nro_factura = $nro_pedido;
+            $subtotal=0;
+            $ivatotal=0;
+            $itemstotal=count($total);
+            $totaltotal=0;
+            //se guarda los totales del resultado de los arreglos
+            for($i=0; $i<count($total); $i++)
+            {
+                $subtotal+=$base[$i];
+                $ivatotal+=(($base[$i]*$iva[$i]) / 100);
+                $totaltotal+=$total[$i];
+                
+            }
+            
+           // debemos ver si hay pedido pendiente, para eso verificamos la fecha de pago
+            $sql="select * from despacho_new where fecha_pago='0000-00-00' and id_cliente='{$datospadre[0]['id_proveedor']}' limit 1";
+            $cargosoriginal=$conn->ObtenerFilasBySqlSelect($sql);
+            if($cargosoriginal==null)
+            {
+                //es su primer cargo por lo que hay que crear el despacho new padre.
+                $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+                $formateo_nro_factura = $nro_factura;
+                #obtenemos el money actual
+                $money=$conn->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
+            
+                $sql = "INSERT INTO `despacho_new` (
+                    `id_cliente`,`cod_factura`,`cod_vendedor`,`fechaFactura`,
+                    `subtotal`,`descuentosItemFactura`,`montoItemsFactura`,
+                    `ivaTotalFactura`,`TotalTotalFactura`,`cantidad_items`,
+                    `totalizar_sub_total`,`totalizar_descuento_parcial`,`totalizar_total_operacion`,
+                    `totalizar_pdescuento_global`,`totalizar_descuento_global`,
+                    `totalizar_base_imponible`,`totalizar_monto_iva`,
+                    `totalizar_total_general`,`totalizar_total_retencion`,`fecha_creacion`,
+                    `usuario_creacion`,`cod_estatus`,`formapago`, `impresora_serial`, `money`, `facturacion`
+                    )
+                VALUES(
+                    {$datospadre[0]['id_proveedor']}, '{$nro_factura}', '{$login->getUsuario()}', now(),
+                    ". $subtotal . ", 0 ," . $subtotal . ","
+                        . $ivatotal . "," . $totaltotal . "," . $itemstotal . ","
+                        . $subtotal . ", 0," . $totaltotal . ", 0 ,  
+                        0," . $subtotal . ","
+                        . $ivatotal . ", " . $totaltotal . ",0 ,CURRENT_TIMESTAMP,'" . $login->getUsuario() . "',
+                        '" . $cod_estatus = 1 . "', 'contado', '".impresora_serial."' , '".$money[0]['money']."',''
+                    );";
+                    $conn->ExecuteTrans($sql);
+                $id_facturaTrans = $conn->getInsertID();
+                        $kardex_almacen_instruccion = "
+                            INSERT INTO kardex_almacen (
+                            `id_transaccion` ,
+                            `tipo_movimiento_almacen` ,
+                            `autorizado_por` ,
+                            `observacion` ,
+                            `fecha` ,
+                            `usuario_creacion`,
+                            `fecha_creacion`,
+                            `estado`,
+                            `fecha_ejecucion`,
+                            id_cliente, 
+                            nro_factura
+                            )
+                            VALUES (
+                            NULL ,
+                            '8',
+                            '" . $login->getUsuario() . "',
+                            'Salida por Ventas',
+                            now(),
+                            '" . $login->getUsuario() . "',
+                            CURRENT_TIMESTAMP,
+                            'Pendiente',
+                            now(),
+                            {$datospadre[0]['id_proveedor']},
+                            '{$nro_factura}'
+                            );";
+            
+                $conn->ExecuteTrans($kardex_almacen_instruccion);
+                $id_transaccion = $conn->getInsertID();
+                for($i=0; $i<count($total); $i++)
+                {
+                    if($total[$i]!=null)
+                    {
+                        $descripcion =  $nombreservicio[$i];
+                       
+                        $detalle_item_instruccion = "
+                        INSERT INTO despacho_new_detalle (
+                        `id_factura`, `id_item`,
+                        `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                        `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                        `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                        `fecha_creacion`, `_item_almacen`
+                        )
+                        VALUES (
+                        '{$id_facturaTrans}', '{$idservicios[$i]}',
+                        '{$descripcion}', '1', '{$base[$i]}',
+                        0, 0, '{$iva[$i]}',
+                        '{$base[$i]}', '{$total[$i]}', '{$usuario}',
+                        CURRENT_TIMESTAMP, '1'
+                        );";
+                        $conn->ExecuteTrans($detalle_item_instruccion);
+                        
+                        $kardex_almacen_detalle_instruccion = "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` ,
+                        `id_transaccion` ,
+                        `id_almacen_entrada` ,
+                        `id_almacen_salida` ,
+                        `id_item` ,
+                        `precio` ,
+                        `cantidad`
+                        )
+                        VALUES (
+                        NULL ,
+                        '" . $id_transaccion . "',
+                        '{$_POST['ubicacion_principal']}',
+                        '',
+                        '" . $idservicios[$i] . "',
+                        '" . $base[$i] . "',
+                        1
+                        );";
+                        $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                    }
+                }
+                $nro_facturaOLD = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
+                $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
+                $conn->ExecuteTrans("update correlativos set contador = '" . $nro_pedido . "' where campo = 'cod_pedido'");
+                $conn->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_factura}' WHERE campo = 'cod_factura';");
+                //Fin pedido
+            }
+            else
+            { // cuando existe pedido pendiente
+                $kardexoriginal=$conn->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
+                if($kardexoriginal==null)
+                { 
+                    echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador"; exit();
+                }
+                $sql="UPDATE
+                        `despacho_new`
+                    SET
+                        `subtotal` =  (subtotal + ". $subtotal . "),
+                        `descuentosItemFactura` = 0,
+                        `montoItemsFactura` = (montoItemsFactura + ". $subtotal . "),
+                        `ivaTotalFactura` = (ivaTotalFactura + ".$ivatotal."),
+                        `TotalTotalFactura` =(TotalTotalFactura + ".$totaltotal."),
+                        `cantidad_items` = (cantidad_items + ".$itemstotal."),
+                        `totalizar_sub_total` = (totalizar_sub_total + ". $subtotal . "),
+                        `totalizar_descuento_parcial` = totalizar_descuento_parcial,
+                        `totalizar_total_operacion` = (totalizar_total_operacion + ".$totaltotal.") ,
+                        `totalizar_pdescuento_global` = totalizar_pdescuento_global ,
+                        `totalizar_descuento_global` = totalizar_descuento_global,
+                        `totalizar_base_imponible` = (totalizar_base_imponible + ".$subtotal."),
+                        `totalizar_monto_iva` = (totalizar_monto_iva + ".$ivatotal."),
+                        `totalizar_total_general` = (totalizar_total_general + ".$totaltotal."),
+                        `totalizar_total_retencion` = totalizar_total_retencion
+                    WHERE
+                        id_factura='".$cargosoriginal[0]['id_factura'] ."'";
+                $conn->ExecuteTrans($sql);
+
+                for($i=0; $i<count($total); $i++)
+                {
+                    if($total[$i]!=null)
+                    {
+                        $descripcion =  $nombreservicio[$i];
+                       
+                        $detalle_item_instruccion = "
+                        INSERT INTO despacho_new_detalle (
+                        `id_factura`, `id_item`,
+                        `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                        `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                        `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                        `fecha_creacion`, `_item_almacen`
+                        )
+                        VALUES (
+                        '".$cargosoriginal[0]['id_factura'] ."', '{$idservicios[$i]}',
+                        '{$descripcion}', '1', '{$base[$i]}',
+                        0, 0, '{$iva[$i]}',
+                        '{$base[$i]}', '{$total[$i]}', '{$usuario}',
+                        CURRENT_TIMESTAMP, '1'
+                        );";
+                        $conn->ExecuteTrans($detalle_item_instruccion);
+                        
+                        $kardex_almacen_detalle_instruccion = "
+                        INSERT INTO kardex_almacen_detalle (
+                        `id_transaccion_detalle` ,
+                        `id_transaccion` ,
+                        `id_almacen_entrada` ,
+                        `id_almacen_salida` ,
+                        `id_item` ,
+                        `precio` ,
+                        `cantidad`
+                        )
+                        VALUES (
+                        NULL ,
+                        '" . $kardexoriginal[0]['id_transaccion'] . "',
+                        '{$_POST['ubicacion_principal']}',
+                        '',
+                        '" . $idservicios[$i] . "',
+                        '" . $base[$i] . "',
+                        1
+                        );";
+                        $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                    }
+                }
+            }
+            if ($conn->errorTransaccion == 1)
+            {    
+                echo "1";
+            }
+            elseif($conn->errorTransaccion == 0)
+            {
+                echo "-1";
+            }
+            $conn->CommitTrans($conn->errorTransaccion);
+            
+        break;
+
         case "cargaUbicacion3":
             $almacen=$_POST["idAlmacen"];
             $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA'" );
@@ -272,7 +816,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
                 a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
                 a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
-                a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado, b.id_marca
+                a.id_receptor, a.nro_contenedor, a.prescintos,  b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado, b.id_marca,  b.id_presentacion
                 from calidad_almacen as a 
                 inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
                 where b.id_transaccion_detalle=".$_POST['id_movimiento']." 
@@ -288,8 +832,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     select 
                     a.id_transaccion, a.tipo_movimiento_almacen, a.autorizado_por, a.observacion, a.fecha, a.usuario_creacion,
                     a.fecha_creacion, a.estado, a.fecha_ejecucion, a.id_documento, a.empresa_transporte, a.id_conductor,
-                    a.placa, a.guia_sunagro, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
-                    a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado,  b.id_marca
+                    a.placa, a.guia_sunagro, a.prescintos, a.orden_despacho, a.almacen_procedencia, a.id_proveedor, a.id_seguridad, a.id_aprobado,
+                    a.id_receptor, a.nro_contenedor, b.elaboracion, b.id_item, b.vencimiento, b.lote, b.c_esperada, b.observacion, b.costo_declarado,  b.id_marca,  b.id_presentacion
                     from kardex_almacen as a
                     inner join calidad_almacen_detalle as b on a.id_transaccion_calidad=b.id_transaccion
                     where b.id_transaccion_detalle=".$_POST['id_movimiento']." and a.tipo_movimiento_almacen=3";
@@ -315,11 +859,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     "
                         INSERT INTO kardex_almacen_detalle (
                         `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `observacion_limite`)
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`,  `observacion_limite`)
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
                         '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
-                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .", '{$_POST["observacion_limite"]}');
+                        '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .", ".$datospadre[0]['id_presentacion'] .", '{$_POST["observacion_limite"]}');
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
                     //actualizo correlativo
@@ -391,7 +935,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     `observacion`, `fecha`, `usuario_creacion`,
                     `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, 
                     `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,  `id_seguridad`, `id_aprobado`,
-                    `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`)
+                    `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`, `prescintos`)
                     VALUES (
                     {$datospadre[0]['id_transaccion']} , '3', '{$datospadre[0]['autorizado_por']}',
                     '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
@@ -400,7 +944,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     '{$datospadre[0]['orden_despacho']}',
                     '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
                     '{$datospadre[0]['id_aprobado']}',
-                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}', '{$datospadre[0]['id_proveedor']}');
+                    '{$datospadre[0]['id_receptor']}', '{$datospadre[0]['nro_contenedor']}', '{$_POST['ticket']}', '{$datospadre[0]['id_proveedor']}', '{$datospadre[0]['prescintos']}');
                 ";
                 
                 //print_r($kardex_almacen_instruccion); exit();
@@ -418,11 +962,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 "
                     INSERT INTO kardex_almacen_detalle (
                     `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `observacion_limite`)
+                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
                     VALUES (
                     NULL, '{$id_transaccion}', '{$_POST["ubicacion_principal"]}',
                     '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
-                    '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}', '{$_POST["observacion_limite"]}');
+                    '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}', '{$datospadre[0]['id_presentacion']}', '{$_POST["observacion_limite"]}');
                 ";
                 $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
                 //actualizo correlativo
@@ -6408,7 +6952,19 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
         WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
                 $campos1 = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item,ubi.descripcion as ubicacion, alm.descripcion as almacen
         from kardex_almacen_detalle as kad join kardex_almacen as k on kad.id_transaccion=k.id_transaccion left join almacen as alm on kad.id_almacen_salida=alm.cod_almacen LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id left join item as ite on kad.id_item=ite.id_item WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
-            }
+            }else if ($_GET["id_tipo_movimiento_almacen"] == '14') 
+            {
+                $operacion = "Tunel Descargo";
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item, kad.peso, ubi.descripcion as ubicacion, alm.descripcion as almacen, um.nombre_unidad
+        FROM kardex_almacen_detalle AS kad
+        join kardex_almacen AS k ON kad.id_transaccion=k.id_transaccion
+        LEFT JOIN marca m ON m.id = kad.id_marca
+        LEFT JOIN almacen AS alm ON kad.id_almacen_salida=alm.cod_almacen
+        LEFT JOIN ubicacion AS ubi ON kad.id_ubi_salida=ubi.id
+        LEFT JOIN item AS ite ON kad.id_item=ite.id_item
+        LEFT JOIN unidad_medida um ON ite.unidadxpeso = um.id
+        WHERE kad.id_transaccion =" . $_GET["id_transaccion"]);
+                }
 //$campos = $conn->ObtenerFilasBySqlSelect("SELECT *,kad.cantidad as cantidad_item
 //from kardex_almacen_detalle as kad left join almacen as alm on kad.id_almacen_entrada=alm.cod_almacen left join item as ite on kad.id_item=ite.id_item WHERE id_transaccion = ".$_GET["id_transaccion"]);
 //echo $campos;

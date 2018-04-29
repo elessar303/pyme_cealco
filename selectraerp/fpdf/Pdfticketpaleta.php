@@ -80,15 +80,18 @@ function Header()
         $this->SetWidths(array(150));
         $this->SetAligns(array("L"));
         $this->Row(array('Cliente : '. $this->datoscampos[0]['proveedor']), 0);
+        //$this->Line($this->GetX()+10, $this->GetY(), 140, $this->GetY());
+        $this->SetX(25);
+        $this->Row(array('RIF : '. $this->datoscampos[0]['rif']), 0);
         $this->Line($this->GetX()+10, $this->GetY(), 140, $this->GetY());
         $this->SetX(25);
-        $this->SetWidths(array(75, 75));
-        $this->SetAligns(array("L", "L"));
-        $this->Row(array('Fecha Recepcion : ', '# Recepcion: '), 0);
+        $this->SetWidths(array(45, 45, 45));
+        $this->SetAligns(array("L", "L", "L"));
+        $this->Row(array('Fecha Recepcion : ','Fecha Vencimiento:', '# Recepcion: '), 0);
         $this->SetX(25);
-        $this->SetWidths(array(75, 75));
-        $this->SetAligns(array("L", "L"));
-        $this->Row(array($this->datoscampos[0]['fecha_recepcion'], $this->datoscampos[0]['nro_recepcion'] ), 0);
+        $this->SetWidths(array(45, 45, 45));
+        $this->SetAligns(array("L", "L", "L"));
+        $this->Row(array($this->datoscampos[0]['fecha_recepcion'], $this->datoscampos[0]['vencimiento'],  $this->datoscampos[0]['nro_recepcion'] ), 0);
         $this->Line($this->GetX()+10, $this->GetY(), 140, $this->GetY());
         $this->SetX(25);
         $this->SetWidths(array(50, 50, 50));
@@ -97,7 +100,7 @@ function Header()
         $this->SetX(25);
         $this->SetWidths(array(50, 50, 50));
         $this->SetAligns(array("L", "L", "L"));
-        $this->Row(array($this->datoscampos[0]['lote'], $this->datoscampos[0]['cantidad'], $this->datoscampos[0]['peso'] ), 0);
+        $this->Row(array($this->datoscampos[0]['lote'], $this->datoscampos[0]['cantidad']." - ".$this->datoscampos[0]['presentacion'], $this->datoscampos[0]['peso'] ), 0);
         $this->Line($this->GetX()+10, $this->GetY(), 140, $this->GetY());
         $this->SetX(25);
         $this->SetWidths(array(150));
@@ -159,11 +162,12 @@ $datosgenerales = $comunes->ObtenerFilasBySqlSelect("select * from parametros_ge
 //b.cantidad*pesoxunidad
 $sql = 
 "
-    select c.codigo_barras, c.descripcion1, b.etiqueta,  d.nombre as proveedor, date_format(a.fecha_creacion, '%d/%m/%Y') as fecha_recepcion,
-    b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.peso, b.observacion, m.marca
+    select d.rif, c.codigo_barras, c.descripcion1, b.etiqueta,  d.nombre as proveedor, date_format(a.fecha_creacion, '%d/%m/%Y') as fecha_recepcion, n.nombre_unidad as presentacion,
+    b.id_transaccion_detalle as nro_recepcion, b.lote, b.cantidad, b.peso, b.observacion, m.marca, date_format(b.vencimiento, '%d/%m/%Y') as vencimiento
     from kardex_almacen as a
     inner join kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
     left join marca as m on m.id=b.id_marca
+    left join unidad_empaque as n on n.id=b.id_presentacion
     inner join item as c on c.id_item=b.id_item
     inner join clientes as d  on a.id_proveedor=d.id_cliente
     where b.id_transaccion_detalle=".$nro;

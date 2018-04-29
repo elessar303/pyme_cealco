@@ -108,7 +108,7 @@ var eventos_form = {
     },
     Limpiar: function() {
 
-        $("#cantidadunitaria, #items,#items_descripcion,#codigoBarra, #almacen, #descripcionitem, #codigofabricante,#cantidadunitaria,#costounitario, #totalitem_tmp,#cantidaddeberia,#observacion,#cantidad_existente,#fVencimiento,#nlote,#fecha_vencimiento,#estatus_producto,#observacion1,#tipo_uso,#costo_referencial,#costo_declarado,#marca").val("");
+        $("#cantidadunitaria, #items,#items_descripcion,#codigoBarra, #almacen, #descripcionitem, #codigofabricante,#cantidadunitaria,#costounitario, #totalitem_tmp,#cantidaddeberia,#observacion,#cantidad_existente,#fVencimiento,#nlote,#fecha_vencimiento,#estatus_producto,#observacion1,#tipo_uso,#costo_referencial,#costo_declarado,#marca,#presentacion").val("");
     },
     IncluirRegistros: function(options) {
         
@@ -132,6 +132,7 @@ var eventos_form = {
                 campos += $.inputHidden("_observacion1", options.observacion, "[]");
                 campos += $.inputHidden("_tipo_uso", options.tipo_uso, "[]");
                 campos += $.inputHidden("_marca", options.marca, "[]");
+                campos += $.inputHidden("_presentacion", options.presentacion, "[]");
                 campos += $.inputHidden("_costo_declarado", options.costo_declarado, "[]");
                 campos += $.inputHidden("_costo_referencial", options.costo_referencial, "[]");
                 

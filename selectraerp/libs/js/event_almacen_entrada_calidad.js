@@ -309,7 +309,8 @@ $("#cantidaddeberia").change(function(){
                     $("#almacen").val()==""||
                     $("#almacen").val()=="0"||
                     $("#ubicacion").val()==""||
-                     $("#marca").val()==""||                    
+                    $("#marca").val()==""||
+                    $("#presentacion").val()==""||
                     $("#cantidadunitaria").val()==""||
                     
                     
@@ -345,6 +346,7 @@ $("#cantidaddeberia").change(function(){
                     costo_referencial:  $("#costo_referencial").val(),
                     costo_declarado:    $("#costo_declarado").val(),
                     marca:              $("#marca").val(),
+                    presentacion:       $("#presentacion").val(),
                     vencimiento:        $("#fVencimiento").val(),
                     lote:               $("#nlote").val(),
                     c_esperada:         $("#cantidaddeberia").val(),

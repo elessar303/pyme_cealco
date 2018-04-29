@@ -69,6 +69,18 @@ foreach ($ubica as $key => $item) {
 $smarty->assign("option_values_nombre_marca", $arraymarca);
 $smarty->assign("option_values_id_marca", $arrayid);
 //fin de marcas;
+//presentacion
+//marcas
+$ubica=$ubicacion->ObtenerFilasBySqlSelect("select * from unidad_empaque");
+$arraypresentacion="";
+$arrayidpresentacion="";
+foreach ($ubica as $key => $item) {
+    $arraypresentacion[] = utf8_encode($item["nombre_unidad"]);
+    $arrayidpresentacion[] = $item["id"];
+}
+$smarty->assign("option_values_nombre_presentacion", $arraypresentacion);
+$smarty->assign("option_values_id_presentacion", $arrayidpresentacion);
+/*fin presentacion*/
 // punto de ventas
 $arraySelectOption = "";
 $arraySelectoutPut1 = "";
@@ -138,11 +150,11 @@ if (isset($_POST["input_cantidad_items"])) {
         $kardex_almacen_instruccion = "INSERT INTO calidad_almacen (
             `id_transaccion` , `tipo_movimiento_almacen`, `autorizado_por`,
             `observacion`, `fecha`, `usuario_creacion`,
-            `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,`id_ticket_entrada` )
+            `fecha_creacion`, `estado`, `fecha_ejecucion`, `id_documento`, `empresa_transporte`, `id_conductor`, `placa`, `guia_sunagro`, `orden_despacho`, `almacen_procedencia`, `id_proveedor`,`id_ticket_entrada`, `prescintos` )
         VALUES (
             NULL , '3', '{$_POST["autorizado_por"]}',
             '{$_POST["observaciones"]}', '{$_POST["input_fechacompra"]}', '{$login->getUsuario()}', 
-            CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_POST["nro_documento"]}', '{$_POST["empresa_transporte"]}', '{$id_conductor[0]["id_conductor"]}', '{$_POST["placa"]}', '{$_POST["codigo_sica"]}', '{$_POST["orden_despacho"]}', '{$_POST["puntodeventa"]}', '{$_POST["id_proveedor"]}','{$_POST["id_ticket"]}');";
+            CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_POST["nro_documento"]}', '{$_POST["empresa_transporte"]}', '{$id_conductor[0]["id_conductor"]}', '{$_POST["placa"]}', '{$_POST["codigo_sica"]}', '{$_POST["orden_despacho"]}', '{$_POST["puntodeventa"]}', '{$_POST["id_proveedor"]}','{$_POST["id_ticket"]}', '{$_POST["prescintos"]}');";
         
         $almacen->ExecuteTrans($kardex_almacen_instruccion);
         
@@ -167,10 +179,10 @@ if (isset($_POST["input_cantidad_items"])) {
         
             $kardex_almacen_detalle_instruccion = "INSERT INTO calidad_almacen_detalle (
                      `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso`, `costo_declarado`, `id_marca` )
+                    `id_almacen_salida`, `id_item`, `cantidad`,`id_ubi_entrada`, `vencimiento`,`lote`, `observacion`, `estatus`, `tipo_uso`, `costo_declarado`, `id_marca`, `id_presentacion` )
                 VALUES (
                     '{$id_transaccion}', '{$_POST["_id_almacen"][$i]}',
-                    '', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}','{$_POST["_ubicacion"][$i]}','{$_POST["_vencimineto"][$i]}','{$_POST["_lote"][$i]}','{$_POST["_observacion1"][$i]}','{$_POST["_estatus_producto"][$i]}', '{$_POST["_tipo_uso"][$i]}', '{$_POST["_costo_declarado"][$i]}', '{$_POST["_marca"][$i]}');";
+                    '', '{$_POST["_id_item"][$i]}', '{$_POST["_cantidad"][$i]}','{$_POST["_ubicacion"][$i]}','{$_POST["_vencimineto"][$i]}','{$_POST["_lote"][$i]}','{$_POST["_observacion1"][$i]}','{$_POST["_estatus_producto"][$i]}', '{$_POST["_tipo_uso"][$i]}', '{$_POST["_costo_declarado"][$i]}', '{$_POST["_marca"][$i]}', '{$_POST["_marca"][$i]}');";
 
             $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
 

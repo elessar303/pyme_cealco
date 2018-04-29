@@ -3,8 +3,8 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <title></title>
-        <script type="text/javascript" src="../../libs/js/event_almacen_entrada_calidad.js"></script>
-        <script type="text/javascript" src="../../libs/js/eventos_formAlmacen_calidad.js"></script>
+        <script type="text/javascript" src="../../libs/js/event_almacen_entrada.js"></script>
+        <script type="text/javascript" src="../../libs/js/eventos_formAlmacen.js"></script>
          <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
         {literal}
         <script language="JavaScript" type="text/JavaScript">
@@ -30,21 +30,6 @@
                   });
 
         }
-
-
-
-        function no_aprobado(valor) {
-           
-        if(valor==0){
-            alert('Explique Causa De no Aprobación');
-            $("#causa").show();
-        }
-
-        }
-
-
-
-
          
 
         function comprobarfechavencimiento() {
@@ -78,20 +63,10 @@
         $(document).ready(function(){
         //funcion para cargar los puntos 
                   $("#estado").change(function() {
-                    cargarInstalacion()
-                  });
-
-                  $("#id_proveedor").change(function() {
-                    cargarInstalacion()
-                  });
-
-                  function cargarInstalacion() {
-
                     estados = $("#estado").val();
-                    cliente = $("#id_proveedor").val();
                         $.ajax({
                             type: 'GET',
-                            data: 'opt=getInstalaciones&'+'estados='+estados+'&cliente='+cliente,
+                            data: 'opt=getPuntos&'+'estados='+estados,
                             url: '../../libs/php/ajax/ajax.php',
                             beforeSend: function() {
                                 $("#puntodeventa").find("option").remove();
@@ -100,17 +75,14 @@
                             success: function(data) {
                                 $("#puntodeventa").find("option").remove();
                                 this.vcampos = eval(data);
-                                     $("#puntodeventa").append("<option value=''>Seleccione...</option>");
+                                     $("#puntodeventa").append("<option value='0'>Todos</option>");
                                 for (i = 0; i <= this.vcampos.length; i++) {
-                                    $("#puntodeventa").append("<option value='" + this.vcampos[i].siga+ "'>Nombre: " + this.vcampos[i].nombre_punto + " Sica: "+this.vcampos[i].siga+"</option>");
+                                    $("#puntodeventa").append("<option value='" + this.vcampos[i].siga+ "'>" + this.vcampos[i].nombre_punto + "</option>");
                                 }
                             }
                         }); 
                         $("#puntodeventa").val(0);
-
-                  }
-
-
+                  });
         });
 
         </script>
@@ -168,7 +140,7 @@
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Autorizado Por (*)</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Elaborado Por:</b></span>
                         </td>
                         <td>
                             <!--input type="text" maxlength="100" name="autorizado_por" id="autorizado_por" value="{$detalles_pendiente[0].autorizado_por}"/-->
@@ -178,7 +150,7 @@
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Cliente (*)</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Proveedor (*):</b></span>
                         </td>
                         <td>
                             <!--input type="text" maxlength="100" name="autorizado_por" id="autorizado_por" value="{$detalles_pendiente[0].autorizado_por}"/-->
@@ -191,7 +163,7 @@
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Nro de Documento (*)</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Nro de Documento (*):</b></span>
                         </td>
                         <td>
                             <input type="text" name="nro_documento" maxlength="100" id="nro_documento" size="30" maxlength="70" class="form-text"/>
@@ -200,7 +172,7 @@
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Observaciones</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Observaciones:</b></span>
                         </td>
                         <td>
                             <input type="text" name="observaciones" maxlength="100" id="observaciones" value="{$detalles_pendiente[0].observacion}" size="30" maxlength="70" class="form-text"/>
@@ -208,7 +180,7 @@
                     </tr>
                     <tr>
                         <td>
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Fecha Entrada</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Fecha Entrada:</b></span>
                         </td>
                         <td>
                             <input type="text" name="input_fechacompra" id="input_fechacompra" value='{$smarty.now|date_format:"%Y-%m-%d"}' size="30" maxlength="70" class="form-text" readonly="readonly"/>
@@ -231,46 +203,77 @@
                     <!--Seccion nueva para ingresar el punto de venta del que se enviaron los productos-->
                     <tr>    
                         <td>
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Estado Instalacion</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Estado de Procedencia (*):</b></span>
                         </td>
                             <!--ESTADOS-->
                         <td> 
                                 <select name="estado" id="estado" class="form-text" style="width:205px">
-                                    <option value="">Seleccione...</option>
+                                    <option value="9999">Todos</option>
                                     {html_options values=$option_values_id_estado output=$option_values_nombre_estado selected=$estado}
                                 </select>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Instalacion</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Punto de Procedencia (*):</b></span>
                         </td>
                              <!-- PUNTOS -->
                             <td>
                                 <select name="puntodeventa" id="puntodeventa" class="form-text" style="width:205px">
-                                    <option value="">Seleccione...</option>                               
-                                
+                                    <option value="0">Todos</option>                               
+                                {html_options values=$option_values_punto output=$option_output_punto selected=$puntodeventa}
                                 
                                 </select>
                             </td>                     
                     </tr>
+                    <!--Cierre de la Seccion nueva-->
+
                     <tr>
                         <td>
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Ticket Entrada</b></span>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Empresa Transporte (*):</b></span>
                         </td>
-                             <!-- PUNTOS -->
-                            <td>
-                                <select name="id_ticket" id="id_ticket" class="form-text" style="width:350px">
-                                    <option value="">Seleccione...</option>                               
-                                {html_options values=$option_values_ticket output=$option_output_ticket selected=$puntodeventa}
-                                
-                                </select>
-                            </td>                     
+                        <td>
+                            <input type="text" name="empresa_transporte" maxlength="100" id="empresa_transporte" size="30" maxlength="70" class="form-text" value="" />
+                        </td>
                     </tr>
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Nro Gu&iacute;a SUNAGRO :</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>C&eacute;dula del Conductor (*):</b></span>
+                        </td>
+                        <td>
+                            <select name="nacionalidad_conductor" id="nacionalidad_conductor" class="form-text">
+                              <option value="">..</option>
+                              <option value="V">V</option>
+                              <option value="E">E</option>
+                            </select>
+                            <input type="text" name="cedula_conductor" maxlength="8" id="cedula_conductor" size="21"  class="form-text" onBlur="comprobarconductor(this.id)" onKeyPress="return soloNumeros(event)"/>
+                        </td>
+                    </tr>
+                    <tr>
+                    <td style="font-family:'Verdana';font-weight:bold;">
+                    <span style="font-family:Verdana"><b>Nombre del Conductor (*):</b></span>
+                    </td>
+                    <td>
+                    <div id="resultado" style="font-family:'Verdana';font-weight:bold;">
+                    
+                    </div>
+                    </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Placa (*):</b></span>
+                        </td>
+                        <td>
+                            <input type="text" name="placa" maxlength="100" id="placa" size="30" maxlength="70" class="form-text"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Nro Gu&iacute;a SUNAGRO (*):</b></span>
                         </td>
                         <td>
                             <input type="text" name="codigo_sica" id="codigo_sica" maxlength="100" size="30" maxlength="70" class="form-text"/>
@@ -278,15 +281,62 @@
                     </tr>
                     <tr>
                         <td>
-                            <span style="font-family:'Verdana';"><b>Prescintos:</b></span>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Orden Despacho Vehicular (*):</b></span>
                         </td>
                         <td>
-                            <input class="form-text" type="text" maxlength="100"  size="30" name="prescintos" id="prescintos"/>
+                            <input type="text" name="orden_despacho" id="orden_despacho" maxlength="100" size="30" maxlength="70" class="form-text"/>
                         </td>
                     </tr>
-                    <!--Cierre de la Seccion nueva-->
-
-                    
+                    <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Nro de Contenedor (*):</b></span>
+                        </td>
+                        <td>
+                            <input type="text" name="nro_contenedor" id="nro_contenedor" maxlength="100" size="30" maxlength="70" class="form-text"/>
+                        </td>
+                    </tr>
+                    <!-- Firmas Casillas-->
+                    <tr>
+                        <td colspan="2" align="center"><span style="font-family:'Verdana';font-weight:bold;"><b>CASILLA DE FIRMAS:</b></span></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Aprobado Por:</b></span>
+                        </td>
+                        <td>
+                            <select name="id_aprobado" id="id_aprobado" class="form-text" style="width:205px">                        
+                                {html_options values=$option_values_aprobado output=$option_output_aprobado}
+                                
+                                </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Receptor:</b></span>
+                        </td>
+                        <td>
+                            <select name="id_receptor" id="id_receptor" class="form-text" style="width:205px">                        
+                                {html_options values=$option_values_receptor output=$option_output_receptor}
+                                
+                                </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/8.png"-->
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Seguridad:</b></span>
+                        </td>
+                        <td>
+                           <select name="id_seguridad" id="id_seguridad" class="form-text" style="width:205px">                        
+                                {html_options values=$option_values_seguridad output=$option_output_seguridad}
+                                
+                                </select>
+                        </td>
+                    </tr>
                     <!--
                     Codigo fuente añadido para cubrir la funcionalidad de registrar los
                     datos de una compra: fecha, nro. de factura y nro de control. Esto
@@ -387,15 +437,14 @@
             <div id="displaytotal2" class="x-hide-display"></div>
         </form>
         <div id="incluirproducto" class="x-hide-display">
-        <!--<p>
+            <p>
                 <label for="almacen"><b>Almac&eacute;n</b></label>
                 <select id="almacen" name="almacen"></select>
             </p>
              <p>
                 <label for="ubicacion"><b>Ubicac&iacute;on</b></label>
-                <input name="ubicacion" id="ubicacion" type="text" value="ENTRADA"> 
+                <select id="ubicacion" name="ubicacion"></select>
             </p>
-        -->
             <p>
                <label><b>Codigo de barra</b></label><br/>
                <input type="text" name="codigoBarra" id="codigoBarra">
@@ -408,32 +457,11 @@
                  <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>
                 <!--<select style="width:100%" id="items" name="items" onchange="comprobarfechavencimiento(this.id)"></select>-->
             </p>
-
             <p>
-                <label for="marca"><b>Marca</b></label><br/>
-                <select name="marca" id="marca" >
-                    <option value="">Seleccione...</option>
-                    {html_options values=$option_values_id_marca output=$option_values_nombre_marca}
-                </select>
+            <label><b>Posee Fecha de Vencimiento</b></label><br/>
+            <input type="text" name="fecha_vence" id="fecha_vence" readonly>
+            <!--<div id="resultado2"></div>-->
             </p>
-
-             <p>
-                <label for="marca"><b>Presentacion</b></label><br/>
-                <select name="presentacion" id="presentacion" >
-                    <option value="">Seleccione...</option>
-                    {html_options values=$option_values_id_presentacion output=$option_values_nombre_presentacion}
-                </select>
-            </p>
-
-            <p>
-                <label><b>Costo Declarado</b></label><br/>
-                <input type="text" name="costo_declarado" id="costo_declarado"/>
-            </p>
-            <p>
-                <label><b>Costo Referencial</b></label><br/>
-                <input type="text" name="costo_referencial" id="costo_referencial" readonly="readonly" />
-            </p>
-            
             <p>
                 <label><b>Fecha de vencimiento</b></label><br/>
                 <input type="text" name="fVencimiento" id="fVencimiento"/>
@@ -449,6 +477,21 @@
                     </script>
                 {/literal}
             </p>
+            <p>
+            <label><b>Fecha de elaboración</b></label><br/>
+            <input type="text" name="fechaelaboracion" id="fechaelaboracion"/>
+            {literal}
+            <script type="text/javascript">//<![CDATA[
+            var cal = Calendar.setup({
+            onSelect: function(cal) {
+            cal.hide();
+            }
+            });
+            cal.manageFields("fechaelaboracion", "fechaelaboracion", "%Y-%m-%d");
+            //]]>
+            </script>
+            {/literal}
+            </p>
              <p>
                 <label><b> Numero de Lote</b></label><br/>
                 <input type="text" name="nlote" id="nlote"/>
@@ -458,23 +501,17 @@
                 <input type="text" name="cantidadunitaria" id="cantidadunitaria"/>
             </p>
             <p>
-                <label for="tipo_uso"><b>Tipo De Uso</b></label>
-                <select id="tipo_uso1" name="tipo_uso"></select>
+                <label><b>Cantidad Esperada</b></label><br/>
+                <input type="text" name="cantidaddeberia" id="cantidaddeberia"/>
             </p>
-            
-            
-            <p>
-                <label><b>Estatus</b></label><br/>
-                <select name="estatus_producto" id="estatus_producto" size="1" onchange="no_aprobado(this.value);">
-                    <option value="" disabled selected>Seleccione </option>
-                    <option value="1">Aprobado </option>
-                    <option value="0">No Aprobado </option>
-                </select>
-                
-            </p>
-            <p id="causa">
-                <label><b>Observación</b></label><br/>
+             <p style="display: none" id="observacion">
+                <label><b>Observacion de diferencia</b></label><br/>
                 <textarea name="observacion1" id="observacion1" style="width: 290px"></textarea>
+            </p>
+            <p>
+                <label><b>Inventario a la Fecha</b></label><br/>
+                <input type="text" name="cantidad_existente" id="cantidad_existente" readonly/>
+                <input type="hidden" name="unidad_paleta" id="unidad_paleta" readonly/>
             </p>
         </div>
     </body>
