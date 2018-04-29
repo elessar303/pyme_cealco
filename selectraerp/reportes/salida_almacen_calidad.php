@@ -139,8 +139,12 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         }
         $this->Ln(5);
         if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==4 || $this->array_movimiento[0]["tipo_movimiento_almacen"]== 8){
-         $this->SetX(14);
+        $this->SetX(14);
         $this->Cell(0,0, "Marca :".utf8_decode($this->array_movimiento[0]["marca_vehiculo"])."          Color:".utf8_decode($this->array_movimiento[0]["color"])."          Prescinto".utf8_decode($this->array_movimiento[0]["prescintos"])."           Jornada:".utf8_decode($this->array_movimiento[0]["id_jornada"]),0,0,'L');
+        
+        $this->Ln(5);
+        $this->SetX(14);
+        $this->Cell(0,0, "Placa :".utf8_decode($this->array_movimiento[0]["placa"]),0,0,'L');
         }
           $this->Ln(5);
       }

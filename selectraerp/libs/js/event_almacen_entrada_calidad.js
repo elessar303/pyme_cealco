@@ -303,15 +303,16 @@ $("#cantidaddeberia").change(function(){
             text:'Incluir',
             icon: '../../libs/imagenes/drop-add.gif',
             handler:function(){
-
+                //$("#nlote").val()==""||
+                //(($("#fVencimiento").val()=="") && ($("#fecha_vencimiento").val()=="Si")) ||
                 if($("#items").val()==""||
                     $("#almacen").val()==""||
                     $("#almacen").val()=="0"||
                     $("#ubicacion").val()==""||
                      $("#marca").val()==""||                    
                     $("#cantidadunitaria").val()==""||
-                    (($("#fVencimiento").val()=="") && ($("#fecha_vencimiento").val()=="Si")) ||
-                    $("#nlote").val()==""||
+                    
+                    
                     $("#observacion1").val()==""
                 ){
                     Ext.Msg.alert("Alerta","Debe especificar todos los campos.");

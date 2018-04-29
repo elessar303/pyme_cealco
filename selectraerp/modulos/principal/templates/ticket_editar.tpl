@@ -166,6 +166,17 @@
                                         <input type="text" name="peso_salida" id="peso_salida" size="20" value='' class="form-text"/>
                                     </td>
                                 </tr>
+                                <tr id="placadiv" >
+                                    <td class="label">Placa **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <input type="text" name="placa" id="placa" size="20"  class="form-text" value="{$datos_ticket[0].placa}" readonly="readonly" />
+                                    </td>
+
+                                    <td class="label"></td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>

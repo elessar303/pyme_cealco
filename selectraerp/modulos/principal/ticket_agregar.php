@@ -31,24 +31,32 @@ if($_POST['posee_vehiculo']!=1)
 {
 	$_POST['vehiculos']=NULL;
 }
-if(isset($_POST["aceptar"])){
-
+if(isset($_POST["aceptar"]))
+{
+	if($_POST["tipo_ticket"]!=1)
+	{
+		$_POST["placa"]=NULL;
+	}
 	$instruccion = "
 	INSERT INTO 
 	`tickets_entrada_salida`
-	(`id_conductor`, `hora_entrada`, `peso_entrada`, `tipo_ticket`)
+	(`id_conductor`, `hora_entrada`, `peso_entrada`, `tipo_ticket`, `placa`)
 	VALUES
 	(
 	'".$_POST["conductores"]."',
 	'".$_POST["fecha_entrada"]."',
 	'".$_POST["peso_entrada"]."',
-	'".$_POST["tipo_ticket"]."'
+	'".$_POST["tipo_ticket"]."',
+	'".$_POST["placa"]."'
 	);";
 
-	if ($comunes->Execute2($instruccion)) {
+	if ($comunes->Execute2($instruccion)) 
+	{
 		$id_ticket = $comunes->getInsertID();
         Msg::setMessage("<span style=\"color:#62875f;\">Ticket Generado Exitosamente con en Nro. " . $id_ticket . "</span>");
-    }else{
+    }
+    else
+    {
         Msg::setMessage("<span style=\"color:red;\">Error al Registrar el Ticket.</span>");
     }
 	header("Location: ?opt_menu=".$_POST["opt_menu"]."&opt_seccion=".$_POST["opt_seccion"]);

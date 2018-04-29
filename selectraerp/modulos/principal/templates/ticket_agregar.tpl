@@ -19,6 +19,19 @@
             <script type="text/javascript">//<![CDATA[
                 $(document).ready(function(){
 
+                    /*solo debe pedir placa cuando sea entrada*/
+                    $( "#tipo_ticket" ).change(function() 
+                    {
+                        if($("#tipo_ticket option:selected").val()!=1)
+                        {
+                            $("#placadiv").attr("style", "visibility: hidden")
+                        }
+                        else
+                        {
+                            $("#placadiv").attr("style", "visibility: visible")   
+                        }
+                      
+                    });
                     $('#conductores').select2(
                     {
                         placeholder: "Seleccione ...",
@@ -38,6 +51,17 @@
                             Ext.Msg.alert("Alerta","Debe Seleccionar el tipo de ticket");
                             $("#tipo_ticket").focus();
                             return false;
+                        }
+
+                        if($("#tipo_ticket option:selected").val()==1)
+                        {
+                            if($("#placa").val()=='')
+                            {
+                                Ext.Msg.alert("Alerta","Debe Ingresar Placa del Vehículo");
+                                $("#tipo_ticket").focus();
+                                return false;    
+                            }
+                            
                         }
 
                         if($("#conductores option:selected").val()==''){
@@ -168,6 +192,18 @@
                                         <input type="text" name="peso_entrada" id="peso_entrada" size="20" value='' class="form-text" />
                                     </td>
                                 </tr>
+                                <tr id="placadiv" style="visibility: hidden">
+                                    <td class="label">Placa **</td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        <input type="text" name="placa" id="placa" size="20"  class="form-text" />
+                                    </td>
+
+                                    <td class="label"></td>
+                                    <td style="padding-top:2px; padding-bottom: 2px;">
+                                        
+                                    </td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>

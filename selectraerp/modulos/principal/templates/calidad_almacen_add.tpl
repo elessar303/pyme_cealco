@@ -370,7 +370,7 @@
             <div id="displaytotal2" class="x-hide-display"></div>
         </form>
         <div id="incluirproducto" class="x-hide-display">
-            <p>
+        <!--<p>
                 <label for="almacen"><b>Almac&eacute;n</b></label>
                 <select id="almacen" name="almacen"></select>
             </p>
@@ -378,6 +378,7 @@
                 <label for="ubicacion"><b>Ubicac&iacute;on</b></label>
                 <input name="ubicacion" id="ubicacion" type="text" value="ENTRADA"> 
             </p>
+        -->
             <p>
                <label><b>Codigo de barra</b></label><br/>
                <input type="text" name="codigoBarra" id="codigoBarra">

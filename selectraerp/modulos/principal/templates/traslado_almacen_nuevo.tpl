@@ -192,15 +192,15 @@ function solonumeros(evt)
             </tr>
             <tr align="center">
                 <th colspan="3"  style= "text-align: center;">
-                    <b><h3>Entrada</h3></b>
+                    <b><h3>Destino</h3></b>
                 </th>
                 <th colspan="3" style= "text-align: center;">
-                    <b><h3>Salida</h3></b>
+                    <b><h3>Origen</h3></b>
                 </th>
             </tr>
             <tr>
                 <td>
-                    <span style="font-family:'Verdana';"><b>Almacen de Entrada:</b></span>
+                    <span style="font-family:'Verdana';"><b>Almacen Destino:</b></span>
                 </td>
                 <td colspan="2" align="center">
                     <select name="almacen_entrada" id="almacen_entrada" class="form-text">
@@ -208,7 +208,7 @@ function solonumeros(evt)
                     </select>
                 </td>
                 <td>
-                    <span style="font-family:'Verdana';"><b>Almacen de Salida:</b></span>
+                    <span style="font-family:'Verdana';"><b>Almacen Origen:</b></span>
                 </td>
                 <td colspan="2">
                     <select name="almacen_salida" id="almacen_salida" class="form-text">
@@ -218,7 +218,7 @@ function solonumeros(evt)
             </tr>
             <tr>
                 <td>
-                    <span style="font-family:'Verdana';"><b>Ubicacion de Entrada:</b></span>
+                    <span style="font-family:'Verdana';"><b>Ubicacion Destino:</b></span>
                 </td>
                 
                 <td colspan="2" align="center">
@@ -226,7 +226,7 @@ function solonumeros(evt)
                     </select>
                 </td>
                 <td>
-                    <span style="font-family:'Verdana';"><b>Ubicacion de Salida:</b></span>
+                    <span style="font-family:'Verdana';"><b>Ubicacion Origen:</b></span>
                 </td>
                 <td colspan="2">
                     <select name="ubicacion_salida" id="ubicacion_salida" class="form-text">
