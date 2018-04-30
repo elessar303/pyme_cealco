@@ -50,6 +50,9 @@ if($datos==null)
     $total=$usuarios->ObtenerFilasBySqlSelect($sql);
     //total peso es 0
     $smarty->assign("totalpeso", 0);
+    $smarty->assign("totalpesobruto", 0);
+    $smarty->assign("totalpesoestiva", 0);
+    $smarty->assign("totalpesoempaque", 0);
     $smarty->assign("visiblecerrar", 0);
     $smarty->assign("total", $total[0]['cantidad']);
     $smarty->assign("paleta", $total[0]['unidad_paleta']);
@@ -86,7 +89,7 @@ else
     //buscar el peso total ingresado al almacen
     $sql=
     "
-        SELECT sum(b.peso) as peso FROM 
+        SELECT sum(b.peso) as peso, sum(b.peso_bruto) as pesobruto, sum(b.peso_estiva) as pesoestiva, sum(b.peso_empaque) as pesoempaque FROM 
         kardex_almacen as a 
         inner join  
         kardex_almacen_detalle as b on a.id_transaccion=b.id_transaccion
@@ -127,6 +130,9 @@ else
     ";
     $nombre=$usuarios->ObtenerFilasBySqlSelect($sql);
     $smarty->assign("totalpeso", $totalpeso[0]['peso']);
+    $smarty->assign("totalpesobruto", $totalpeso[0]['pesobruto']);
+    $smarty->assign("totalpesoestiva", $totalpeso[0]['pesoestiva']);
+    $smarty->assign("totalpesoempaque", $totalpeso[0]['pesoempaque']);
     $smarty->assign("nombre_producto", $nombre[0]['descripcion1']);
     $smarty->assign("total", $total[0]['total']);
     $smarty->assign("paleta", $datos[0]['unidad_paleta']);

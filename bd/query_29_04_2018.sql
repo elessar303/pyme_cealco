@@ -7,3 +7,4 @@ INSERT INTO `modulos`(`cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tp
 INSERT INTO `subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES ('add', 'tunel_salida_almacen_nuevo.tpl', 'tunel_salida_almacen_nuevo.php', '280', 'Agregar Tunel Salida Nuevo');
 ALTER TABLE `calidad_almacen_detalle` ADD `id_presentacion` INT NOT NULL AFTER `id_marca`;
 ALTER TABLE `kardex_almacen_detalle` ADD `id_presentacion` INT NOT NULL AFTER `id_marca`;
+ALTER TABLE `kardex_almacen_detalle` ADD `peso_bruto` DECIMAL(10,2) NOT NULL AFTER `peso`, ADD `peso_estiva` DECIMAL(10,2) NOT NULL AFTER `peso_bruto`, ADD `peso_empaque` DECIMAL(10,2) NOT NULL AFTER `peso_estiva`;

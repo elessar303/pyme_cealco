@@ -80,7 +80,24 @@
                 };
                $(document).ready(function()
                {
-                    
+                    $("#pesoempaque").keyup(function()
+                    {
+                        pesobruto=$("#pesobruto").val();
+                        pesoestiva=$("#pesoestiva").val();
+                        pesoempaque=$("#pesoempaque").val();
+                        if( (isNaN(pesobruto) || pesobruto=="") || (isNaN(pesoestiva) || pesoestiva=="") || (isNaN(pesoempaque) || pesoempaque=="")  )
+                        {
+                            alert("Debe introducir solo Números en los campos pesos");
+                            $("#pesoempaque").val("");
+                            this.focus();
+                            return false;
+                        }
+                        else
+                        {
+                            pesototal=parseFloat(pesobruto) - (parseFloat(pesoempaque)+parseFloat( pesoestiva)) ;
+                            $("#peso").val(pesototal);
+                        }
+                    });
                     $("#cerrar").click(function()
                     {
                         
@@ -175,6 +192,9 @@
                         var detalle = $('#ubicacion_detalle').val();
                         var cantidad = $('#peso_unidad').val();
                         var peso = $('#peso').val();
+                        var pesobruto = $('#pesobruto').val();
+                        var pesoestiva = $('#pesoestiva').val();
+                        var pesoempaque = $('#pesoempaque').val();
                         var movimiento = $('#movimiento').val();
                         var ticketestatus = $('#ticketestatus').val();
                         if(ticketestatus ==1)
@@ -191,7 +211,7 @@
                             ticket="";
                         }
                         
-                        if(principal=="" || detalle=="" || principal=="0" || detalle=="0" || cantidad=="" || cantidad<1 || peso=="" || peso<1)
+                        if(principal=="" || detalle=="" || principal=="0" || detalle=="0" || cantidad=="" || cantidad<1 || peso=="" || peso<1 || pesobruto=="" || pesobruto<1 || pesoestiva=="" || pesoestiva<0 || pesoempaque=="" || pesoempaque<0)
                         {
                             Ext.Msg.alert("Alerta","Debe llenar todos los campos");
                             return false;
@@ -217,6 +237,9 @@
                         'ubicacion_detalle' : detalle,
                         'cantidad' : cantidad,
                         'peso' : peso,
+                        'peso_bruto' : pesobruto,
+                        'peso_estiva' : pesoestiva,
+                        'peso_empaque' : pesoempaque,
                         'ticket' : ticket,
                         'cajas' : cajas,
                         'observacion_limite' : observacion_limite,
@@ -343,6 +366,9 @@
                                         <th class="tb-head" ><b>Total Cantidad Unitaria</b></th>
                                         <th class="tb-head" ><b>Peso Paleta</b></th>
                                         <th class="tb-head" ><b>Total Peso Ingresado</b></th>
+                                        <th class="tb-head" ><b>Total Peso Bruto</b></th>
+                                        <th class="tb-head" ><b>Total Peso Estiva</b></th>
+                                        <th class="tb-head" ><b>Total Peso Empaque</b></th>
                                     </tr>
                                 </thead>
                                 <tr>
@@ -361,6 +387,18 @@
                                     <td align="center">
                                         <b>{$totalpeso}</b>
                                         <input type='hidden' value = '{$totalpeso}' name='totalpeso' id='totalpeso'/>
+                                    </td>
+                                    <td align="center">
+                                        <b>{$totalpesobruto}</b>
+                                        <input type='hidden' value = '{$totalpesobruto}' name='totalpesobruto' id='totalpesobruto'/>
+                                    </td>
+                                    <td align="center">
+                                        <b>{$totalpesoestiva}</b>
+                                        <input type='hidden' value = '{$totalpesoestiva}' name='totalpesoestiva' id='totalpesoestiva'/>
+                                    </td>
+                                    <td align="center">
+                                        <b>{$totalpesoempaque}</b>
+                                        <input type='hidden' value = '{$totalpesoempaque}' name='totalpesoempaque' id='totalpesoempaque'/>
                                     </td>
                                 </tr>
                             </table>
@@ -405,11 +443,38 @@
                     </tr>
                     <tr>
                         <td colspan="3" class="label">
-                            Peso **
+                            Peso Neto**
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
-                            <input type="text" name="peso" placeholder="Peso" size="60" id="peso" class="form-text"/>
-                            <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}" />
+                            <input type="text" name="peso" placeholder="Peso" size="60" id="peso" class="form-text" readonly="readonly"/>
+                            <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}"  readonly="readonly" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="label">
+                            Peso Bruto**
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="text" name="pesobruto" placeholder="Peso" size="60" id="pesobruto" class="form-text"/>
+                           
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="label">
+                            Peso Estiva**
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="text" name="pesoestiva" placeholder="Peso" size="60" id="pesoestiva" class="form-text"/>
+                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="label">
+                            Peso Empaque**
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="text" name="pesoempaque" placeholder="Peso" size="60" id="pesoempaque" class="form-text"/>
+                            
                         </td>
                     </tr>
                     {if $ticket eq 1}

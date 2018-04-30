@@ -73,10 +73,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     "
                         INSERT INTO kardex_almacen_detalle (
                         `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `peso_bruto`, `peso_estiva`, `peso_empaque`, `id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
-                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}', '{$_POST["peso_bruto"]}', '{$_POST["peso_estiva"]}', '{$_POST["peso_empaque"]}', '{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
                         '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .", ".$datospadre[0]['id_presentacion'] .", '{$_POST["observacion_limite"]}');
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -86,7 +86,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     //bloqueando las ubicaciones
                     $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
                     $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
-                    if($ocupado[0]['ocupado']!=1)
+                    if($ocupado[0]['ocupado']==0)
                     {
                         $sql=
                         "
@@ -176,10 +176,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 "
                     INSERT INTO kardex_almacen_detalle (
                     `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
+                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `peso_bruto`, `peso_estiva`, `peso_empaque`, `id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
                     VALUES (
                     NULL, '{$id_transaccion}', '{$_POST["ubicacion_principal"]}',
-                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}', '{$_POST["peso_bruto"]}', '{$_POST["peso_estiva"]}', '{$_POST["peso_empaque"]}', '{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
                     '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}', '{$datospadre[0]['id_presentacion']}', '{$_POST["observacion_limite"]}');
                 ";
                 $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -189,7 +189,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 //bloqueando las ubicaciones
                 $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
                 $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
-                if($ocupado[0]['ocupado']!=1)
+                if($ocupado[0]['ocupado']==0)
                 {
                     $sql=
                     "
@@ -859,10 +859,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     "
                         INSERT INTO kardex_almacen_detalle (
                         `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`,  `observacion_limite`)
+                        `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `peso_bruto`, `peso_estiva`, `peso_empaque`, `id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`,  `observacion_limite`)
                         VALUES (
                         NULL, '{$datospadre[0]['id_transaccion']}', '{$_POST["ubicacion_principal"]}',
-                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                        '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}', '{$_POST["peso_bruto"]}', '{$_POST["peso_estiva"]}', '{$_POST["peso_empaque"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
                         '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'] .", ".$datospadre[0]['costo_declarado'] .", ".$datospadre[0]['id_marca'] .", ".$datospadre[0]['id_presentacion'] .", '{$_POST["observacion_limite"]}');
                     ";
                     $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -872,7 +872,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     //bloqueando las ubicaciones
                     $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
                     $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
-                    if($ocupado[0]['ocupado']!=1)
+                    if($ocupado[0]['ocupado']==0)
                     {
                         $sql=
                         "
@@ -962,10 +962,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 "
                     INSERT INTO kardex_almacen_detalle (
                     `id_transaccion_detalle` , `id_transaccion` ,`id_almacen_entrada`,
-                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`,`id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
+                    `id_almacen_salida`, `id_item`, `cantidad`, `peso`, `peso_bruto`, `peso_estiva`, `peso_empaque`, `id_ubi_entrada`, `vencimiento`,`elaboracion`,`lote`, `c_esperada`,`observacion`, `precio`, `etiqueta`, `costo_declarado`, `id_marca`, `id_presentacion`, `observacion_limite`)
                     VALUES (
                     NULL, '{$id_transaccion}', '{$_POST["ubicacion_principal"]}',
-                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
+                    '', '{$datospadre[0]['id_item']}', '{$_POST["cantidad"]}', '{$_POST["peso"]}', '{$_POST["peso_bruto"]}', '{$_POST["peso_estiva"]}', '{$_POST["peso_empaque"]}','{$_POST["ubicacion_detalle"]}','{$datospadre[0]['vencimiento']}',
                     '{$datospadre[0]['elaboracion']}','{$datospadre[0]['lote']}','{$datospadre[0]['c_esperada']}','{$datospadre[0]['observacion']}', ".$precioconiva.", ".$idticket[0]['contador'].", '{$datospadre[0]['costo_declarado']}', '{$datospadre[0]['id_marca']}', '{$datospadre[0]['id_presentacion']}', '{$_POST["observacion_limite"]}');
                 ";
                 $conn->ExecuteTrans($kardex_almacen_detalle_instruccion);
@@ -975,7 +975,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 //bloqueando las ubicaciones
                 $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
                 $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
-                if($ocupado[0]['ocupado']!=1)
+                if($ocupado[0]['ocupado']==0)
                 {
                     $sql=
                     "
