@@ -120,6 +120,7 @@ class PDF extends FPDFSelectra {
         AND ubicacion!='PISO DE VENTA'
         ".$filtros."
         GROUP BY i.codigo_barras, lote
+        ORDER BY i.descripcion1, lote
         ", $conexion);
 
         $this->SetFont("Arial", "B", 9);
