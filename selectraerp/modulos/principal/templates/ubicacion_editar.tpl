@@ -95,15 +95,17 @@
                                 <input type="text" name="orden_ubicacion" size="60" id="orden_ubicacion"  value="{$datos_ubicacion[0].orden}"  class="form-text" />
                                 <div id="notificacionVUsuario"></div>
                             </td>
-                        </tr> 
-                         <!--<tr>
+                        </tr>
+                        {if $campos.ocupado==0 || $campos.ocupado==2}
+                        <tr>
                             <td colspan="3" class="label">
-                                Puede vender
+                                Disposicion
                             </td>
                             <td style="padding-top:2px; padding-bottom: 2px;">
-                                <input {if $datos_ubicacion[0].puede_vender eq "1" } checked {/if}  type="checkbox" name="puede_vender" value=1 id="puede_vender" class="form-text" />
+                                <input {if $datos_ubicacion[0].ocupado eq "2" } checked {/if}  type="checkbox" name="ocupado" value=2 id="ocupado" class="form-text" />
                             </td>
-                        </tr>-->
+                        </tr>
+                        {/if}
                 </table>
                 <table style="width:100%">
                     <tbody>

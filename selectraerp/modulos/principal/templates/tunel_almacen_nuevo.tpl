@@ -150,7 +150,7 @@
                     <tr>
                         <td>
                             <!--img align="absmiddle" width="17" height="17" src="../../../includes/imagenes/28.png"-->
-                            <span style="font-family:'Verdana';font-weight:bold;"><b>Proveedor (*):</b></span>
+                            <span style="font-family:'Verdana';font-weight:bold;"><b>Cliente (*):</b></span>
                         </td>
                         <td>
                             <!--input type="text" maxlength="100" name="autorizado_por" id="autorizado_por" value="{$detalles_pendiente[0].autorizado_por}"/-->

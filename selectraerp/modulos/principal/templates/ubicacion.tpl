@@ -34,9 +34,17 @@ Modificado por: daniel fernandez
                                 {assign var=bgcolor value="#cacacf"}
                             {/if}
                         <tr bgcolor="{$bgcolor}">
-                            <td>{$campos.id}</td>
-                            <td>{$campos.descripcion}</td>
-                            <td>{$campos.orden}</td>
+                            <td style="text-align:center;">{$campos.descripcion}</td>
+                            <td style="text-align:center;">{$campos.orden}</td>
+                            <td style="text-align:center;">
+                            {if $campos.ocupado==0}
+                                <span style="color:#0c880c;"><b>Disponible</b></span>
+                            {elseif $campos.ocupado==1}   
+                                <span style="color:red;"><b>Ocupado</b></span>
+                            {elseif $campos.ocupado==2}
+                                <span style="color:gray;"><b>Disposicion</b></span>
+                            {/if}
+                            </td>
                             <td style="cursor: pointer; width: 30px; text-align:center">
                                 <img class="editar" {if $smarty.get.loc } onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=editUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}&amp;idLocalidad={$smarty.get.idLocalidad}&amp;loc=1'" {else}onclick="javascript: window.location.href='?opt_menu={$smarty.get.opt_menu}&amp;opt_seccion={$smarty.get.opt_seccion}&amp;opt_subseccion=editUbicacion&amp;cod={$smarty.get.cod}&amp;id={$campos.id}'" {/if} title="Editar" src="../../../includes/imagenes/edit.gif"/>
                             </td>
