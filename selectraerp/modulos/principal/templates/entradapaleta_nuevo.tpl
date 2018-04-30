@@ -367,7 +367,7 @@
                                         <th class="tb-head" ><b>Peso Paleta</b></th>
                                         <th class="tb-head" ><b>Total Peso Ingresado</b></th>
                                         <th class="tb-head" ><b>Total Peso Bruto</b></th>
-                                        <th class="tb-head" ><b>Total Peso Estiva</b></th>
+                                        <th class="tb-head" ><b>Total Peso Estiba</b></th>
                                         <th class="tb-head" ><b>Total Peso Empaque</b></th>
                                     </tr>
                                 </thead>
@@ -451,7 +451,7 @@
                     </tr>
                     <tr>
                         <td colspan="3" class="label">
-                            Peso Estiva**
+                            Peso Estiba**
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
                             <input type="text" name="pesoestiva" placeholder="Peso" size="60" id="pesoestiva" class="form-text"/>
