@@ -141,6 +141,15 @@ class FPDFSelectra extends FPDF {
         $this->Ln($h);
     }
 
+    function SetDash($black=null, $white=null)
+    {
+        if($black!==null)
+            $s=sprintf('[%.3F %.3F] 0 d',$black*$this->k,$white*$this->k);
+        else
+            $s='[] 0 d';
+        $this->_out($s);
+    }
+
     function Header() {
         $Conn = conexion_conf();
         $var_sql = "SELECT * FROM parametros_generales";
@@ -152,15 +161,12 @@ class FPDFSelectra extends FPDF {
         $var_nomemp = $row_rs['nombre_empresa'];
 
         cerrar_conexion($Conn);
-
+        $this->SetTextColor(0,0,0);
         $this->SetY(15);
         $this->SetLeftMargin(15);
         $this->SetFont("Arial", "B", 8);
-        #$this->Image($var_imagen_izq, 10, 8, 33);
-        //$this->Image($var_imagen_der ? $var_imagen_der : $var_imagen_izq, 10, 8, 50, 20);
-        #$this->Cell(45);
+        $this->Image('../../includes/imagenes/pdval-logo.gif',10, 8, 20, 20);
         $this->Cell(0, 0, utf8_decode($var_nomemp), 0, 0, "C");
-        //$this->Image($var_imagen_der,170,15,33);
         $this->Ln(7);
         $this->Cell(0, 0, utf8_decode($row_rs['direccion']), 0, 0, "C");
 
@@ -171,13 +177,13 @@ class FPDFSelectra extends FPDF {
         $this->Ln(3);
         $this->Cell(0, 0, 'Fecha de Emision: ' . date('d-m-Y'), 0, 0, "R");
         //$this->SetFont("Arial", "B", 8);
-        $this->Ln(10);
+        $this->Ln(5);
         $this->SetX(14);
         $this->SetFont('Arial', 'B', 14);
-        $this->Ln(3);
+        $this->Ln(1);
         $this->Cell(0, 0, $this->getTituloReporte(), 0, 0, "C");
         $this->SetLineWidth(0.1);
-        $this->Ln(10);
+        $this->Ln(5);
     }
 
     function Footer() {
