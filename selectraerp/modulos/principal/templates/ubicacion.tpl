@@ -52,7 +52,7 @@ Modificado por: daniel fernandez
                     {/if}
                     </tbody>
                 </table>
-                {include file = "snippets/navegacion_paginas.tpl"}
+                {include file = "snippets/navegacion_paginas_ubicaciones.tpl"}
             </div>
         </form>
     </body>
