@@ -1353,7 +1353,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
         break;
         case "cargaUbicacionNuevo":
            $almacen=$_POST["idUbicacion"];
-           $campos = $conn->ObtenerFilasBySqlSelect("SELECT id, concat(descripcion, ' - ', orden) as descripcion FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado==0 order by  orden asc ");
+           $campos = $conn->ObtenerFilasBySqlSelect("SELECT id, concat(descripcion, ' - ', orden) as descripcion FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado=0 order by  orden asc ");
             if (count($campos) == 0) 
             {
                 echo "[{band:'-1'}]";
