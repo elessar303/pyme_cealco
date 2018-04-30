@@ -152,8 +152,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`)
                     VALUES (
                     {$datospadre[0]['id_transaccion']} , '13', '{$datospadre[0]['autorizado_por']}',
-                    '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
-                    CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_datospadre[0]['id_documento']}', '{$datospadre[0]['empresa_transporte']}',
+                    '{$datospadre[0]['observacion']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
+                    CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$datospadre[0]['id_documento']}', '{$datospadre[0]['empresa_transporte']}',
                     '{$datospadre[0]['id_conductor']}', '{$datospadre[0]['placa']}', '{$datospadre[0]['guia_sunagro']}', '{$datospadre[0]['prescintos']}',
                     '{$datospadre[0]['orden_despacho']}',
                     '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
@@ -938,8 +938,8 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     `id_receptor`, `nro_contenedor`, `ticket_entrada`, `id_cliente`, `prescintos`)
                     VALUES (
                     {$datospadre[0]['id_transaccion']} , '3', '{$datospadre[0]['autorizado_por']}',
-                    '{$_datospadre['observaciones']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
-                    CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$_datospadre[0]['id_documento']}', '{$datospadre[0]['empresa_transporte']}',
+                    '{$datospadre[0]['observacion']}', '{$datospadre[0]['fecha']}', '{$login->getUsuario()}', 
+                    CURRENT_TIMESTAMP, 'Entregado', CURRENT_TIMESTAMP, '{$datospadre[0]['id_documento']}', '{$datospadre[0]['empresa_transporte']}',
                     '{$datospadre[0]['id_conductor']}', '{$datospadre[0]['placa']}', '{$datospadre[0]['guia_sunagro']}',
                     '{$datospadre[0]['orden_despacho']}',
                     '{$datospadre[0]['almacen_procedencia']}', '{$datospadre[0]['id_proveedor']}','{$datospadre[0]['id_seguridad']}',
