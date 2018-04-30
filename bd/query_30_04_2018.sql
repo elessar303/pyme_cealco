@@ -1,0 +1,1 @@
+UPDATE `kardex_almacen` SET `nro_factura` = '00957' WHERE `kardex_almacen`.`id_transaccion` = 2256 AND `kardex_almacen`.`guia_sunagro` = '';

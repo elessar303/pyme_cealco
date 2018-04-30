@@ -438,16 +438,6 @@
                         </td>
                         <td style="padding-top:2px; padding-bottom: 2px;">
                             <input type="text" name="peso_unidad" placeholder="Unidad" size="60" id="peso_unidad" class="form-text"/>
-                            <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="3" class="label">
-                            Peso Neto**
-                        </td>
-                        <td style="padding-top:2px; padding-bottom: 2px;">
-                            <input type="text" name="peso" placeholder="Peso" size="60" id="peso" class="form-text" readonly="readonly"/>
-                            <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}"  readonly="readonly" />
                         </td>
                     </tr>
                     <tr>
@@ -475,6 +465,15 @@
                         <td style="padding-top:2px; padding-bottom: 2px;">
                             <input type="text" name="pesoempaque" placeholder="Peso" size="60" id="pesoempaque" class="form-text"/>
                             
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="label">
+                            Peso Neto**
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="text" name="peso" placeholder="Peso" size="60" id="peso" class="form-text" readonly="readonly"/>
+                            <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}"  readonly="readonly" />
                         </td>
                     </tr>
                     {if $ticket eq 1}

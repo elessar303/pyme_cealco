@@ -269,4 +269,7 @@ $instruccion = "
    </script>";
     exit;
 }
+
+$campos = $menu->ObtenerFilasBySqlSelect("select * from modulos where cod_modulo= ".$_GET["opt_seccion"]);
+$smarty->assign("campo_seccion",$campos);
 ?>
