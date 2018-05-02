@@ -9,7 +9,7 @@ class PDF extends FPDFSelectra {
     function tHead($dpto, $moneda) {
         $this->SetFont("Arial", "B", 9);
         $this->Cell(20, 7, utf8_decode('Ubicacion'), 1, 0, 'C');
-        $this->Cell(30, 7, utf8_decode('Proveedor'),1, 0, 'C');
+        $this->Cell(30, 7, utf8_decode('Cliente'),1, 0, 'C');
         $this->Cell(15, 7, utf8_decode('Producto'), 1, 0, 'C');
         $this->Cell(90, 7, utf8_decode('Descripcion'),1, 0, 'C');
         $this->Cell(15, 7, 'Cant. PL', 1, 0, 'C');
@@ -171,7 +171,7 @@ class PDF extends FPDFSelectra {
         $this->SetY(15);
         $this->SetLeftMargin(15);
         $this->SetFont("Arial", "B", 8);
-        $this->Image('../../includes/imagenes/pdval-logo.gif',10, 8, 20, 20);
+        //$this->Image('../../includes/imagenes/pdval-logo.gif',10, 8, 20, 20);
         $this->Cell(0, 0, utf8_decode($var_nomemp), 0, 0, "C");
         $this->Ln(7);
         $this->Cell(0, 0, utf8_decode($row_rs['direccion']), 0, 0, "C");
@@ -193,7 +193,7 @@ class PDF extends FPDFSelectra {
         if($num==1){
         $this->SetFont("Arial", "B", 9);
         $this->Cell(20, 7, utf8_decode('Ubicacion'), 1, 0, 'C');
-        $this->Cell(30, 7, utf8_decode('Proveedor'),1, 0, 'C');
+        $this->Cell(30, 7, utf8_decode('Cliente'),1, 0, 'C');
         $this->Cell(15, 7, utf8_decode('Producto'), 1, 0, 'C');
         $this->Cell(90, 7, utf8_decode('Descripcion'),1, 0, 'C');
         $this->Cell(15, 7, 'Cant. PL', 1, 0, 'C');

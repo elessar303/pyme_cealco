@@ -165,7 +165,7 @@ class FPDFSelectra extends FPDF {
         $this->SetY(15);
         $this->SetLeftMargin(15);
         $this->SetFont("Arial", "B", 8);
-        $this->Image('../../includes/imagenes/pdval-logo.gif',10, 8, 20, 20);
+        //$this->Image('../../includes/imagenes/pdval-logo.gif',10, 8, 20, 20);
         $this->Cell(0, 0, utf8_decode($var_nomemp), 0, 0, "C");
         $this->Ln(7);
         $this->Cell(0, 0, utf8_decode($row_rs['direccion']), 0, 0, "C");
