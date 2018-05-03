@@ -113,6 +113,21 @@ class PDF extends FPDFSelectra {
 
     function imprimir_datos2() {
         $conexion = conexion();
+
+        $filtros="";
+
+        if($_GET['almacen']!=0){
+            $filtros.=" AND v.cod_almacen=".$_GET['almacen']." ";
+        }
+        if($_GET['ubicacion']!=0){
+            $filtros.=" AND v.id_ubicacion=".$_GET['ubicacion']." ";
+        }
+        if($_GET['cliente']!=0){
+            $filtros.=" AND v.id_proveedor=".$_GET['cliente']." ";
+        }
+        if($_GET['item']!=0){
+            $filtros.=" AND v.id_item=".$_GET['item']." ";
+        }
         $rs2 = query("select sum(v.cantidad) as total_cantidad, sum(v.peso) as total_peso, i.descripcion1 as nombre_item, v.lote as lote  FROM vw_existenciabyalmacen v, item i, clientes pro
         where i.id_item=v.id_item 
         AND v.id_proveedor=pro.id_cliente
