@@ -53,18 +53,30 @@ class PDF extends FPDFSelectra {
 
         while($row = fetch_array($rs2)){
 
+            $conexion2 = conexion();
+            $rs_fecha= query("SELECT vencimiento FROM kardex_almacen_detalle WHERE id_ubi_entrada=".$row['id_ubicacion']." AND lote=".$row['lote']." AND id_item=".$row['id_item']." GROUP BY id_ubi_entrada", $conexion2);
 
+            $res_fecha=fetch_array($rs_fecha);
 
             $peso = number_format($row['total_cantidad'], 2, ',', '.');
             $cantidad = number_format($row['total_peso'], 2, ',', '.');
             $producto = utf8_decode($row['nombre_item']);
 
+            if($res_fecha[0]==''){
+                $vencimiento='Sin Fecha';
+            }else{
+                $vencimiento=date_create($res_fecha[0]);
+            }
             $this->Cell(80, 7, $producto, 0, 0, 'L');
             $this->Cell(20, 7, $cantidad,0, 0, 'C');
             $this->Cell(15, 7, utf8_decode('UM'), 0, 0, 'C');
             $this->Cell(20, 7, $peso,0, 0, 'C');
             $this->Cell(20, 7, $row['lote'], 0, 0, 'C');
-            $this->Cell(40, 7, 'Fecha de Vencimiento', 0, 1, 'C');
+            if($res_fecha[0]!=''){
+                $this->Cell(40, 7, date_format($vencimiento, 'd-m-Y'), 0, 1, 'C');
+            }else{
+                $this->Cell(40, 7,'Sin Fecha', 0, 1, 'C');
+            }
         }
 
     }
