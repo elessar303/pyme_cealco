@@ -111,57 +111,6 @@ class PDF extends FPDFSelectra {
         }//fin del while
     }
 
-    function imprimir_datos2() {
-        $conexion = conexion();
-
-        $filtros="";
-
-        if($_GET['almacen']!=0){
-            $filtros.=" AND v.cod_almacen=".$_GET['almacen']." ";
-        }
-        if($_GET['ubicacion']!=0){
-            $filtros.=" AND v.id_ubicacion=".$_GET['ubicacion']." ";
-        }
-        if($_GET['cliente']!=0){
-            $filtros.=" AND v.id_proveedor=".$_GET['cliente']." ";
-        }
-        if($_GET['item']!=0){
-            $filtros.=" AND v.id_item=".$_GET['item']." ";
-        }
-        $rs2 = query("select sum(v.cantidad) as total_cantidad, sum(v.peso) as total_peso, i.descripcion1 as nombre_item, v.lote as lote  FROM vw_existenciabyalmacen v, item i, clientes pro
-        where i.id_item=v.id_item 
-        AND v.id_proveedor=pro.id_cliente
-        AND v.cantidad>0 
-        AND ubicacion!='PISO DE VENTA'
-        ".$filtros."
-        GROUP BY i.codigo_barras, lote
-        ORDER BY i.descripcion1, lote
-        ", $conexion);
-
-        $this->SetFont("Arial", "B", 9);
-        $this->SetWidths(array(178));
-        $this->SetAligns(array('R'));
-        $this->Setceldas(array(0));
-        $this->Setancho(array(5));
-        $this->SetFont("Arial", "I", 9);
-        $this->Ln(5);
-
-        while($row = fetch_array($rs2)){
-
-            $peso = number_format($row['total_cantidad'], 2, ',', '.');
-            $cantidad = number_format($row['total_peso'], 2, ',', '.');
-            $producto = utf8_decode($row['nombre_item']);
-
-            $this->Cell(80, 7, $producto, 0, 0, 'L');
-            $this->Cell(20, 7, $cantidad,0, 0, 'C');
-            $this->Cell(15, 7, utf8_decode('UM'), 0, 0, 'C');
-            $this->Cell(20, 7, $peso,0, 0, 'C');
-            $this->Cell(20, 7, $row['lote'], 0, 0, 'C');
-            $this->Cell(40, 7, 'Fecha de Vencimiento', 0, 1, 'C');
-        }
-
-    }
-
 
     //Pie de página
     function Footer() {
@@ -171,7 +120,7 @@ class PDF extends FPDFSelectra {
         $this->Ln();
     }
 
-    function Header($num) {
+    function Header() {
         $Conn = conexion_conf();
         $var_sql = "SELECT * FROM parametros_generales";
         $rs = query($var_sql, $Conn);
@@ -205,7 +154,6 @@ class PDF extends FPDFSelectra {
         $this->Cell(0, 0, $this->getTituloReporte(), 0, 0, "C");
         $this->SetLineWidth(0.1);
         $this->Ln(5);
-        if($num==1){
         $this->SetFont("Arial", "B", 9);
         $this->Cell(20, 7, utf8_decode('Ubicacion'), 1, 0, 'C');
         $this->Cell(30, 7, utf8_decode('Cliente'),1, 0, 'C');
@@ -214,16 +162,6 @@ class PDF extends FPDFSelectra {
         $this->Cell(15, 7, 'Cant. PL', 1, 0, 'C');
         $this->Cell(15, 7, 'Peso', 1, 0, 'C');
         $this->Cell(10, 7, 'Lote', 1, 1, 'C');
-        }
-        if($num==2){
-        $this->SetFont("Arial", "B", 9);
-        $this->Cell(80, 7, utf8_decode('Producto'), 1, 0, 'C');
-        $this->Cell(20, 7, utf8_decode('Cantidad'),1, 0, 'C');
-        $this->Cell(15, 7, utf8_decode('UM'), 1, 0, 'C');
-        $this->Cell(20, 7, utf8_decode('Peso Neto'),1, 0, 'C');
-        $this->Cell(20, 7, 'Lote', 1, 0, 'C');
-        $this->Cell(40, 7, 'Fecha de Vencimiento', 1, 1, 'C');
-        }
         $this->Ln(1);
     }
 
@@ -247,14 +185,11 @@ $rs = query($sql, $conexion);
 $lista_dptos = array();
 $subtotal_dptos = array();
 $pdf->AddPage();
-$pdf->Header(1);
 $subtotal_dptos[] = $pdf->imprimir_datos();
-$pdf->AddPage();
-$pdf->Header(2);
-$subtotal_dptos[] = $pdf->imprimir_datos2();
 $lista_dptos[] = $fila["descripcion"];
 $fila = "";
 
 ob_end_clean();
-$pdf->Output();
+$date=date('d-m-Y');
+$pdf->Output('Existencia_'.$date.'.pdf', 'I');
 ?>
