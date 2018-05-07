@@ -1,0 +1,1 @@
+INSERT INTO `modulos`(`cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES ('106', 'Carga-inicial', 'precargainicial.php', 'precargainicial.tpl', '7', '../../libs/imagenes/icons/4.png', '1')
