@@ -934,7 +934,7 @@
                  </td>
                  <td>&nbsp;&nbsp;</td>
                  <td id="tab4" class="tab">
-                    <img src="../../../includes/imagenes/1.png" width="20" height="20" style="vertical-align: middle;"/><b>Forma de Pago</b>&nbsp;
+                    <img src="../../../includes/imagenes/1.png" width="20" height="20" style="vertical-align: middle;"/><b>Cerrar Orden</b>&nbsp;
                 </td>
             </tr>
         </table>
