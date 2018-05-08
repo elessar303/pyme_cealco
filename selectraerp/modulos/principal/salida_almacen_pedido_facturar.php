@@ -19,14 +19,14 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
             $instruccion = $comunes->buscar_exacta_join($tabla, $des, $busqueda, $join, $orden);
             break;
         case "todas":
-            $instruccion = $comunes->buscar_todas_join($tabla, $des, $busqueda);
+            $instruccion = $comunes->buscar_todas_join($tabla, $des, $busqueda,$join);
             break;
         case "cualquiera":
             $instruccion = $comunes->buscar_cualquiera_join($tabla, $des, $busqueda, $join);
             break;
     }
     $instruccion = $instruccion . " and operacion='-' and (k.estado='Despachado'
-    or k.estado='Facturado' or k.estado='Pendiente') and k.id_cliente<>0  group by  k.estado, cli.id_cliente  order by fecha desc";
+    or k.estado='Facturado' or k.estado='Pendiente') and k.id_cliente<>0  group by  k.estado, cli.id_cliente order by cli.nombre,id_transaccion desc";
     //echo $instruccion; exit();
     //exit(0);
 } else {
@@ -41,7 +41,7 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     or k.estado='Despachado')
     and k.id_cliente<>0
     group by   k.estado, cli.id_cliente
-    order by id_transaccion desc ";
+    order by cli.nombre,id_transaccion desc ";
 }
 //print_r($instruccion); exit();
 $num_paginas = $comunes->obtener_num_paginas($instruccion);
@@ -65,8 +65,8 @@ $smarty->assign("campo_seccion", $campos);
 //**************************************************************************
 //Criterios de Busqueda ****************************************************
 //**************************************************************************
-$smarty->assign("option_values", array("id_transaccion", "observacion", "id_almacen", "cli.nombre"));
-$smarty->assign("option_output", array("Transaccion", "Observacion", "Almacen", "NOMBRE"));
+$smarty->assign("option_values", array("cli.nombre", "id_transaccion"));
+$smarty->assign("option_output", array("Cliente", "Transaccion"));
 $smarty->assign("option_selected", $busqueda);
 //**************************************************************************
 //**************************************************************************
