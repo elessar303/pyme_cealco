@@ -54,10 +54,14 @@ class PDF extends FPDFSelectra {
         while($row = fetch_array($rs2)){
 
             $conexion2 = conexion();
-            $rs_fecha= query("SELECT vencimiento FROM kardex_almacen_detalle WHERE id_ubi_entrada=".$row['id_ubicacion']." AND lote=".$row['lote']." AND id_item=".$row['id_item']." GROUP BY id_ubi_entrada", $conexion2);
+            $sql="SELECT vencimiento, nombre_unidad, count(*) as numero FROM kardex_almacen_detalle k 
+                LEFT JOIN unidad_empaque ue ON ue.id=k.id_presentacion
+                WHERE k.id_ubi_entrada=".$row['id_ubicacion']." AND k.lote=".$row['lote']." AND k.id_item=".$row['id_item']." GROUP BY k.id_ubi_entrada";
+            $rs_fecha= query($sql, $conexion2);
 
             $res_fecha=fetch_array($rs_fecha);
 
+            //print_r($res_fecha); exit;
             $peso = number_format($row['total_cantidad'], 2, ',', '.');
             $cantidad = number_format($row['total_peso'], 2, ',', '.');
             $producto = utf8_decode($row['nombre_item']);
@@ -67,9 +71,15 @@ class PDF extends FPDFSelectra {
             }else{
                 $vencimiento=date_create($res_fecha[0]);
             }
+
+            if($res_fecha[1]==''){
+                $unidad='PL';
+            }else{
+                $unidad=utf8_decode($res_fecha[1]);
+            }
             $this->Cell(80, 7, $producto, 0, 0, 'L');
             $this->Cell(20, 7, $cantidad,0, 0, 'C');
-            $this->Cell(15, 7, utf8_decode('UM'), 0, 0, 'C');
+            $this->Cell(15, 7, $res_fecha[2]." ".$unidad, 0, 0, 'C');
             $this->Cell(20, 7, $peso,0, 0, 'C');
             $this->Cell(20, 7, $row['lote'], 0, 0, 'C');
             if($res_fecha[0]!=''){
