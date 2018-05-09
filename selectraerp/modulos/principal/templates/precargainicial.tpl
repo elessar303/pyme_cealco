@@ -77,6 +77,14 @@
                                 <input type="button" name="cancelar" value="Cancelar" onclick="javascript:document.location.href='?opt_menu={$smarty.get.opt_menu}';" />
                             </td>
                         </tr>
+                        <tr class="tb-tit">
+                            <td colspan="6">
+                                <a href="../../uploads/Libro1.csv" download="Formato De Subida">
+                                Descargar Formato Archivo
+                                </a>
+                            </td>
+                        </tr>
+                        
                     </tbody>
                 </table>
             </div>
