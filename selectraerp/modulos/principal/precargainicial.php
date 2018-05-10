@@ -15,8 +15,10 @@ include_once("../../libs/php/clases/correlativos.php");
 require_once "../../libs/php/clases/numerosALetras.class.php";
 include("../../../menu_sistemas/lib/common.php");
 include("../../libs/php/clases/producto.php");
+include("../../libs/php/clases/almacen.php");
 
 $comunes = new ConexionComun();
+$comunes = new Almacen();
 $correlativos = new Correlativos();
 $comun = new Comunes();
 $login = new Login();
@@ -729,7 +731,7 @@ if(!empty($_FILES['archivo_productos']))
                     //se comienza hacer el pedido por la entrada.
                     //obtener correlativo:
                     //obtenemos el correlativo de la factura
-                    $correlativos = new Correlativos();
+                    //$correlativos = new Correlativos();
                     $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "si");
                     $formateo_nro_factura = $nro_pedido;
                     $subtotal=0;
@@ -747,11 +749,16 @@ if(!empty($_FILES['archivo_productos']))
                     
                    // debemos ver si hay pedido pendiente, para eso verificamos la fecha de pago
                     $sql="select * from despacho_new where fecha_pago='0000-00-00' and id_cliente='{$values[3]}' limit 1";
+                    
                     $cargosoriginal=$comunes->ObtenerFilasBySqlSelect($sql);
                     if($cargosoriginal==null)
                     {
                         //es su primer cargo por lo que hay que crear el despacho new padre.
-                        $nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+                        //por alguna razon no me funciona el correlativo, por lo que hare la consulta manual
+                        $sql="select formato, contador from correlativos";
+                        $actualizarfactura=$comunes->ObtenerFilasBySqlSelect($sql);
+                        $nro_factura=str_pad(($actualizarfactura[0]['contador']), strlen($actualizarfactura[0]['formato']), "0", 0);
+                        //$nro_factura = $correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
                         $formateo_nro_factura = $nro_factura;
                         #obtenemos el money actual
                         $money=$comunes->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
@@ -775,7 +782,7 @@ if(!empty($_FILES['archivo_productos']))
                                 '" . $cod_estatus = 1 . "', 'contado', '".impresora_serial."' , '".$money[0]['money']."',''
                             );";
                             $comunes->ExecuteTrans($sql);
-                        $id_facturaTrans = $comunes->getInsertID();
+                            $id_facturaTrans = $comunes->getInsertID();
                                 $kardex_almacen_instruccion = "
                                     INSERT INTO kardex_almacen (
                                     `id_transaccion` ,
@@ -851,14 +858,17 @@ if(!empty($_FILES['archivo_productos']))
                                 $comunes->ExecuteTrans($kardex_almacen_detalle_instruccion);
                             }
                         }
-                        $nro_facturaOLD = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
+                        $nro_facturaOLD = ($correlativos->getUltimoCorrelativo("cod_factura", 1, "no"));
                         $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "no");
+                        
                         $comunes->ExecuteTrans("update correlativos set contador = '" . $nro_pedido . "' where campo = 'cod_pedido'");
-                        $comunes->ExecuteTrans("UPDATE correlativos SET contador = '{$nro_factura}' WHERE campo = 'cod_factura';");
+                        $comunes->ExecuteTrans("UPDATE correlativos SET contador = '".$nro_facturaOLD."' WHERE campo = 'cod_factura';");
                         //Fin pedido
                     }
                     else
-                    { // cuando existe pedido pendiente
+                    { 
+                        
+                        // cuando existe pedido pendiente
                         $kardexoriginal=$comunes->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
                         if($kardexoriginal==null)
                         { 

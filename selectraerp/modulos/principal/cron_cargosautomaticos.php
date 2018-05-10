@@ -219,11 +219,9 @@ if($despacho!='all') //proceso para un solo cliente
                 continue;
             }
 
-            $sql="Select concat(formato, (contador + 1)) as cod_factura from correlativos where campo='cod_factura'";
-            $correlativo=$almacen->ObtenerFilasBySqlSelect($sql);
-            $nro_factura4 = $correlativo[0]['cod_factura'];//$correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
-            $sql="UPDATE correlativos SET contador = ({$nro_factura4}) WHERE campo = 'cod_factura';";
-            $almacen->ExecuteTrans($sql);
+            //$sql="Select concat(formato, (contador + 1)) as cod_factura from correlativos where campo='cod_factura'";
+            //$correlativo=$almacen->ObtenerFilasBySqlSelect($sql);
+            
             $subtotal=0;
             $ivatotal=0;
             $itemstotal=count($total);
@@ -241,6 +239,12 @@ if($despacho!='all') //proceso para un solo cliente
             $cargosoriginal=$almacen->ObtenerFilasBySqlSelect($sql);
             if($cargosoriginal==null)
             {
+                $sql="select formato, contador from correlativos";
+                $actualizarfactura=$almacen->ObtenerFilasBySqlSelect($sql);
+                $nro_factura4=str_pad(($actualizarfactura[0]['contador']+1), strlen($actualizarfactura[0]['formato']), "0", 0);
+                //$nro_factura4 = $correlativo[0]['cod_factura'];//$correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+                $sql="UPDATE correlativos SET contador = ({$nro_factura4}) WHERE campo = 'cod_factura';";
+                $almacen->ExecuteTrans($sql);
                 #obtenemos el money actual
                 $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
     
@@ -632,11 +636,9 @@ else
                     continue;
                 }
 
-                $sql="Select concat(formato, (contador + 1)) as cod_factura from correlativos where campo='cod_factura'";
-                $correlativo=$almacen->ObtenerFilasBySqlSelect($sql);
-                $nro_factura4 = $correlativo[0]['cod_factura'];//$correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
-                $sql="UPDATE correlativos SET contador = ({$nro_factura4}) WHERE campo = 'cod_factura';";
-                $almacen->ExecuteTrans($sql);
+                //$sql="Select concat(formato, (contador + 1)) as cod_factura from correlativos where campo='cod_factura'";
+                //$correlativo=$almacen->ObtenerFilasBySqlSelect($sql);
+                
                 $subtotal=0;
                 $ivatotal=0;
                 $itemstotal=count($total);
@@ -654,6 +656,12 @@ else
                 $cargosoriginal=$almacen->ObtenerFilasBySqlSelect($sql);
                 if($cargosoriginal==null)
                 { 
+                    $sql="select formato, contador from correlativos";
+                    $actualizarfactura=$almacen->ObtenerFilasBySqlSelect($sql);
+                    $nro_factura4=str_pad(($actualizarfactura[0]['contador']+1), strlen($actualizarfactura[0]['formato']), "0", 0);
+                    //$nro_factura4 = $correlativo[0]['cod_factura'];//$correlativos->getUltimoCorrelativo("cod_factura", 1, "si");
+                    $sql="UPDATE correlativos SET contador = ({$nro_factura4}) WHERE campo = 'cod_factura';";
+                    $almacen->ExecuteTrans($sql);
                     #obtenemos el money actual
                     $money=$almacen->ObtenerFilasBySqlSelect("select money from closedcash_pyme where serial_caja='".impresora_serial."' and fecha_fin is null order by secuencia desc limit 1");
     

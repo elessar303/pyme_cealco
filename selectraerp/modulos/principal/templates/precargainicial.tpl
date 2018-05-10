@@ -79,7 +79,7 @@
                         </tr>
                         <tr class="tb-tit">
                             <td colspan="6">
-                                <a href="../../uploads/Libro1.csv" download="Formato De Subida">
+                                <a href="../../uploads/Formato_De_Subida.csv" download="Formato.csv">
                                 Descargar Formato Archivo
                                 </a>
                             </td>
