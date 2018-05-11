@@ -770,10 +770,7 @@ else
                     $usuario=$login->getUsuario();
                     // cuando existe pedido pendiente
                     $kardexoriginal=$almacen->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
-                    if($kardexoriginal==null)
-                    { 
-                        echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador, factura: ".$cargosoriginal[0]['cod_factura']; exit();
-                    }
+                    
                     $sql="UPDATE
                             `despacho_new`
                         SET
@@ -800,44 +797,49 @@ else
                     {
                         if($total[$ii]!=null)
                         {
-                            $descripcion =  $nombreservicio[$ii];
-                            $detalle_item_instruccion = "
-                            INSERT INTO despacho_new_detalle (
-                            `id_factura`, `id_item`,
-                            `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
-                            `_item_descuento`, `_item_montodescuento`, `_item_piva`,
-                            `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
-                            `fecha_creacion`, `_item_almacen`
-                            )
-                            VALUES (
-                            '".$cargosoriginal[0]['id_factura'] ."', '{$idservicios[$ii]}',
-                            '{$descripcion}', '1', '{$base[$ii]}',
-                            0, 0, '{$iva[$ii]}',
-                            '{$base[$ii]}', '{$total[$ii]}', '{$usuario}',
-                            CURRENT_TIMESTAMP, '1'
-                            );";
-                            $almacen->ExecuteTrans($detalle_item_instruccion);
+
+                            if($kardexoriginal!=null)
+                            {
                             
-                            $kardex_almacen_detalle_instruccion = "
-                            INSERT INTO kardex_almacen_detalle (
-                            `id_transaccion_detalle` ,
-                            `id_transaccion` ,
-                            `id_almacen_entrada` ,
-                            `id_almacen_salida` ,
-                            `id_item` ,
-                            `precio` ,
-                            `cantidad`
-                            )
-                            VALUES (
-                            NULL ,
-                            '" . $kardexoriginal[0]['id_transaccion'] . "',
-                            '{$value3['ubicacion']}',
-                            '',
-                            '" . $idservicios[$ii] . "',
-                            '" . $base[$ii] . "',
-                            1
-                            );";
-                            $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                                $descripcion =  $nombreservicio[$ii];
+                                $detalle_item_instruccion = "
+                                INSERT INTO despacho_new_detalle (
+                                `id_factura`, `id_item`,
+                                `_item_descripcion`, `_item_cantidad`, `_item_preciosiniva` ,
+                                `_item_descuento`, `_item_montodescuento`, `_item_piva`,
+                                `_item_totalsiniva`, `_item_totalconiva`, `usuario_creacion` ,
+                                `fecha_creacion`, `_item_almacen`
+                                )
+                                VALUES (
+                                '".$cargosoriginal[0]['id_factura'] ."', '{$idservicios[$ii]}',
+                                '{$descripcion}', '1', '{$base[$ii]}',
+                                0, 0, '{$iva[$ii]}',
+                                '{$base[$ii]}', '{$total[$ii]}', '{$usuario}',
+                                CURRENT_TIMESTAMP, '1'
+                                );";
+                                $almacen->ExecuteTrans($detalle_item_instruccion);
+                                
+                                $kardex_almacen_detalle_instruccion = "
+                                INSERT INTO kardex_almacen_detalle (
+                                `id_transaccion_detalle` ,
+                                `id_transaccion` ,
+                                `id_almacen_entrada` ,
+                                `id_almacen_salida` ,
+                                `id_item` ,
+                                `precio` ,
+                                `cantidad`
+                                )
+                                VALUES (
+                                NULL ,
+                                '" . $kardexoriginal[0]['id_transaccion'] . "',
+                                '{$value3['ubicacion']}',
+                                '',
+                                '" . $idservicios[$ii] . "',
+                                '" . $base[$ii] . "',
+                                1
+                                );";
+                                $almacen->ExecuteTrans($kardex_almacen_detalle_instruccion);
+                            }
                         }
                     }   
                 }
