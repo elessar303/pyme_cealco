@@ -34,7 +34,7 @@ class PDF extends FPDFSelectra {
         if($_GET['item']!=0){
             $filtros.=" AND v.id_item=".$_GET['item']." ";
         }
-        $rs2 = query("select sum(v.cantidad) as total_cantidad, sum(v.peso) as total_peso, i.descripcion1 as nombre_item, v.lote as lote, v.id_proveedor, v.id_ubicacion, v.id_item  FROM vw_existenciabyalmacen v, item i, clientes pro
+        $rs2 = query("select sum(v.cantidad) as total_cantidad, sum(v.peso) as total_peso, i.descripcion1 as nombre_item, v.lote as lote, v.id_proveedor, v.id_ubicacion, v.id_item, count(*) as nro_paleta  FROM vw_existenciabyalmacen v, item i, clientes pro
         where i.id_item=v.id_item 
         AND v.id_proveedor=pro.id_cliente
         AND v.cantidad>0 
@@ -62,8 +62,8 @@ class PDF extends FPDFSelectra {
             $res_fecha=fetch_array($rs_fecha);
 
             //print_r($res_fecha); exit;
-            $peso = number_format($row['total_cantidad'], 2, ',', '.');
-            $cantidad = number_format($row['total_peso'], 2, ',', '.');
+            $peso = number_format($row['total_peso'], 2, ',', '.');
+            $cantidad = number_format($row['total_cantidad'], 0, ',', '.');
             $producto = utf8_decode($row['nombre_item']);
 
             if($res_fecha[0]==''){
@@ -79,13 +79,14 @@ class PDF extends FPDFSelectra {
             }
             $this->Cell(80, 7, $producto, 0, 0, 'L');
             $this->Cell(20, 7, $cantidad,0, 0, 'C');
-            $this->Cell(15, 7, $res_fecha[2]." ".$unidad, 0, 0, 'C');
+            $this->Cell(15, 7, $unidad, 0, 0, 'C');
+            $this->Cell(15, 7, $row['nro_paleta'], 0, 0, 'C');
             $this->Cell(20, 7, $peso,0, 0, 'C');
-            $this->Cell(20, 7, $row['lote'], 0, 0, 'C');
+            $this->Cell(15, 7, $row['lote'], 0, 0, 'C');
             if($res_fecha[0]!=''){
-                $this->Cell(40, 7, date_format($vencimiento, 'd-m-Y'), 0, 1, 'C');
+                $this->Cell(30, 7, date_format($vencimiento, 'd-m-Y'), 0, 1, 'C');
             }else{
-                $this->Cell(40, 7,'Sin Fecha', 0, 1, 'C');
+                $this->Cell(30, 7,'Sin Fecha', 0, 1, 'C');
             }
         }
 
@@ -138,9 +139,10 @@ class PDF extends FPDFSelectra {
         $this->Cell(80, 7, utf8_decode('Producto'), 1, 0, 'C');
         $this->Cell(20, 7, utf8_decode('Cantidad'),1, 0, 'C');
         $this->Cell(15, 7, utf8_decode('UM'), 1, 0, 'C');
+        $this->Cell(15, 7, utf8_decode('Paletas'), 1, 0, 'C');
         $this->Cell(20, 7, utf8_decode('Peso Neto'),1, 0, 'C');
-        $this->Cell(20, 7, 'Lote', 1, 0, 'C');
-        $this->Cell(40, 7, 'Fecha de Vencimiento', 1, 1, 'C');
+        $this->Cell(15, 7, 'Lote', 1, 0, 'C');
+        $this->Cell(30, 7, 'F. de Vencimiento', 1, 1, 'C');
         $this->Ln(1);
     }
 

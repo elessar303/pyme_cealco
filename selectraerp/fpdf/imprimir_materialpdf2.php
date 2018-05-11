@@ -84,7 +84,7 @@ class PDF extends FPDFSelectra {
             $preciociva=$row_rs['precio1']+$row_rs['precio1']*($row_rs['iva']/100);
             $var_codigo = $row_rs['codigo_barras'];
             $var_descrip = utf8_decode($row_rs['descripcion1']);
-            $var_exi = number_format($row_rs['cantidad'], 2, ',', '.');
+            $var_exi = number_format($row_rs['cantidad'], 0, ',', '.');
             $var_peso = number_format($row_rs['peso'], 2, ',', '.');
             $lote = $row_rs['lote'];
             $var_preciosiva = number_format($preciosiva, 2, ',', '.');
