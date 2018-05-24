@@ -11,10 +11,11 @@ class PDF extends FPDFSelectra {
         $this->Cell(20, 7, utf8_decode('Ubicacion'), 1, 0, 'C');
         $this->Cell(30, 7, utf8_decode('Cliente'),1, 0, 'C');
         $this->Cell(15, 7, utf8_decode('Producto'), 1, 0, 'C');
-        $this->Cell(90, 7, utf8_decode('Descripcion'),1, 0, 'C');
+        $this->Cell(75, 7, utf8_decode('Descripcion'),1, 0, 'C');
         $this->Cell(15, 7, 'Cant. PL', 1, 0, 'C');
         $this->Cell(15, 7, 'Peso', 1, 0, 'C');
-        $this->Cell(10, 7, 'Lote', 1, 1, 'C');
+        $this->Cell(10, 7, 'Lote', 1, 0, 'C');
+        $this->Cell(15, 7, 'F. Venc.', 1, 1, 'C');
     }
 
     function imprimir_datos() {
@@ -67,7 +68,7 @@ class PDF extends FPDFSelectra {
         $alma="";
         $ubi="";
         while ($totalwhile >= $contar) {
-            $conexion = conexion();
+            $conexion2 = conexion();
             $row_rs = fetch_array($rs);
             $cont2++;
             //$var_snc=$row_rs[4];           
@@ -80,6 +81,32 @@ class PDF extends FPDFSelectra {
                  $alma=$row_rs['descripcion'];
                  $this->SetTextColor(0,0,0);
             }
+
+            $filtros2="";
+
+            if($_GET['desde']!=''){
+            $filtros2.=" AND vencimiento>='".$_GET['desde']."'";
+            }
+
+            if($_GET['hasta']!=''){
+            $filtros2.=" AND vencimiento<='".$_GET['hasta']."'";
+            }
+
+            $sql="SELECT vencimiento, nombre_unidad, count(*) as numero FROM kardex_almacen_detalle k 
+                LEFT JOIN unidad_empaque ue ON ue.id=k.id_presentacion
+                WHERE k.id_ubi_entrada=".$row_rs['id_ubicacion']." AND k.lote=".$row_rs['lote']." AND k.id_item=".$row_rs['id_item']." ".$filtros2." GROUP BY k.id_ubi_entrada";
+            $rs_fecha= query($sql, $conexion2);
+
+            $res_fecha=fetch_array($rs_fecha);
+            
+
+            if($res_fecha[0]==''){
+                $fecha_vencimiento='Sin Fecha';
+            }else{
+                $vencimiento=date_create($res_fecha[0]);
+                $fecha_vencimiento=date_format($vencimiento, 'd-m-Y');
+            }
+
             $preciosiva=$row_rs['precio1'];
             $preciociva=$row_rs['precio1']+$row_rs['precio1']*($row_rs['iva']/100);
             $var_codigo = $row_rs['codigo_barras'];
@@ -97,16 +124,22 @@ class PDF extends FPDFSelectra {
             $subtotal_dpto += $precio_sub;
             $nombre_proveedor=utf8_decode($row_rs['nombre_proveedor']);
             $ubicacion=utf8_decode($row_rs['ubicacion']);
+            
             $contador++;
 
             $this->SetFont("Arial", "I", 9);
             // llamado para hacer multilinea sin que haga salto de linea
-            $this->SetWidths(array(20,30, 15,90,15,15, 10));
-            $this->SetAligns(array('C','L', 'L','L','C', 'C', 'C'));
-            $this->Setceldas(array(0,0, 0, 0, 0, 0, 0));
-            $this->Setancho(array(5,5, 5, 5, 5, 5, 5, 5,5,5));
-            $this->Row(array($ubicacion,$nombre_proveedor,$var_codigo,$var_descrip, $var_exi, $var_peso,$lote));
+            $this->SetWidths(array(20,30, 15,70,15,15, 10, 20));
+            $this->SetAligns(array('C','L', 'L','L','C', 'C', 'C', 'C'));
+            $this->Setceldas(array(0,0, 0, 0, 0, 0, 0,0));
+            $this->Setancho(array(5,5, 5, 5, 5, 5, 5, 5,5,5,5));
+            if($_GET['desde']=='' && $_GET['hasta']==''){
+            $this->Row(array($ubicacion,$nombre_proveedor,$var_codigo,$var_descrip, $var_exi, $var_peso,$lote, $fecha_vencimiento));
+            }else if( ($_GET['desde']!='' || $_GET['hasta']!='') && $res_fecha[0]!=''){
+            $this->Row(array($ubicacion,$nombre_proveedor,$var_codigo,$var_descrip, $var_exi, $var_peso,$lote, $fecha_vencimiento));
+            }
             $contar++;
+
 
         }//fin del while
     }
@@ -158,10 +191,11 @@ class PDF extends FPDFSelectra {
         $this->Cell(20, 7, utf8_decode('Ubicacion'), 1, 0, 'C');
         $this->Cell(30, 7, utf8_decode('Cliente'),1, 0, 'C');
         $this->Cell(15, 7, utf8_decode('Producto'), 1, 0, 'C');
-        $this->Cell(90, 7, utf8_decode('Descripcion'),1, 0, 'C');
+        $this->Cell(70, 7, utf8_decode('Descripcion'),1, 0, 'C');
         $this->Cell(15, 7, 'Cant. PL', 1, 0, 'C');
         $this->Cell(15, 7, 'Peso', 1, 0, 'C');
-        $this->Cell(10, 7, 'Lote', 1, 1, 'C');
+        $this->Cell(10, 7, 'Lote', 1, 0, 'C');
+        $this->Cell(20, 7, 'F. Venc.', 1, 1, 'C');
         $this->Ln(1);
     }
 

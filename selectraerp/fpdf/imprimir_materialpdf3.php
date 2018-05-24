@@ -69,7 +69,8 @@ class PDF extends FPDFSelectra {
             $sql="SELECT vencimiento, nombre_unidad, count(*) as numero FROM kardex_almacen_detalle k 
                 LEFT JOIN unidad_empaque ue ON ue.id=k.id_presentacion
                 WHERE k.id_ubi_entrada=".$row['id_ubicacion']." AND k.lote=".$row['lote']." AND k.id_item=".$row['id_item']." ".$filtros2." GROUP BY k.id_ubi_entrada";
-            //echo $sql; exit;
+
+          
             $rs_fecha= query($sql, $conexion2);
 
             $res_fecha=fetch_array($rs_fecha);
