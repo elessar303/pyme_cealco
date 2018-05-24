@@ -1,0 +1,1 @@
+ALTER TABLE `kardex_almacen_detalle` ADD `temperatura` INT NOT NULL DEFAULT '0' AFTER `observacion_limite`;
