@@ -56,14 +56,14 @@
 }
 .label{vertical-align:middle; width:20%; text-align: right; padding-right: 15px; white-space: nowrap;}
 
-#aceptar, input[type="button"], input[type="submit"]{
+#aceptar, input[type="button"], input[type="submit"],input[type="reset"]{
     border-radius: 4px;
     height: 30px;
     float: right;
     cursor: pointer;
     white-space: nowrap;
 }
-#aceptar:focus, #aceptar:hover, input[type="button"]:focus, input[type="button"]:hover, input[type="submit"]:focus, input[type="submit"]:hover{
+#aceptar:focus, #aceptar:hover, input[type="button"]:focus, input[type="button"]:hover, input[type="submit"]:focus, input[type="submit"]:hover,input[type="reset"]:focus, input[type="reset"]:hover{
     border:1px solid #99CCFF;
     /*background-color: buttonhighlight;*/
     background-color: activecaption;

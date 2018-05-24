@@ -188,9 +188,10 @@
                             </td>
                             </tr>                         
                             <tr class="tb-head">
-                                <td colspan="8">
+                                <td colspan="10">
                                     <input type="submit" id="enviarajax" name="aceptar" value="Mostrar"/>
                                     <input type="button" name="cancelar" value="Cancelar" onclick="javascript:document.location.href='?opt_menu={$smarty.get.opt_menu}';" />
+                                    <input type="reset" name="reset" value="Limpiar"/>
                                 </td>
                             </tr>
                         </tbody>

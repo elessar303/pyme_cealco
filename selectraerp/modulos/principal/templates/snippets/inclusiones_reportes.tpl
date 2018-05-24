@@ -34,7 +34,7 @@
                     frame:true
                 });
                 formpanel.render("formulario");
-                $("input[name='aceptar'], input[name='cancelar']").button();//Coloca estilo JQuery
+                $("input[name='aceptar'], input[name='cancelar'], input[name='reset']").button();//Coloca estilo JQuery
                 $("#formato").buttonset();
             });
             function valida_envia(rpt1, rpt2){
