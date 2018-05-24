@@ -197,6 +197,7 @@
                         var pesoempaque = $('#pesoempaque').val();
                         var movimiento = $('#movimiento').val();
                         var ticketestatus = $('#ticketestatus').val();
+                        var temperatura = $('#temperatura').val();
                         if(ticketestatus ==1)
                         {
                             ticket= $.trim($('#ticket').val());
@@ -211,7 +212,7 @@
                             ticket="";
                         }
                         
-                        if(principal=="" || detalle=="" || principal=="0" || detalle=="0" || cantidad=="" || cantidad<1 || peso=="" || peso<1 || pesobruto=="" || pesobruto<1 || pesoestiva=="" || pesoestiva<0 || pesoempaque=="" || pesoempaque<0)
+                        if(principal=="" || detalle=="" || principal=="0" || detalle=="0" || cantidad=="" || cantidad<1 || peso=="" || peso<1 || pesobruto=="" || pesobruto<1 || pesoestiva=="" || pesoestiva<0 || pesoempaque=="" || pesoempaque<0 || temperatura=="")
                         {
                             Ext.Msg.alert("Alerta","Debe llenar todos los campos");
                             return false;
@@ -243,6 +244,7 @@
                         'ticket' : ticket,
                         'cajas' : cajas,
                         'observacion_limite' : observacion_limite,
+                        'temperatura' : temperatura,
                         
                       };
                         $.ajax(
@@ -474,6 +476,14 @@
                         <td style="padding-top:2px; padding-bottom: 2px;">
                             <input type="text" name="peso" placeholder="Peso" size="60" id="peso" class="form-text" readonly="readonly"/>
                             <input type="hidden" name="ticketestatus" id="ticketestatus" value="{$ticket}"  readonly="readonly" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" class="label">
+                            Temperatura**
+                        </td>
+                        <td style="padding-top:2px; padding-bottom: 2px;">
+                            <input type="number" name="temperatura" placeholder="Temperatura" size="60" id="temperatura" class="form-text"/> &deg;C
                         </td>
                     </tr>
                     {if $ticket eq 1}

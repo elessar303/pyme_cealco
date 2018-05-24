@@ -185,6 +185,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
         $this->Cell(20,$width,'Codigo',1,0,"C",0);
         $this->Cell(90,$width,utf8_decode('Descripción'),1,0,"C",0);
         $this->Cell(20,$width,utf8_decode('Etiqueta'),1,0,"C",0);
+        $this->Cell(15,$width,utf8_decode('Temp. °C'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Cantidad'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Peso'),1,0,"C",0);
         $this->Cell(18,$width,utf8_decode('Toneladas'),1,0,"C",0);
@@ -224,9 +225,9 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
 
     function ChapterBody() {
 
-        $this->SetWidths(array(10,20,90,20,18,18,18,18,18,18));
-        $this->SetAligns(array("C","J","C","C","C","C","C","C","C"));
-        $this->SetFillColor(232,232,232,232,232,232,232,232,232);
+        $this->SetWidths(array(10,20,90,20,15,18,18,18,18,18,18));
+        $this->SetAligns(array("C","J","C","C","C","C","C","C","C","C"));
+        $this->SetFillColor(232,232,232,232,232,232,232,232,232,232);
 
         $subtotal = 0;
         $total_ton=0;
@@ -271,6 +272,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
                     $value["codigo_barras"],
                     $value["descripcion1"],
                     $value["etiqueta"],
+                    $value["temperatura"],
                     $value["cantidad_item"],
                     number_format($value["peso"], 2, '.', ' ')."Kg",
                     number_format(($value["peso"])/1000, 2, '.', ' '),
@@ -289,7 +291,7 @@ if( $this->array_movimiento[0]["tipo_movimiento_almacen"]==3 || $this->array_mov
 
         }
         $this->SetX(14);
-        $this->Cell(140,$width,utf8_decode('TOTALES'),1,0,"C",0);
+        $this->Cell(155,$width,utf8_decode('TOTALES'),1,0,"C",0);
         $this->Cell(18,$width,number_format($total_cantidad, 2, '.', ' '),1,0,"C",0);
         $this->Cell(18,$width,number_format($total_peso, 2, '.', ' ')."Kg",1,0,"C",0);
         $this->Cell(18,$width,number_format($total_ton, 2, '.', ' '),1,0,"C",0);
