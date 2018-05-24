@@ -53,6 +53,36 @@
                     allowClear: true
                 });
 
+                 $("#fecha").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    showOtherMonths:true,
+                    selectOtherMonths: true,
+                    //numberOfMonths: 1,
+                    //yearRange: "-100:+100",
+                    dateFormat: "yy-mm-dd",
+                    //timeFormat: 'HH:mm:ss',
+                    showOn: "both",//button,
+                    onClose: function( selectedDate ) {
+                        //$( "#fecha2" ).datepicker( "option", "minDate", selectedDate );
+                        $( "#fecha2" ).datepicker("option", "minDate", selectedDate);
+                    }
+                });
+                $("#fecha2").datepicker({
+                    changeMonth: true,
+                    changeYear: true,
+                    showOtherMonths:true,
+                    selectOtherMonths: true,
+                    //numberOfMonths: 1,
+                    //yearRange: "-100:+100",
+                    dateFormat: "yy-mm-dd",
+                    //timeFormat: 'HH:mm:ss',
+                    showOn: "both",//button,
+                    onClose: function( selectedDate ) {
+                        $( "#fecha" ).datepicker( "option", "maxDate", selectedDate );
+                    }
+                });
+
                 function cargarUbicaciones() {
                     idAlmacen=$("#almacen_entrada").val();     
                     if(idAlmacen!=0)
@@ -86,7 +116,7 @@
                 });
     </script>
     {/literal}
-    <script type="text/javascript" src="../../../includes/js/jquery-ui-1.10.0/js/jquery-1.9.0.js"></script>
+    
     <link href="../../libs/js/select2/dist/css/select2.min.css" rel="stylesheet" />
     <script src="../../libs/js/select2/dist/js/select2.min.js"></script>
         
@@ -144,6 +174,18 @@
                                         {html_options output=$option_output_producto values=$option_values_producto selected=$item}
                                     </select>
                                 </td>
+                            </tr>
+                            <tr>
+                            <td class="label">Fecha de Vencimiento: </td>
+
+                            <td class="label">Desde: </td>
+                            <td style="padding-top:2px; padding-bottom: 2px;" colspan="2">
+                                <input type="text" name="fecha" id="fecha" size="20" value='' readonly class="form-text" />
+                            </td>
+                            <td class="label">Hasta: </td>
+                            <td style="padding-top:2px; padding-bottom: 2px;" colspan="2">
+                                <input type="text" name="fecha2" id="fecha2" size="20" value='' readonly class="form-text" />
+                            </td>
                             </tr>                         
                             <tr class="tb-head">
                                 <td colspan="8">

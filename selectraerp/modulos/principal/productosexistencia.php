@@ -63,11 +63,13 @@ if(isset($_POST['aceptar'])){
     $ubicacion=$_POST['ubicacion'];
     $cliente=$_POST['cliente'];
     $item=$_POST['item'];
+    $desde=$_POST['fecha'];
+    $hasta=$_POST['fecha2'];
     echo '
     <script type="text/javascript">
-    window.open("../../fpdf/imprimir_materialpdf2.php?almacen='.$almacen.'&ubicacion='.$ubicacion.'&cliente='.$cliente.'&item='.$item.'");
+    window.open("../../fpdf/imprimir_materialpdf2.php?almacen='.$almacen.'&ubicacion='.$ubicacion.'&cliente='.$cliente.'&item='.$item.'&desde='.$desde.'&hasta='.$hasta.'");
     location.href="?opt_menu=7&opt_seccion=126";
-    window.open("../../fpdf/imprimir_materialpdf3.php?almacen='.$almacen.'&ubicacion='.$ubicacion.'&cliente='.$cliente.'&item='.$item.'");
+    window.open("../../fpdf/imprimir_materialpdf3.php?almacen='.$almacen.'&ubicacion='.$ubicacion.'&cliente='.$cliente.'&item='.$item.'&desde='.$desde.'&hasta='.$hasta.'");
     location.href="?opt_menu=7&opt_seccion=126";
 </script>';
 }

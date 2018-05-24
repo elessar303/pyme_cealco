@@ -54,9 +54,22 @@ class PDF extends FPDFSelectra {
         while($row = fetch_array($rs2)){
 
             $conexion2 = conexion();
+
+            $filtros2="";
+
+            if($_GET['desde']!=''){
+            $filtros2.=" AND vencimiento>='".$_GET['desde']."'";
+            }
+
+            if($_GET['hasta']!=''){
+            $filtros2.=" AND vencimiento<='".$_GET['hasta']."'";
+            }
+
+
             $sql="SELECT vencimiento, nombre_unidad, count(*) as numero FROM kardex_almacen_detalle k 
                 LEFT JOIN unidad_empaque ue ON ue.id=k.id_presentacion
-                WHERE k.id_ubi_entrada=".$row['id_ubicacion']." AND k.lote=".$row['lote']." AND k.id_item=".$row['id_item']." GROUP BY k.id_ubi_entrada";
+                WHERE k.id_ubi_entrada=".$row['id_ubicacion']." AND k.lote=".$row['lote']." AND k.id_item=".$row['id_item']." ".$filtros2." GROUP BY k.id_ubi_entrada";
+            //echo $sql; exit;
             $rs_fecha= query($sql, $conexion2);
 
             $res_fecha=fetch_array($rs_fecha);
@@ -77,16 +90,31 @@ class PDF extends FPDFSelectra {
             }else{
                 $unidad=utf8_decode($res_fecha[1]);
             }
-            $this->Cell(80, 7, $producto, 0, 0, 'L');
-            $this->Cell(20, 7, $cantidad,0, 0, 'C');
-            $this->Cell(15, 7, $unidad, 0, 0, 'C');
-            $this->Cell(15, 7, $row['nro_paleta'], 0, 0, 'C');
-            $this->Cell(20, 7, $peso,0, 0, 'C');
-            $this->Cell(15, 7, $row['lote'], 0, 0, 'C');
-            if($res_fecha[0]!=''){
-                $this->Cell(30, 7, date_format($vencimiento, 'd-m-Y'), 0, 1, 'C');
-            }else{
-                $this->Cell(30, 7,'Sin Fecha', 0, 1, 'C');
+
+            if( ($_GET['desde']!='' || $_GET['hasta']!='') && $res_fecha[0]!=''){
+                $this->Cell(80, 7, $producto, 0, 0, 'L');
+                $this->Cell(20, 7, $cantidad,0, 0, 'C');
+                $this->Cell(15, 7, $unidad, 0, 0, 'C');
+                $this->Cell(15, 7, $row['nro_paleta'], 0, 0, 'C');
+                $this->Cell(20, 7, $peso,0, 0, 'C');
+                $this->Cell(15, 7, $row['lote'], 0, 0, 'C');
+                if($res_fecha[0]!=''){
+                    $this->Cell(30, 7, date_format($vencimiento, 'd-m-Y'), 0, 1, 'C');
+                }else{
+                    $this->Cell(30, 7,'Sin Fecha', 0, 1, 'C');
+                }
+            }else if($_GET['desde']=='' && $_GET['hasta']==''){
+                $this->Cell(80, 7, $producto, 0, 0, 'L');
+                $this->Cell(20, 7, $cantidad,0, 0, 'C');
+                $this->Cell(15, 7, $unidad, 0, 0, 'C');
+                $this->Cell(15, 7, $row['nro_paleta'], 0, 0, 'C');
+                $this->Cell(20, 7, $peso,0, 0, 'C');
+                $this->Cell(15, 7, $row['lote'], 0, 0, 'C');
+                if($res_fecha[0]!=''){
+                    $this->Cell(30, 7, date_format($vencimiento, 'd-m-Y'), 0, 1, 'C');
+                }else{
+                    $this->Cell(30, 7,'Sin Fecha', 0, 1, 'C');
+                }
             }
         }
 
