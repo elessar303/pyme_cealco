@@ -191,22 +191,16 @@ function solonumeros(evt)
                 </th>
             </tr>
             <tr align="center">
-                <th colspan="3"  style= "text-align: center;">
-                    <b><h3>Destino</h3></b>
-                </th>
+                
                 <th colspan="3" style= "text-align: center;">
                     <b><h3>Origen</h3></b>
                 </th>
+                <th colspan="3"  style= "text-align: center;">
+                    <b><h3>Destino</h3></b>
+                </th>
             </tr>
             <tr>
-                <td>
-                    <span style="font-family:'Verdana';"><b>Almacen Destino:</b></span>
-                </td>
-                <td colspan="2" align="center">
-                    <select name="almacen_entrada" id="almacen_entrada" class="form-text">
-                        {html_options output=$option_output_almacen values=$option_values_almacen}
-                    </select>
-                </td>
+                
                 <td>
                     <span style="font-family:'Verdana';"><b>Almacen Origen:</b></span>
                 </td>
@@ -215,21 +209,30 @@ function solonumeros(evt)
                         
                     </select>
                 </td>
+                <td>
+                    <span style="font-family:'Verdana';"><b>Almacen Destino:</b></span>
+                </td>
+                <td colspan="2" align="center">
+                    <select name="almacen_entrada" id="almacen_entrada" class="form-text">
+                        {html_options output=$option_output_almacen values=$option_values_almacen}
+                    </select>
+                </td>
             </tr>
             <tr>
+                
+                <td>
+                    <span style="font-family:'Verdana';"><b>Ubicacion Origen:</b></span>
+                </td>
+                <td colspan="2">
+                    <select name="ubicacion_salida" id="ubicacion_salida" class="form-text">
+                    </select>
+                </td>
                 <td>
                     <span style="font-family:'Verdana';"><b>Ubicacion Destino:</b></span>
                 </td>
                 
                 <td colspan="2" align="center">
                     <select name="ubicacion_entrada" id="ubicacion_entrada" class="form-text">
-                    </select>
-                </td>
-                <td>
-                    <span style="font-family:'Verdana';"><b>Ubicacion Origen:</b></span>
-                </td>
-                <td colspan="2">
-                    <select name="ubicacion_salida" id="ubicacion_salida" class="form-text">
                     </select>
                 </td>
             </tr>

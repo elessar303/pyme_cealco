@@ -13,7 +13,7 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
         $des = $_POST['buscar'];
         $busqueda = $_POST['busqueda'];
     }
-    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN conductores AS c ON k.id_conductor = c.id_conductor";
+    $join = "as k inner join tipo_movimiento_almacen as t on k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen LEFT JOIN conductores AS c ON k.id_conductor = c.id_conductor LEFT JOIN clientes AS cli ON k.id_cliente = cli.id_cliente";
     switch ($tipob) {
         case "exacta":
             $instruccion = $comunes->buscar_exacta_join($tabla, $des, $busqueda, $join, $orden);
@@ -31,6 +31,7 @@ if (isset($_POST['buscar']) || $tipob != NULL) {
     $instruccion = "SELECT * FROM $tabla AS k 
     INNER JOIN tipo_movimiento_almacen AS t 
     ON k.tipo_movimiento_almacen=t.id_tipo_movimiento_almacen 
+    LEFT JOIN clientes AS cli ON k.id_cliente = cli.id_cliente
     WHERE operacion = '-'
     AND t.id_tipo_movimiento_almacen<7
     order by id_transaccion desc";
@@ -41,7 +42,7 @@ $pagina = $comunes->obtener_pagina_actual($pagina, $num_paginas);
 $campos = $comunes->paginacion($pagina, $instruccion);
 
 $smarty->assign("registros", $campos);
-$smarty->assign("cabecera", array("Transacci&oacute;n", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n"));
+$smarty->assign("cabecera", array("Transacci&oacute;n", "Cliente", "Fecha", "Autorizado Por", "Tipo de Movimiento", "Descripci&oacute;n"));
 $smarty->assign("limitePaginacion", $comunes->LimitePaginaciones);
 $smarty->assign("num_paginas", $num_paginas);
 $smarty->assign("pagina", $pagina);

@@ -32,7 +32,7 @@ $arraySelectOption = "";
 $arraySelectoutPut = "";
 
 
-$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes order by nombre");
+$campos_comunes= $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes inner join item_existencia_almacen as b on clientes.id_cliente=b.id_proveedor group by clientes.nombre ORDER BY clientes.nombre");
 foreach ($campos_comunes as $key => $item) {
     $arraySelectOption[] = $item["id_cliente"];
     $nombre_proveedor=$item["cod_cliente"]."-".$item["nombre"];

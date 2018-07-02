@@ -35,7 +35,8 @@ $smarty->assign("option_values_almacen", $valueSELECT);
 $smarty->assign("option_output_almacen", $outputSELECT);
 
 
-$datos_almacen = $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes ORDER BY nombre");
+$datos_almacen = $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes inner join item_existencia_almacen as b on clientes.id_cliente=b.id_proveedor group by clientes.nombre ORDER BY clientes.nombre");
+
 $valueSELECT = "";
 $outputSELECT = "";
 foreach ($datos_almacen as $key => $item) {
