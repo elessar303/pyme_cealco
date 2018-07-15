@@ -1,0 +1,9 @@
+INSERT INTO `modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES (NULL, '225', 'Pre - Despacho Productos', 'calidad_salida.php', 'calidad_salida.tpl', '2', '../../libs/imagenes/113.png', '1');
+
+ALTER TABLE `subseccion` ADD `id_subseccion` INT NOT NULL AUTO_INCREMENT FIRST, ADD PRIMARY KEY (`id_subseccion`);
+
+INSERT INTO `subseccion` (`id_subseccion`, `opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES (NULL, 'add', 'calidad_salida_add.tpl', 'calidad_salida_add.php', '282', 'Agregar Nuevos Despachos De Productos');
+
+UPDATE `modulos` SET `nom_menu` = 'Pre - Movimientos' WHERE `modulos`.`cod_modulo` = 225;
+
+ALTER TABLE `kardex_almacen` ADD `id_predespacho` INT NOT NULL COMMENT 'Referencia al id en calidad_almacen' AFTER `cierre_entrada`;
