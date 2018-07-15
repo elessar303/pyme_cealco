@@ -22,6 +22,52 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
 
     switch ($opt) {
 
+        case "getPredespacho":
+            $sql="SELECT * FROM calidad_almacen WHERE id_transaccion=".$_GET['predespacho']."";
+            $campos=$conn->ObtenerFilasBySqlSelect($sql);
+            echo json_encode($campos);
+        break;
+
+        case "getPredespachoDetalle":
+
+        $sql="SELECT cod_acta_calidad FROM calidad_almacen WHERE id_transaccion=".$_GET['predespacho']."";
+        $campos_cabecera=$conn->ObtenerFilasBySqlSelect($sql);
+
+
+        $sql="SELECT a.cantidad, b.codigo_barras, b.descripcion1 FROM calidad_almacen_detalle a 
+        LEFT JOIN item b ON a.id_item=b.id_item
+        WHERE id_transaccion=".$_GET['predespacho']."";
+        $campos=$conn->ObtenerFilasBySqlSelect($sql);
+        echo '
+        <table>
+        <thead>
+        <tr><th style="font-weight: bold; text-align: center;" colspan="3">Datos del Predespacho: '.$campos_cabecera[0]["cod_acta_calidad"].'</th></tr>
+        <tr>
+        <th style="width:200px; font-weight: bold; text-align: center;">Item</th>
+        <th style="width:200px; font-weight: bold; text-align: center;">Codigo de Barras </th>
+        <th style="width:110px; font-weight: bold; text-align: center;">Cantidad</th>
+        </tr>
+        </thead>
+        <tbody>
+        ';
+        $total=0;
+        foreach ($campos as $key => $item) {
+            echo '
+            <tr>
+            <td style="width:200px; text-align: center;">' . $item["descripcion1"] . '</td>
+            <td style="width:200px; text-align: center;">' . $item["codigo_barras"] . '</td>
+            <td style="width:150px; text-align: center;">' . $item["cantidad"] . '</td>
+            </tr>';
+            $total=$total+$item["cantidad"];
+        }
+
+        echo '
+        <tr>
+        <td colspan="2" style="width:200px; text-align: right;"> <b>Total:</b> </td>
+        <td style="width:110px; text-align: center;">' . number_format($total,2,'.', ''). '</td>
+        </tbody></table>';
+        break;
+
         case "EntradaTunelNuevaAlmacen":
             //buscamos los datos básicos en calidad y a su vez nos aseguramos  que no se ha registrado en kardex almacen
             $sql=

@@ -34,6 +34,17 @@ foreach ($datos_almacen as $key => $item) {
 $smarty->assign("option_values_almacen", $valueSELECT);
 $smarty->assign("option_output_almacen", $outputSELECT);
 
+//Seleccionando los pre despachos sin salidad asociadas
+$datos_despachos = $almacen->ObtenerFilasBySqlSelect("SELECT a.id_transaccion, a.cod_acta_calidad,b.nombre FROM calidad_almacen a, clientes b WHERE a.id_proveedor=b.id_cliente AND a.tipo_acta=2 AND a.id_transaccion NOT IN (SELECT id_predespacho FROM kardex_almacen GROUP BY id_predespacho)");
+$valueSELECT2 = "";
+$outputSELECT2 = "";
+foreach ($datos_despachos as $key => $item) {
+    $valueSELECT2[] = $item["id_transaccion"];
+    $outputSELECT2[] = $item["cod_acta_calidad"]." - ".$item["nombre"];
+}
+$smarty->assign("option_values_despachos", $valueSELECT2);
+$smarty->assign("option_output_despachos", $outputSELECT2);
+
 
 $datos_almacen = $almacen->ObtenerFilasBySqlSelect("SELECT * FROM clientes inner join item_existencia_almacen as b on clientes.id_cliente=b.id_proveedor group by clientes.nombre ORDER BY clientes.nombre");
 

@@ -28,6 +28,13 @@ $(document).ready(function() {
     });
     $('tr.detalle').click(function() {
         objeto = $(this);
+        //si se le da click al mismo objeto se debe quitar el detalle
+        if(objeto.next().hasClass('detalle_items'))
+        {
+            objeto.parents("tbody").find(".detalle_items").remove();
+             objeto.parents("tbody").find(".boton_detalle").attr("src", "../../libs/imagenes/drop-add.gif");
+            return;
+        }
         //Deseleccionamos cualquier fila cambiandole el color del tr
         objeto.parents("tbody").find(".detalle").attr("bgcolor", "#ececec");
         //Seleccionamos la fila a la cual se dio click para conocer detalles

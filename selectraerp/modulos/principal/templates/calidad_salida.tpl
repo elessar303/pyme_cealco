@@ -42,7 +42,7 @@ Objetivos:
                                     <td style="text-align: right; padding-right: 20px;">{$campos.cod_acta_calidad}</td>
                                     <td style="text-align:center;">{$campos.fecha|date_format:"%d-%m-%Y"}</td>
                                     <td style="padding-left: 20px;">{$campos.autorizado_por}</td>
-                                    <td style="padding-left: 20px;">Pre Entrada</td>
+                                    <td style="padding-left: 20px;">Pre Despacho</td>
                                     <td style="padding-left: 20px;">{$campos.observacion}</td>
                                     <td style="padding-left: 20px;">{$campos.nombre}</td>
                                     <td style="padding-left: 20px;">{$campos.nombres} {$campos.apellidos}</td>
