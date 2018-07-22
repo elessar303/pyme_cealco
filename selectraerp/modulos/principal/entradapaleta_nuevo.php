@@ -220,7 +220,36 @@ $smarty->assign("option_values_ubicacion_principal", $arraySelectOption);
 $smarty->assign("option_output_ubicacion_principal", $arraySelectOutPut);
 $arraySelectOption="";
 $arraySelectOutPut="";
+//buscando al cliente
+$sql=
+    "   
+        select a.id_proveedor from
+        calidad_almacen as a
+        inner join calidad_almacen_detalle as b on a.id_transaccion=b.id_transaccion
+        where b.id_transaccion_detalle=".$id_transaccion."
+    ";
+$cliente=$usuarios->ObtenerFilasBySqlSelect($sql);
+$smarty->assign("cliente", $cliente[0]['id_proveedor']);
+$sql="select a.cod_almacen, a.descripcion from almacen as a inner join ubicacion as b on a.cod_almacen=b.id_almacen inner join disposicion as c on  b.id=c.idubicacion where c.idcliente=".$cliente[0]['id_proveedor']." group by a.cod_almacen";
 
+$almacenes= $usuarios->ObtenerFilasBySqlSelect($sql);
+foreach ($almacenes as $key => $item) 
+{
+    $arraySelectOption[] = $item["cod_almacen"];
+    $arraySelectOutPut[] = $item["descripcion"];
+}
+if($almacenes!=null)
+{
+    $smarty->assign("verdisponible", 1);
+}
+else
+{
+    $smarty->assign("verdisponible", 0);
+}
+$smarty->assign("option_values_ubicacion_principal_disponible", $arraySelectOption);
+$smarty->assign("option_output_ubicacion_principal_disponible", $arraySelectOutPut);
+$arraySelectOption="";
+$arraySelectOutPut="";
 $arraySelectOption_tipo=array(0,1);
 $arraySelectOutPut_tipo=array('PYME','POS');
 

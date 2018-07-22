@@ -621,6 +621,19 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                  echo json_encode($campos);
              }
         break;
+        
+        case "cargaUbicacion4":
+            $almacen=$_POST["idAlmacen"];
+            $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado=0" );
+             if (count($campos) == 0) 
+             {
+                 echo "[{id:'-1'}]";
+             } 
+             else 
+             {
+                 echo json_encode($campos);
+             }
+        break;
 
         case "cargaUbicacionsalidasTraslado":
             $almacen=$_POST["idAlmacen"];
@@ -884,13 +897,16 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     inner join calidad_almacen_detalle as b on a.id_transaccion_calidad=b.id_transaccion
                     where b.id_transaccion_detalle=".$_POST['id_movimiento']." and a.tipo_movimiento_almacen=3";
                 $maestro=$conn->ObtenerFilasBySqlSelect($sql);
+                
                 if($maestro==null)
                 {
+                    
                     //error
                     echo "-1"; exit();
                 }
                 else
                 {
+                    
                     $datospadre=$maestro;
                     $conn->BeginTrans();
                     //Se consulta el precio actual para dejar el historico en kardex (Junior)
@@ -918,7 +934,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     //bloqueando las ubicaciones
                     $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
                     $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
-                    if($ocupado[0]['ocupado']==0)
+                    if($ocupado[0]['ocupado']==0 || $ocupado[0]['ocupado']==2)
                     {
                         $sql=
                         "
@@ -929,7 +945,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                     {
                         echo "-1"; exit();
                     }
-        
+                    
                     $sql=
                     "
                         SELECT * FROM item_existencia_almacen WHERE
@@ -1021,7 +1037,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 //bloqueando las ubicaciones
                 $sql="select ocupado from ubicacion where id=".$_POST['ubicacion_detalle'];
                 $ocupado=$conn->ObtenerFilasBySqlSelect($sql);
-                if($ocupado[0]['ocupado']==0)
+                if($ocupado[0]['ocupado']==0 || $ocupado[0]['ocupado']==2)
                 {
                     $sql=
                     "
@@ -1136,20 +1152,24 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             }
             
             //fin del cobro de movimiento, ahora se cobra la ubicacion
-            $sql="select id_servicio from ubicacion_servicio where id_ubicacion=".$_POST['ubicacion_detalle'];
-            $buscarserviciosubicacion=$conn->ObtenerFilasBySqlSelect($sql);
-            foreach($buscarserviciosubicacion as $key => $servicios)
+            if($_POST['disposicion']==0)
             {
-                $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
-                $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
-                $iva[$contador] = $contarservicio[0]['iva'];
-                $base[$contador] = $contarservicio[0][$precio];
-                $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
-                $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
-                $idservicios[$contador]= $contarservicio[0]['id_item'];
-                $codservicio[$contador]= $contarservicio[0]['cod_item'];
-                $contador++;
+                $sql="select id_servicio from ubicacion_servicio where id_ubicacion=".$_POST['ubicacion_detalle'];
+                $buscarserviciosubicacion=$conn->ObtenerFilasBySqlSelect($sql);
+                foreach($buscarserviciosubicacion as $key => $servicios)
+                {
+                    $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                    $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
+                    $iva[$contador] = $contarservicio[0]['iva'];
+                    $base[$contador] = $contarservicio[0][$precio];
+                    $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
+                    $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                    $idservicios[$contador]= $contarservicio[0]['id_item'];
+                    $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                    $contador++;
+                }
             }
+            
             //ahora a realizar el cobro del seguro******
             $sql="select id_item, cod_item, iva, descripcion1 from item where precio1=-1";
             $contarservicio=$conn->ObtenerFilasBySqlSelect($sql);
@@ -1409,6 +1429,57 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
                 foreach ($campos as $filas)
                 {
                 ?>
+                    <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
+    
+                <?php 
+                }
+            }
+        break;
+        case "cargaUbicacionNuevodestino":
+           $almacen=$_POST["idUbicacion"];
+           $cliente=$_POST['cliente'];
+           $fecha=date("Y-m-d");
+           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=2 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+           $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            if (count($campos) == 0) 
+            {
+                echo "[{band:'-1'}]";
+            } 
+            else 
+            {
+                ?>
+                <option value='0'>Seleccione...</option>
+                <?php
+                foreach ($campos as $filas)
+                {
+                ?>
+                    
+                    
+                    <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
+    
+                <?php 
+                }
+            }
+        break;
+        case "cargaUbicacionNuevod":
+           $almacen=$_POST["idUbicacion"];
+           $cliente=$_POST['cliente'];
+           $fecha=date("Y-m-d");
+           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=1 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+           $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            if (count($campos) == 0) 
+            {
+                echo "[{band:'-1'}]";
+            } 
+            else 
+            {
+                ?>
+                <option value='0'>Seleccione...</option>
+                <?php
+                foreach ($campos as $filas)
+                {
+                ?>
+                    
                     <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
     
                 <?php 
@@ -7120,6 +7191,41 @@ WHERE vw_cxc.cod_edocuenta = " . $_GET["cod_edocuenta"]);
                 echo json_encode($campos);
             }
             break;
+        case "getAlmacend":
+            if(isset($_GET['cliente']) && $_GET['cliente']!=null)
+            {
+                $fecha=date('Y-m-d');
+                $sql="select a.cod_almacen, a.descripcion from almacen as a inner join ubicacion as b on a.cod_almacen=b.id_almacen inner join disposicion as c on  b.id=c.idubicacion where c.idcliente=".$_GET['cliente']." and b.ocupado=1 and c.fecha_fin>='".$fecha."' group by a.cod_almacen";
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+            
+            if (count($campos) == 0) 
+            {
+                echo "[{id:'-1'}]";
+            } 
+            else 
+            {
+                echo json_encode($campos);
+            }
+        break;
+        
+        case "getAlmacendestino":
+            if(isset($_GET['cliente']) && $_GET['cliente']!=null)
+            {
+                $fecha=date('Y-m-d');
+                $sql="select a.cod_almacen, a.descripcion from almacen as a inner join ubicacion as b on a.cod_almacen=b.id_almacen inner join disposicion as c on  b.id=c.idubicacion where c.idcliente=".$_GET['cliente']." and b.ocupado=2 and c.fecha_fin>='".$fecha."' group by a.cod_almacen";
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            }
+            
+            if (count($campos) == 0) 
+            {
+                echo "[{id:'-1'}]";
+            } 
+            else 
+            {
+                echo json_encode($campos);
+            }
+        break;
 
             case "gettipo_uso":
 
@@ -8142,8 +8248,8 @@ order by mb.cod_movimiento_ban";
             case "cargaUbicacionCliente":
                        $almacen=$_POST["idAlmacen"];
                        $cliente=$_POST["cliente"];
-                       $sql="SELECT a.* FROM ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion 
-                        WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."' ";
+                       $sql="SELECT a.* FROM ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion
+                        WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."'";
                         //echo $sql; exit();
                        $campos = $conn->ObtenerFilasBySqlSelect($sql);
                         if (count($campos) == 0) {
@@ -8151,6 +8257,25 @@ order by mb.cod_movimiento_ban";
                         } else {
                             echo json_encode($campos);
                         }
+            break;
+            
+            //como no se si otro lugar usa el disposicion cliente creo un nuevo case
+            case "cargaUbicacionClienteDisposicion":
+                $almacen=$_POST["idAlmacen"];
+                $cliente=$_POST["cliente"];
+                $fecha=date('Y-m-d');
+                $sql="SELECT a.* FROM ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion
+                WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."' and a.id not in (SELECT c.id FROM ubicacion as c inner join disposicion as d on c.id=d.idubicacion WHERE c.id_almacen='".$almacen."' and c.descripcion<>'PISO DE VENTA' and c.ocupado=1 and d.idcliente=".$cliente." and d.fecha_fin>='".$fecha."')";
+                //echo $sql; exit();
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                if (count($campos) == 0) 
+                {
+                    echo "[{band:'-1'}]";
+                } 
+                else 
+                {
+                    echo json_encode($campos);
+                }
             break;
             case "cargaUbicacionTraslado":
                        $almacen=$_POST["idAlmacen"];

@@ -127,9 +127,20 @@ Ext.onReady(function()
 
     }
     //walter
-    function traerdatos() {
+    function traerdatos() 
+    {
         codAlmacen = $("select[name='almacen_salida']").val();
-        id = $("#ubicacion_salida").val();
+        if(codAlmacen!=0)
+        {
+            id = $("#ubicacion_salida").val();
+            origen_disponible=0;
+        }
+        else
+        {
+            codAlmacen = $("select[name='almacen_salida_disponible']").val();
+            id = $("#ubicacion_salida_disponible").val();
+            origen_disponible=1;
+        }
         cliente = $("#id_proveedor").val();
         if (id != null && isNaN(id) == false) {
             $.ajax({
@@ -147,8 +158,8 @@ Ext.onReady(function()
                         $("#peso_existente").val(resultado[0].peso);
                         $("#nlote").val(resultado[0].lote);
                         $("#marca").val(resultado[0].marca);
+                        $("#bandera_origen_disponible").val(origen_disponible);
                         cargarproductoitem(resultado[0].id_item);
-
                     }
                 }
             });
@@ -252,6 +263,10 @@ Ext.onReady(function()
         cargarCantidad();
     });
     $("#ubicacion_salida").change(function() {
+        cargarCantidad();
+        traerdatos();
+    });
+    $("#ubicacion_salida_disponible").change(function() {
         cargarCantidad();
         traerdatos();
     });
@@ -416,13 +431,45 @@ Ext.onReady(function()
                         return false;
                     }
 
+                    //incio
+                    id_almacen_entradav= $("#almacen_entrada").val();
+                    //se verifican las entrdas si son por disposicion o por normal
+                    if(id_almacen_entradav!=0 && id_almacen_entradav)
+                    {
+                        id_ubicacion_entradav= $("#ubicacion_entrada").val();
+                        bandera_entrada_disponiblev=0;
+                    }
+                    else
+                    {
+                        id_almacen_entradav=$("#almacen_entrada_disponible").val();
+                        id_ubicacion_entradav= $("#ubicacion_entrada_disponible").val();
+                        bandera_entrada_disponiblev=1;
+                    }
+                    
+                    id_almacen_salidav = $("#almacen_salida").val();
+                    
+                    //se verifican las salidas si son por disposicion o normal
+                    if(id_almacen_salidav!=0 && id_almacen_salidav)
+                    {
+                        id_ubicacion_salidav= $("#ubicacion_salida").val();
+                        bandera_salida_disponiblev=0;
+                    }
+                    else
+                    {
+                        id_almacen_salidav = $("#almacen_salida_disponible").val();
+                        id_ubicacion_salidav= $("#ubicacion_salida_disponible").val();
+                        bandera_salida_disponiblev=1;
+                    }
+                    //fin
                     eventos_form.IncluirRegistros({
                         id_item: $("#items").val(),
                         descripcion: $("#items :selected").text() == "" ? $("#items_descripcion").val() : $("#items :selected").text(),
-                        id_almacen_entrada: $("#almacen_entrada").val(),
-                        id_ubicacion_entrada: $("#ubicacion_entrada").val(),
-                        id_almacen_salida: $("#almacen_salida").val(),
-                        id_ubicacion_salida: $("#ubicacion_salida").val(),
+                        id_almacen_entrada: id_almacen_entradav,
+                        id_ubicacion_entrada: id_ubicacion_entradav,
+                        bandera_entrada_disponible: bandera_entrada_disponiblev,
+                        id_almacen_salida: id_almacen_salidav,
+                        id_ubicacion_salida: id_ubicacion_salidav,
+                        bandera_salida_disponible: bandera_salida_disponiblev,
                         cantidad: $("#cantidadunitaria").val(),
                         peso: $("#peso").val(),
                         marca:  $("#marca").val(),

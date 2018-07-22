@@ -1,0 +1,13 @@
+INSERT INTO `modulos`(`cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES 
+(3,'Disposiciones','disposicion.php','disposicion.tpl',15,'../../libs/imagenes/68.png',1);
+
+INSERT INTO  `pyme_prueba_standar_cealco`.`subseccion` (
+`opt_subseccion` ,
+`archivo_tpl` ,
+`archivo_php` ,
+`cod_seccion` ,
+`descripcion`
+)
+VALUES (
+'add',  'disposicion_add.tpl',  'disposicion_add.php',  '283',  'Agregar Nueva Disposicion'
+);

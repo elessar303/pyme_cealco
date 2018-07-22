@@ -192,9 +192,19 @@ if (isset($_POST["input_cantidad_items"]))
                 and id_proveedor='{$_POST["id_proveedor"]}'"
             );
             //se habilita la ubicacion
-            $almacen->ExecuteTrans("
+            //se verifica si es una disposicion, de ser asi se debe colocar en 2
+            if($_POST["_bandera_salida_disponible"][$i]==1)
+            {
+                $almacen->ExecuteTrans("
+                    update ubicacion set ocupado=2 where id='". $_POST["_ubicacion"][$i] . "'
+                ");    
+            }
+            else
+            {
+                $almacen->ExecuteTrans("
                     update ubicacion set ocupado=0 where id='". $_POST["_ubicacion"][$i] . "'
                 ");
+            }
         }
         //Entrada de Items en almacen seleccionado...
         $campos = $almacen->ObtenerFilasBySqlSelect("
@@ -357,20 +367,24 @@ if (isset($_POST["input_cantidad_items"]))
             }
         }*/
         /**************************************************/
-        //fin del cobro de movimiento, ahora se cobra la ubicacion 
-        $sql="select id_servicio from ubicacion_servicio where id_ubicacion in ('".$_POST['_id_ubicacion_entrada'][$i]."')";
-        $buscarserviciosubicacion=$almacen->ObtenerFilasBySqlSelect($sql);
-        foreach($buscarserviciosubicacion as $key => $servicios)
+        //solo cobro la ubicacion si no esta disponible
+        if($_POST['_bandera_entrada_disponible'][$i]==0)
         {
-            $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
-            $contarservicio=$almacen->ObtenerFilasBySqlSelect($sql);
-            $iva[$contador] = $contarservicio[0]['iva'];
-            $base[$contador] = $contarservicio[0][$precio];
-            $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
-            $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
-            $idservicios[$contador]= $contarservicio[0]['id_item'];
-            $codservicio[$contador]= $contarservicio[0]['cod_item'];
-            $contador++;
+            //fin del cobro de movimiento, ahora se cobra la ubicacion 
+            $sql="select id_servicio from ubicacion_servicio where id_ubicacion in ('".$_POST['_id_ubicacion_entrada'][$i]."')";
+            $buscarserviciosubicacion=$almacen->ObtenerFilasBySqlSelect($sql);
+            foreach($buscarserviciosubicacion as $key => $servicios)
+            {
+                $sql="select id_item, cod_item, precio1, precio2, precio3, iva, descripcion1 from item where id_item=".$servicios['id_servicio'];
+                $contarservicio=$almacen->ObtenerFilasBySqlSelect($sql);
+                $iva[$contador] = $contarservicio[0]['iva'];
+                $base[$contador] = $contarservicio[0][$precio];
+                $total[$contador] = $contarservicio[0][$precio]+(($contarservicio[0][$precio]*$contarservicio[0]['iva']) / 100);
+                $nombreservicio[$contador]= $contarservicio[0]['descripcion1'];
+                $idservicios[$contador]= $contarservicio[0]['id_item'];
+                $codservicio[$contador]= $contarservicio[0]['cod_item'];
+                $contador++;
+            }
         }
         //***********************PEDIDO
         $nro_pedido = $correlativos->getUltimoCorrelativo("cod_pedido", 1, "si");

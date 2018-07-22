@@ -252,9 +252,23 @@ if (isset($_POST["input_cantidad_items"]))
                     delete from item_existencia_almacen where id_item  = '" . $_POST["_id_item"][$i] . "' and cod_almacen = '" . $_POST["_id_almacen"][$i] . "' and id_ubicacion='". $_POST["_ubicacion"][$i] . "' and lote='" . $_POST["_nlote"][$i] . "' and id_marca='" . $_POST["_marca"][$i] . "'"
                 );
                 //se habilita la ubicacion
-                $almacen->ExecuteTrans("
+                //se verifica si es una disposicion, de ser asi se debe colocar en 2
+                $fechaactual=date('Y-m-d 00:00:00');
+                $sql="select a.id from disposicion as a  where a.idubicacion=".$_POST["_ubicacion"][$i]." and a.fecha_fin>='".$fechaactual."'";
+                $resultado=$almacen->ObtenerFilasBySqlSelect($sql);
+                if($resultado!=null)
+                {
+                    $almacen->ExecuteTrans("
+                        update ubicacion set ocupado=2 where id='". $_POST["_ubicacion"][$i] . "'
+                    ");    
+                }
+                else
+                {
+                    $almacen->ExecuteTrans("
                         update ubicacion set ocupado=0 where id='". $_POST["_ubicacion"][$i] . "'
                     ");
+                }
+                
             }
             //se comienza a cobrar
             

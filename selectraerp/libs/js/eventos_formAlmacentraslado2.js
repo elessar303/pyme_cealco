@@ -106,7 +106,7 @@ var eventos_form = {
             data: 'opt=DetalleSelectitem&v1=' + options.id_item,
             url: '../../libs/php/ajax/ajax.php',
             success: function(data) {
-                if(options.id_ubicacion_entrada=="")
+                if(options.id_ubicacion_entrada=="" || options.id_ubicacion_entrada==0 || options.id_ubicacion_entrada==null)
                 {
                     alert('La ubicación de Entrada no existe');
                     return false;
@@ -140,6 +140,8 @@ var eventos_form = {
                 campos += $.inputHidden("_id_item", options.id_item, "[]");
                 campos += $.inputHidden("_id_almacen_entrada", options.id_almacen_entrada, "[]");
                 campos += $.inputHidden("_id_ubicacion_entrada", options.id_ubicacion_entrada, "[]");
+                campos += $.inputHidden("_bandera_entrada_disponible", options.bandera_entrada_disponible, "[]");
+                campos += $.inputHidden("_bandera_salida_disponible", options.bandera_salida_disponible, "[]");
                 campos += $.inputHidden("_id_almacen_salida", options.id_almacen_salida, "[]");
                 campos += $.inputHidden("_id_ubicacion_salida", options.id_ubicacion_salida, "[]");
                 campos += $.inputHidden("_cantidad", options.cantidad, "[]");

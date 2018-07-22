@@ -1,7 +1,7 @@
-
-
 <script type="text/javascript" src="../../libs/js/buscar_productos_servicio_factura_rapida_entrada.js"></script>
-<link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" /> {literal}
+
+<link type="text/css" rel="stylesheet" href="../../../includes/css/estilos_basicos.css" /> 
+{literal}
 <script>
 $(document).ready(function() {
     function cargarUbicaciones() {
@@ -19,11 +19,13 @@ $(document).ready(function() {
                 this.vcampos = eval(data);
                 $("#ubicacion_entrada").append("<option value=''>Seleccione..</option>");
                 for (i = 0; i <= this.vcampos.length; i++) {
-                    $("#ubicacion_entrada").append("<option value='" + this.vcampos[i].id + "'>" + this.vcampos[i].descripcion + "</option>");
+                    $("#ubicacion_entrada").append("<option value='" + this.vcampos[i].id + "'>" + this.vcampos[i].descripcion +  ' - ' + this.vcampos[i].orden + "</option>");
                 }
             }
         });
     }
+    
+    
     function cargarsalidaalmacen() 
     {
       
@@ -44,22 +46,133 @@ $(document).ready(function() {
                 $("#almacen_salida").find("option").remove();
                 $("#almacen_salida").append("<option value=''>Cargando..</option>");
             },
-            success: function(data) {
+            success: function(data) 
+            {
                 $("#almacen_salida").find("option").remove();
                 this.vcampos = eval(data);
                      $("#almacen_salida").append("<option value='0'>Seleccione...</option>");
                 for (i = 0; i <= this.vcampos.length; i++) {
                     $("#almacen_salida").append("<option value='" + this.vcampos[i].cod_almacen + "'>" + this.vcampos[i].descripcion + "</option>");
                 }
+                
+                
             }
         });
     }
+    //funcion para cargar la salida disponible del cliente.
+    function cargarsalidaalmacend() 
+    {
+        if($("#cliente").val()!=null)
+        {
+            cliente = $("#cliente").val();
+        }
+        else
+        {
+            cliente=$("#id_proveedor").val();
+        }
+        
+        $.ajax({
+            type: 'GET',
+            data: 'opt=getAlmacend&cliente='+cliente,
+            url: '../../libs/php/ajax/ajax.php',
+            beforeSend: function() {
+                $("#almacen_salida_disponible").find("option").remove();
+                $("#almacen_salida_disponible").append("<option value=''>Cargando..</option>");
+            },
+            success: function(data) 
+            {
+                $("#almacen_salida_disponible").find("option").remove();
+                this.vcampos = eval(data);
+                     $("#almacen_salida_disponible").append("<option value='0'>Seleccione...</option>");
+                for (i = 0; i <= this.vcampos.length; i++) {
+                    $("#almacen_salida_disponible").append("<option value='" + this.vcampos[i].cod_almacen + "'>" + this.vcampos[i].descripcion + "</option>");
+                }
+            }
+        });
+    }
+    
+    //funcion para cargar la salida disponible del cliente.
+    function cargardestinoalmacen() 
+    {
+        if($("#cliente").val()!=null)
+        {
+            cliente = $("#cliente").val();
+        }
+        else
+        {
+            cliente=$("#id_proveedor").val();
+        }
+        
+        $.ajax({
+            type: 'GET',
+            data: 'opt=getAlmacendestino&cliente='+cliente,
+            url: '../../libs/php/ajax/ajax.php',
+            beforeSend: function() {
+                $("#almacen_entrada_disponible").find("option").remove();
+                $("#almacen_entrada_disponible").append("<option value=''>Cargando..</option>");
+            },
+            success: function(data) 
+            {
+                $("#almacen_entrada_disponible").find("option").remove();
+                this.vcampos = eval(data);
+                     $("#almacen_entrada_disponible").append("<option value='0'>Seleccione...</option>");
+                for (i = 0; i <= this.vcampos.length; i++) {
+                    $("#almacen_entrada_disponible").append("<option value='" + this.vcampos[i].cod_almacen + "'>" + this.vcampos[i].descripcion + "</option>");
+                }
+            }
+        });
+    }
+    //funcion para buscar el combo dependiente
+    function listarubicacionesd(idalmacen, tipoSql, idubicacion)
+    {
+        cliente=$("#id_proveedor").val();
+        var paramentros="opt=cargaUbicacionNuevod&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
+        $.ajax({
+            type: "POST",
+            url: "../../libs/php/ajax/ajax.php",
+            data: paramentros,
+            beforeSend: function(datos){
+                $("#"+idalmacen).html('<option value = 0> Cargando... </option>');
+            },
+            success: function(datos)
+            {
+            
+                $("#"+idalmacen).html(datos);
+                
+            },
+            error: function(datos,falla, otroobj){
+                $("#"+idSelect).html('<option value = 0> Error... </option>');
+            }
+        });
+    };
+    
+    //funcion para buscar el combo dependiente
+    function listarubicacionesdestino(idalmacen, tipoSql, idubicacion)
+    {
+        cliente=$("#id_proveedor").val();
+        var paramentros="opt=cargaUbicacionNuevodestino&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
+        $.ajax({
+            type: "POST",
+            url: "../../libs/php/ajax/ajax.php",
+            data: paramentros,
+            beforeSend: function(datos){
+                $("#"+idalmacen).html('<option value = 0> Cargando... </option>');
+            },
+            success: function(datos){
+                $("#"+idalmacen).append("<option value='0'>Seleccione...</option>");
+                $("#"+idalmacen).html(datos);
+            },
+            error: function(datos,falla, otroobj){
+                $("#"+idSelect).html('<option value = 0> Error... </option>');
+            }
+        });
+    };
     function cargarsalidaubicaciones() {
         idAlmacen = $("#almacen_salida").val();
         cliente = $("#id_proveedor").val();
         $.ajax({
             type: 'POST',
-            data: 'opt=cargaUbicacionCliente&idAlmacen=' + idAlmacen + '&cliente=' + cliente,
+            data: 'opt=cargaUbicacionClienteDisposicion&idAlmacen=' + idAlmacen + '&cliente=' + cliente,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
                 $("#ubicacion_salida").find("option").remove();
@@ -70,25 +183,62 @@ $(document).ready(function() {
                 this.vcampos = eval(data);
                 $("#ubicacion_salida").append("<option value=''>Seleccione..</option>");
                 for (i = 0; i < this.vcampos.length; i++) {
-                    $("#ubicacion_salida").append("<option value='" + this.vcampos[i].id + "'>" + this.vcampos[i].descripcion + "</option>");
+                    $("#ubicacion_salida").append("<option value='" + this.vcampos[i].id + "'>" + this.vcampos[i].descripcion + ' - ' +  this.vcampos[i].orden +  "</option>");
                 }
             }
         });
     }
+    //evento para el almacen destino
     $("#almacen_entrada").change(function() 
     {
+        document.getElementById("almacen_entrada_disponible").disabled=true;
+        if($("#almacen_entrada").val()==0)
+        {
+            document.getElementById("almacen_entrada_disponible").disabled=false;
+        }
         cargarUbicaciones();
     });
-    cargarUbicaciones();
+    //evento para el almacen destino disponible
+    $("#almacen_entrada_disponible").change(function() 
+    {
+        document.getElementById("almacen_entrada").disabled=true;
+        if($("#almacen_entrada_disponible").val()==0)
+        {
+            document.getElementById("almacen_entrada").disabled=false;
+        }
+        idAlmacen = $("#almacen_entrada_disponible").val();
+        listarubicacionesdestino("ubicacion_entrada_disponible", 0, idAlmacen);
+    });
+    
     $("#id_proveedor").change(function() 
     {
         cargarsalidaalmacen();
+        cargarsalidaalmacend();
+        cargardestinoalmacen();
     });
-    
+    //evento de cambio en el combo de almacen origen
     $("#almacen_salida").change(function() 
     {
         cargarsalidaubicaciones();
+        document.getElementById("almacen_salida_disponible").disabled=true;
+        if($("#almacen_salida").val()==0)
+        {
+            document.getElementById("almacen_salida_disponible").disabled=false;
+        }
     });
+    //evento del cambio en el combo almacen origen disponible
+    $("#almacen_salida_disponible").change(function() 
+    {
+        
+        document.getElementById("almacen_salida").disabled=true;
+        if($("#almacen_salida_disponible").val()==0)
+        {
+            document.getElementById("almacen_salida").disabled=false;
+        }
+        idAlmacen = $("#almacen_salida_disponible").val();
+        listarubicacionesd("ubicacion_salida_disponible", 0, idAlmacen);
+    });
+    
 
     
 
@@ -199,6 +349,7 @@ function solonumeros(evt)
                     <b><h3>Destino</h3></b>
                 </th>
             </tr>
+            
             <tr>
                 
                 <td>
@@ -214,6 +365,7 @@ function solonumeros(evt)
                 </td>
                 <td colspan="2" align="center">
                     <select name="almacen_entrada" id="almacen_entrada" class="form-text">
+                        <option value=''>Seleccione..</option>
                         {html_options output=$option_output_almacen values=$option_values_almacen}
                     </select>
                 </td>
@@ -233,6 +385,50 @@ function solonumeros(evt)
                 
                 <td colspan="2" align="center">
                     <select name="ubicacion_entrada" id="ubicacion_entrada" class="form-text">
+                    </select>
+                </td>
+            </tr>
+            <tr align="center">
+                <th colspan="6" style= "text-align: center;">
+                    
+                    <b><h3>Disponibles</h3></b>
+                    
+                </th>
+            </tr>
+            <tr>
+                <td>
+                    <span style="font-family:'Verdana';"><b>Almacen Origen Disponible:</b></span>
+                </td>
+                <td colspan="2">
+                    <select name="almacen_salida_disponible" id="almacen_salida_disponible" class="form-text">
+                        
+                    </select>
+                </td>
+                <td>
+                    <span style="font-family:'Verdana';"><b>Almacen Destino Disponible:</b></span>
+                </td>
+                <td colspan="2" align="center">
+                    <select name="almacen_entrada_disponible" id="almacen_entrada_disponible" class="form-text">
+                        {html_options output=$option_output_almacen values=$option_values_almacen}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                
+                <td>
+                    <span style="font-family:'Verdana';"><b>Ubicacion Origen Disponible:</b></span>
+                </td>
+                <td colspan="2">
+                    <select name="ubicacion_salida_disponible" id="ubicacion_salida_disponible" class="form-text">
+                        
+                    </select>
+                </td>
+                <td>
+                    <span style="font-family:'Verdana';"><b>Ubicacion Destino Disponible:</b></span>
+                </td>
+                
+                <td colspan="2" align="center">
+                    <select name="ubicacion_entradadisponible" id="ubicacion_entrada_disponible" class="form-text">
                     </select>
                 </td>
             </tr>
@@ -331,6 +527,7 @@ function solonumeros(evt)
         <p><b>Productos</b></p>
         <p>
             
+            <input type="hidden" name="bandera_origen_disponible" id="bandera_origen_disponible">
             <input type="hidden" name="marca" id="marca">
             <input type="hidden" name="items" id="items">
             <input type="text" name="items_descripcion" id="items_descripcion" size="30" readonly>

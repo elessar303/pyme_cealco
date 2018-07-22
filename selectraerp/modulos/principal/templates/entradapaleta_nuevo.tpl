@@ -43,7 +43,7 @@
                                 if(datos==1)
                                 {
                                     alert("Se ha eliminado la Paleta");
-                                    location.reload();
+                                    //location.reload();
                                     
                                 }
                                 else
@@ -63,6 +63,26 @@
                 function listarubicaciones(idalmacen, tipoSql, idubicacion)
                 {
                     var paramentros="opt=cargaUbicacionNuevo&idUbicacion="+idubicacion+"&tipoSql="+tipoSql;
+                    $.ajax({
+                        type: "POST",
+                        url: "../../libs/php/ajax/ajax.php",
+                        data: paramentros,
+                        beforeSend: function(datos){
+                            $("#"+idalmacen).html('<option value = 0> Cargando... </option>');
+                        },
+                        success: function(datos){
+                            $("#"+idalmacen).html(datos);
+                        },
+                        error: function(datos,falla, otroobj){
+                            $("#"+idSelect).html('<option value = 0> Error... </option>');
+                        }
+                    });
+                };
+                //funcion para buscar el combo dependiente
+                function listarubicacionesd(idalmacen, tipoSql, idubicacion)
+                {
+                    cliente=$("#cliente").val();
+                    var paramentros="opt=cargaUbicacionNuevod&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
                     $.ajax({
                         type: "POST",
                         url: "../../libs/php/ajax/ajax.php",
@@ -115,7 +135,7 @@
                                     if(resultado=="1")
                                     {
                                         alert("Se ha cerrado la entrada");
-                                        location.reload();
+                                        //location.reload();
                                         
                                     }
                                     else
@@ -175,12 +195,60 @@
                         placeholder: "Seleccione ...",
                         allowClear: true
                     });
+                    $('#ubicacion_principal_disponible').select2(
+                    {
+                        placeholder: "Seleccione ...",
+                        allowClear: true
+                    });
+                    $('#ubicacion_detalle_disponible').select2(
+                    {
+                        placeholder: "Seleccione ...",
+                        allowClear: true
+                    });
                     
                     //combo dependiente
                     $("#ubicacion_principal").change(function()
                     {
+                        
+                        if ( document.getElementById( "ubicacion_principal_disponible" ))
+                        {
+                            document.getElementById("ubicacion_principal_disponible").disabled=true;
+                        }
                         idubicacion=$("#ubicacion_principal").val();
+                        
+                        if(idubicacion==0)
+                        {
+                            if ( document.getElementById( "ubicacion_principal_disponible" ))
+                            {
+                                document.getElementById("ubicacion_principal_disponible").disabled=false;
+                            }
+                        }
+                        else
+                        {
+                            if ( document.getElementById( "ubicacion_principal_disponible" ))
+                            {
+                                document.getElementById("ubicacion_detalle_disponible").length=0;
+                            }
+                        }
                         listarubicaciones("ubicacion_detalle", 0, idubicacion);
+                    });
+                    
+                    //combo dependiente
+                    $("#ubicacion_principal_disponible").change(function()
+                    {
+                        
+                        document.getElementById("ubicacion_principal").disabled=true;
+                        idubicacion=$("#ubicacion_principal_disponible").val();
+                        if(idubicacion==0)
+                        {
+                            document.getElementById("ubicacion_principal").disabled=false;
+                        }
+                        else
+                        {
+                            document.getElementById("ubicacion_detalle").length=0;
+                        }
+                        
+                        listarubicacionesd("ubicacion_detalle_disponible", 0, idubicacion);
                     });
                     
                     //enviando el formulario
@@ -188,8 +256,27 @@
                     {
                         //se toman los valores
                         var cajas = JSON.stringify($('[name="cajas[]"]').serializeArray());
-                        var principal = $('#ubicacion_principal').val();
-                        var detalle = $('#ubicacion_detalle').val();
+                        if (document.getElementById( "ubicacion_principal_disponible" ))
+                        {
+                            if(document.getElementById( "ubicacion_principal_disponible" ).value!=0)
+                            {
+                                var principal = $('#ubicacion_principal_disponible').val();
+                                var detalle = $('#ubicacion_detalle_disponible').val();
+                                var disposicion=1;
+                            }
+                            else
+                            {
+                                var principal = $('#ubicacion_principal').val();
+                                var detalle = $('#ubicacion_detalle').val();
+                                var disposicion=0;    
+                            }
+                        }
+                        else
+                        {
+                            var principal = $('#ubicacion_principal').val();
+                            var detalle = $('#ubicacion_detalle').val();
+                            var disposicion=0;
+                        }
                         var cantidad = $('#peso_unidad').val();
                         var peso = $('#peso').val();
                         var pesobruto = $('#pesobruto').val();
@@ -236,6 +323,7 @@
                         'id_movimiento' : movimiento,
                         'ubicacion_principal' : principal,
                         'ubicacion_detalle' : detalle,
+                        'disposicion' : disposicion,
                         'cantidad' : cantidad,
                         'peso' : peso,
                         'peso_bruto' : pesobruto,
@@ -266,7 +354,7 @@
                                 if(resultado!=-1)
                                 {
                                     //si se procesó correctamente se hace llamado a la tabla de movimiento
-                                    location.reload();
+                                    //location.reload();
                                     
                                 }
                             }
@@ -381,6 +469,7 @@
                                         <b>{$total}</b>
                                         <input type='hidden' value = '{$total}' name='valortotal' id='valortotal'/>
                                         <input type='hidden' value = '{$movimiento}' name='movimiento' id='movimiento'/>
+                                        <input type='hidden' value = '{$cliente}' name='cliente' id='cliente'/>
                                     </td>
                                     <td align="center">
                                         <b>{$paleta}</b>
@@ -423,6 +512,17 @@
                                 {html_options values=$option_values_ubicacion_principal output=$option_output_ubicacion_principal}
                             </select>
                         </td>
+                        {if $verdisponible eq 1}
+                            <td colspan="3" class="label">
+                                Ubicacion Principal Disponible**
+                            </td>
+                            <td width="200px" style="padding-top:2px; padding-bottom: 2px;">
+                                <select name="ubicacion_principal_disponible" id="ubicacion_principal_disponible" style="width:200px;" class="form-text">
+                                    <option value="0">Seleccione ...</option>                               
+                                    {html_options values=$option_values_ubicacion_principal_disponible output=$option_output_ubicacion_principal_disponible}
+                                </select>
+                            </td>
+                        {/if}
                     </tr>
                     <tr>
                         <td colspan="3" class="label">
@@ -433,6 +533,16 @@
                                 
                             </select>
                         </td>
+                        {if $verdisponible eq 1}
+                            <td colspan="3" class="label">
+                                Ubicacion Detalle Disponible**
+                            </td>
+                            <td width="200px" style="padding-top:2px; padding-bottom: 2px;">
+                                <select name="ubicacion_detalle_disponible" id="ubicacion_detalle_disponible" style="width:200px;" class="form-text">
+                                    
+                                </select>
+                            </td>
+                        {/if}
                     </tr>
                     <tr>
                         <td colspan="3" class="label">
