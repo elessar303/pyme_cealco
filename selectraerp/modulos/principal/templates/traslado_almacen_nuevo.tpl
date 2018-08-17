@@ -6,9 +6,17 @@
 $(document).ready(function() {
     function cargarUbicaciones() {
         idAlmacen = $("#almacen_entrada").val();
+        if($("#cliente").val()!=null)
+        {
+            cliente = $("#cliente").val();
+        }
+        else
+        {
+            cliente=$("#id_proveedor").val();
+        }
         $.ajax({
             type: 'POST',
-            data: 'opt=cargaUbicacionTraslado&idAlmacen=' + idAlmacen,
+            data: 'opt=cargaUbicacionTraslado&idAlmacen=' + idAlmacen+ '&cliente='+ cliente,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
                 $("#ubicacion_entrada").find("option").remove();
@@ -126,7 +134,7 @@ $(document).ready(function() {
     function listarubicacionesd(idalmacen, tipoSql, idubicacion)
     {
         cliente=$("#id_proveedor").val();
-        var paramentros="opt=cargaUbicacionNuevod&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
+        var paramentros="opt=cargaUbicacionNuevodorigen&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
         $.ajax({
             type: "POST",
             url: "../../libs/php/ajax/ajax.php",

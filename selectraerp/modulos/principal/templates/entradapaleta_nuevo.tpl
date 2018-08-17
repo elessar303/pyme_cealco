@@ -62,7 +62,8 @@
                //funcion para buscar el combo dependiente
                 function listarubicaciones(idalmacen, tipoSql, idubicacion)
                 {
-                    var paramentros="opt=cargaUbicacionNuevo&idUbicacion="+idubicacion+"&tipoSql="+tipoSql;
+                    cliente=$("#cliente").val();
+                    var paramentros="opt=cargaUbicacionNuevo&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
                     $.ajax({
                         type: "POST",
                         url: "../../libs/php/ajax/ajax.php",
@@ -210,6 +211,7 @@
                     $("#ubicacion_principal").change(function()
                     {
                         
+                        
                         if ( document.getElementById( "ubicacion_principal_disponible" ))
                         {
                             document.getElementById("ubicacion_principal_disponible").disabled=true;
@@ -354,7 +356,7 @@
                                 if(resultado!=-1)
                                 {
                                     //si se procesó correctamente se hace llamado a la tabla de movimiento
-                                    //location.reload();
+                                    location.reload();
                                     
                                 }
                             }

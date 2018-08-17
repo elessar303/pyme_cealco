@@ -1418,21 +1418,33 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             
         break;
         case "cargaUbicacionNuevo":
+           
            $almacen=$_POST["idUbicacion"];
-           $campos = $conn->ObtenerFilasBySqlSelect("SELECT id, concat(descripcion, ' - ', orden) as descripcion FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado=0 order by  orden asc ");
-            if (count($campos) == 0) 
+           $cliente=$_POST["cliente"];
+           //primero buscamos si el cliente tiene disposicion en esa cava
+           $sql="select * from ubicacion  as a inner join disposicion as b on a.id=b.idubicacion where a.id_almacen=".$almacen." and b.idcliente=".$cliente. " and b.fecha_fin>=date(now())";
+           $resultado=$conn->ObtenerFilasBySqlSelect($sql);
+           if(count($resultado)==0)
+           {
+               $campos = $conn->ObtenerFilasBySqlSelect("SELECT id, concat(descripcion, ' - ', orden) as descripcion FROM ubicacion WHERE id_almacen='".$almacen."' and descripcion<>'PISO DE VENTA' and ocupado=0 order by  orden asc ");
+                if (count($campos) == 0) 
+                {
+                    echo "[{band:'-1'}]";
+                } 
+                else 
+                {
+                    foreach ($campos as $filas)
+                    {
+                    ?>
+                        <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
+        
+                    <?php 
+                    }
+                }
+            }
+            else
             {
                 echo "[{band:'-1'}]";
-            } 
-            else 
-            {
-                foreach ($campos as $filas)
-                {
-                ?>
-                    <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
-    
-                <?php 
-                }
             }
         break;
         case "cargaUbicacionNuevodestino":
@@ -1440,6 +1452,7 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
            $cliente=$_POST['cliente'];
            $fecha=date("Y-m-d");
            $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=2 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+           
            $campos = $conn->ObtenerFilasBySqlSelect($sql);
             if (count($campos) == 0) 
             {
@@ -1465,8 +1478,33 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
            $almacen=$_POST["idUbicacion"];
            $cliente=$_POST['cliente'];
            $fecha=date("Y-m-d");
+           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=2 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+          $campos = $conn->ObtenerFilasBySqlSelect($sql);
+            if (count($campos) == 0) 
+            {
+                echo "[{band:'-1'}]";
+            } 
+            else 
+            {
+                ?>
+                <option value='0'>Seleccione...</option>
+                <?php
+                foreach ($campos as $filas)
+                {
+                ?>
+                    
+                    <option value= "<?php echo $filas['id']; ?>"><?php echo $filas['descripcion']; ?> </option>
+    
+                <?php 
+                }
+            }
+        break;
+        case "cargaUbicacionNuevodorigen":
+           $almacen=$_POST["idUbicacion"];
+           $cliente=$_POST['cliente'];
+           $fecha=date("Y-m-d");
            $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=1 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
-           $campos = $conn->ObtenerFilasBySqlSelect($sql);
+          $campos = $conn->ObtenerFilasBySqlSelect($sql);
             if (count($campos) == 0) 
             {
                 echo "[{band:'-1'}]";
@@ -8265,7 +8303,11 @@ order by mb.cod_movimiento_ban";
                 $cliente=$_POST["cliente"];
                 $fecha=date('Y-m-d');
                 $sql="SELECT a.* FROM ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion
-                WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."' and a.id not in (SELECT c.id FROM ubicacion as c inner join disposicion as d on c.id=d.idubicacion WHERE c.id_almacen='".$almacen."' and c.descripcion<>'PISO DE VENTA' and c.ocupado=1 and d.idcliente=".$cliente." and d.fecha_fin>='".$fecha."')";
+                WHERE a.id_almacen='".$almacen."' and a.ocupado = 1 and b.id_proveedor='".$cliente."' 
+                and a.id not in (SELECT c.id FROM ubicacion as c 
+                inner join disposicion as d on c.id=d.idubicacion WHERE c.id_almacen='".$almacen."' 
+                and c.descripcion<>'PISO DE VENTA' and c.ocupado=1 and 
+                d.idcliente=".$cliente." and d.fecha_fin>='".$fecha."')";
                 //echo $sql; exit();
                 $campos = $conn->ObtenerFilasBySqlSelect($sql);
                 if (count($campos) == 0) 
@@ -8278,14 +8320,35 @@ order by mb.cod_movimiento_ban";
                 }
             break;
             case "cargaUbicacionTraslado":
-                       $almacen=$_POST["idAlmacen"];
-                       $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 ");
-                        if (count($campos) == 0) 
-                        {
-                            echo "[{band:'-1'}]";
-                        } else {
-                            echo json_encode($campos);
-                        }
+                $almacen=$_POST["idAlmacen"];
+                $cliente=$_POST["cliente"];
+                $sql="select a.id_almacen from ubicacion as a inner join disposicion as b on a.id=b.idubicacion where 
+                a.id_almacen=".$almacen." and a.ocupado=2 and b.idcliente=".$cliente." and fecha_fin>=date(now()) group by a.id_almacen";
+                $almacenesdispo = $conn->ObtenerFilasBySqlSelect($sql);
+                $quitar="";
+                foreach ($almacenesdispo as $i => $valores)
+                {
+                    
+                    
+                    $quitar.="'".$valores['id_almacen']."', ";
+                    
+                }
+                if($quitar!='')
+                {
+                    $quitar=substr($quitar, 0, -2);
+                
+                }
+                else
+                {
+                    $quitar="'-1'";
+                }
+                $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 and id_almacen not in (".$quitar.")");
+                if (count($campos) == 0) 
+                {
+                    echo "[{band:'-1'}]";
+                } else {
+                    echo json_encode($campos);
+                }
             break;
 
             case "cargaUbicacion2":
