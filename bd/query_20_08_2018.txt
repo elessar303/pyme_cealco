@@ -1,0 +1,12 @@
+CREATE TABLE IF NOT EXISTS `reconversion_monetaria` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `tabla` varchar(255) NOT NULL,
+  `columna` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+INSERT INTO `modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES
+(283, 1, 'Reconversion Monetaria', 'reconversion_monetaria.php', 'reconversion_monetaria.tpl', 8, '../../libs/imagenes/55.png', 1);
+
+INSERT INTO `subseccion` (`opt_subseccion`, `archivo_tpl`, `archivo_php`, `cod_seccion`, `descripcion`) VALUES
+('add', 'reconversion_add.tpl', 'reconversion_add.php', 283, 'Agregar a Reconversi&oacute;n');
