@@ -1,0 +1,1 @@
+INSERT INTO `modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES (NULL, '106', 'Descargar TXT SIGA', 'descargar_txt_siga.php', 'descargar_txt_siga.tpl', '22', '../../libs/imagenes/document-save.png', '1');
