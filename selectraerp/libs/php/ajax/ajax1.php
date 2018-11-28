@@ -22,6 +22,96 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
     $opt = (isset($_GET["opt"])) ? $_GET["opt"] : $_POST["opt"];
 
     switch ($opt) {
+
+        case 'pregunta1':
+
+            $pyme=DB_SELECTRA_FAC;
+
+            $cedula=$_POST["cedula"];
+
+            if ($cedula > 0) {
+
+            $in="SELECT * FROM $pyme.empleados WHERE cedula='$cedula' AND activo='f'";
+            $rs_conn=$conn->ObtenerFilasBySqlSelect($in); 
+            $filas=$conn->getFilas($rs_conn);
+    
+
+            if ($filas==0) {
+
+            $in="SELECT * FROM $pyme.empleados WHERE cedula='$cedula' AND activo='t'";
+            $rs_conn=$conn->ObtenerFilasBySqlSelect($in); 
+            $filas1=$conn->getFilas($rs_conn); 
+
+            if ($filas1==1) {
+
+            $in="SELECT * FROM $pyme.entrada WHERE cedula=$cedula AND day(entrada) = day(curdate()) AND salida is NULL AND incompleto='f'";
+            $rs_conn=$conn->ObtenerFilasBySqlSelect($in); 
+            $filas2=$conn->getFilas($rs_conn);
+
+            $in="SELECT * FROM entrada WHERE day(entrada) = day(date_add(curdate(),interval -1 day)) AND cedula=$cedula AND salida is NULL AND incompleto='f'";
+            $rs_conn=$conn->ObtenerFilasBySqlSelect($in); 
+            $row=$conn->getFilas($rs_conn);
+
+            if ($row==1) {
+            echo '<form name="botones" id="botones" action="" method="post">
+                <table>
+                    <tr>
+                        <td class="label">¿Está saliendo?</td>
+                        <td>
+                            <input type="submit" class="label" name="no" id="no" value="No"/>
+                            <input type="submit" class="label" name="si" id="si" value="Si"/>
+                        </td>
+                    </tr>
+                </table>
+            </form>';
+            if (isset($_POST["si"])) {
+
+                $sql="UPDATE $pyme.entrada SET salida=now(), incompleto='t' WHERE day(entrada) = day(date_add(curdate(),interval -1 day)) AND cedula=$cedula AND salida is NULL AND incompleto='f'";
+                $query=$conn->Execute2($sql);
+
+                }elseif (isset($_POST["no"])) {
+
+                 $in="INSERT INTO $pyme.entrada (cedula, entrada, salida, incompleto) VALUES ('$cedula', now(), NULL, 'f')";
+                 $query=$conn->Execute2($in);
+
+                }else{
+                }
+            }elseif ($filas2==1) {
+
+                    $sql="UPDATE $pyme.entrada SET salida=now() WHERE cedula='$cedula' AND day(entrada) = day(curdate()) AND salida is NULL AND incompleto='f'";
+                    $query=$conn->Execute2($sql);
+                    echo '<script language="javascript" type="text/JavaScript">';
+                    echo 'alert("Hasta luego");history.back();';
+                    echo '</script>';
+                    exit();
+
+            }else{
+
+                $in="INSERT INTO $pyme.entrada (cedula, entrada, salida, incompleto) VALUES ('$cedula', now(), NULL, 'f')";
+                $query=$conn->Execute2($in);
+                echo '<script language="javascript" type="text/JavaScript">';
+                echo 'alert("Bienvenido");history.back();';
+                echo '</script>';
+                exit();
+
+            }
+
+        }else{
+            echo '<script language="javascript" type="text/JavaScript">';
+            echo 'alert("El usuario no se encuentra registrado");history.back();';
+            echo '</script>';
+            exit();
+        }
+    }else{
+            echo '<script language="javascript" type="text/JavaScript">';
+            echo 'alert("El usuario no se encuentra activo en el sistema");history.back();';
+            echo '</script>';
+            exit();
+        }
+    }
+
+    break;
+
         case "reporte_categoria_central":
                     //$punto = $_GET["punto"];
                     //$estado = $_GET["estados"];

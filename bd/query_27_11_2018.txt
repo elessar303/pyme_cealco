@@ -1,0 +1,24 @@
+INSERT INTO `modulos` (`cod_modulo`, `cod_modulo_padre`, `nom_menu`, `archivo_php`, `archivo_tpl`, `orden`, `img_ruta`, `visible`) VALUES (NULL, '106', 'Control de Acceso', 'gestion_entrada.php', 'gestion_entrada.tpl', '23', '../../libs/imagenes/traslados.png', '1');
+
+  CREATE TABLE IF NOT EXISTS `empresa` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `rif` varchar(50) NOT NULL,
+  `nombre_empresa` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`));
+
+CREATE TABLE IF NOT EXISTS `empleados` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `cedula` int(15) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `ID_empresa` int(11) NOT NULL,
+  `activo` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  CONSTRAINT `FK_empresa` FOREIGN KEY (`ID_empresa`) REFERENCES `empresa` (`ID`)); 
+
+CREATE TABLE IF NOT EXISTS `entrada` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `cedula` int(15) NOT NULL,
+  `entrada` timestamp NULL DEFAULT NULL,
+  `salida` timestamp NULL DEFAULT NULL,
+  `incompleto` varchar(11) NOT NULL,
+  PRIMARY KEY (`ID`));
