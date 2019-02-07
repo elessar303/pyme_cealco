@@ -171,6 +171,12 @@ var eventos_form = {
                 $("#pesooculto").val(total);
                 eventos_form.CargarDisplayMontos();
                 win.hide();
+                //limpiamos los destinos
+                //refrescando combo
+                $("#almacen_entrada").val($("#almacen_entrada option:first").val());
+                $("#almacen_entrada_disponible").val($("#almacen_entrada_disponible option:first").val());
+                $('#ubicacion_entrada_disponible').val("");
+                $('#ubicacion_entrada').val("");
                 eventos_form.Limpiar();
             }
         });

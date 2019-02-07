@@ -1451,7 +1451,25 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
            $almacen=$_POST["idUbicacion"];
            $cliente=$_POST['cliente'];
            $fecha=date("Y-m-d");
-           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=2 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+           $ubicacionesQuitar=json_decode($_POST['ubicacionesQuitar']);
+           $ubicacionesQuitar=($_POST['ubicacionesQuitar']);
+            if($ubicacionesQuitar!=null)
+            {    
+                $arrayUbicaciones=split(",", $ubicacionesQuitar);
+                $string=null;
+                foreach($arrayUbicaciones as $key => $value)
+                {
+                    $string .="'".$value."',";
+                    
+                }
+                
+                $string=substr($string, 0, -1);
+            }
+            if($string==null)
+            {
+                $string='-1';
+            }
+           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=2 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' and a.id not in (".$string.") order by  a.orden asc ";
            
            $campos = $conn->ObtenerFilasBySqlSelect($sql);
             if (count($campos) == 0) 
@@ -1503,8 +1521,10 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
            $almacen=$_POST["idUbicacion"];
            $cliente=$_POST['cliente'];
            $fecha=date("Y-m-d");
-           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=1 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
-          $campos = $conn->ObtenerFilasBySqlSelect($sql);
+           //Se cambia consulta, debido a que puede tener la disposición, pero puede ser que este vacia, por lo tanto no debe aparecer en origen sino en destino.
+           //$sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=1 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+           $sql="SELECT a.id, concat(a.descripcion, ' - ', a.orden) as descripcion FROM ubicacion as a inner join disposicion as b on a.id=b.idubicacion inner join vw_existenciabyalmacen as c on a.id_almacen=c.cod_almacen and c.id_ubicacion=a.id WHERE a.id_almacen='".$almacen."' and a.descripcion<>'PISO DE VENTA' and a.ocupado=1 and b.idcliente=".$cliente." and b.fecha_fin>='".$fecha."' order by  a.orden asc ";
+           $campos = $conn->ObtenerFilasBySqlSelect($sql);
             if (count($campos) == 0) 
             {
                 echo "[{band:'-1'}]";
@@ -6481,7 +6501,8 @@ where a.money not in  (select  money from $bd_pyme.libro_ventas) and date(dateen
 
             if($ubicacion_pro[0]['descripcion']!='PISO DE VENTA')
             {
-
+               
+               // echo "SELECT * FROM vw_existenciabyalmacen  WHERE cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'  and id_proveedor='". $_GET["cliente"]."'";
                 $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM vw_existenciabyalmacen  WHERE cod_almacen = '" . $_GET["v1"] . "' and id_ubicacion='". $_GET["ubicacion"]."'  and id_proveedor='". $_GET["cliente"]."'");
 
             
@@ -8264,10 +8285,27 @@ order by mb.cod_movimiento_ban";
             case "cargaUbicacion":
                $almacen=$_POST["idAlmacen"];
                $cliente=$_POST["cliente"];
+               $ubicacionQuitar=$_POST["ubicacionQuitar"];
                if(isset($_POST['cliente']) && $_POST['cliente']!=null)
                 {
-                    $sql="select a.id, a.descripcion, a.orden, b.lote, b.cantidad, b.peso,  (select etiqueta from kardex_almacen_detalle where id_ubi_entrada=a.id order by id_transaccion_detalle DESC LIMIT 1) as etiqueta from ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion  where a.id_almacen='".$almacen."' and b.id_proveedor='".$cliente."'";
-                    $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                    if(isset($_POST['ubicacionQuitar']) && $_POST['ubicacionQuitar']!=null)
+                    {
+                        $arrayUbicaciones=split(",", $ubicacionQuitar);
+                        $string=null;
+                        foreach($arrayUbicaciones as $key => $value)
+                        {
+                            $string .="'".$value."',";
+                        }
+            
+                        $string=substr($string, 0, -1);
+                        $sql="select a.id, a.descripcion, a.orden, b.lote, b.cantidad, b.peso,  (select etiqueta from kardex_almacen_detalle where id_ubi_entrada=a.id order by id_transaccion_detalle DESC LIMIT 1) as etiqueta from ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion  where a.id_almacen='".$almacen."' and b.id_proveedor='".$cliente."' and a.id not in(".$string.")";
+                        $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                    }
+                    else
+                    {
+                        $sql="select a.id, a.descripcion, a.orden, b.lote, b.cantidad, b.peso,  (select etiqueta from kardex_almacen_detalle where id_ubi_entrada=a.id order by id_transaccion_detalle DESC LIMIT 1) as etiqueta from ubicacion as a inner join item_existencia_almacen as b on a.id=b.id_ubicacion  where a.id_almacen='".$almacen."' and b.id_proveedor='".$cliente."'";
+                        $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                    }
                 }
                 else
                 {
@@ -8322,8 +8360,26 @@ order by mb.cod_movimiento_ban";
             case "cargaUbicacionTraslado":
                 $almacen=$_POST["idAlmacen"];
                 $cliente=$_POST["cliente"];
+                /*
+                /Se agrega la restriccion de las ubicaciones en el grid
+                */
+                $ubicacionesQuitar=($_POST['ubicacionesQuitar']);
+                
+                if($ubicacionesQuitar!=null)
+                {    
+                    $arrayUbicaciones=split(",", $ubicacionesQuitar);
+                    $string=null;
+                    foreach($arrayUbicaciones as $key => $value)
+                    {
+                        $string .="'".$value."',";
+                        
+                    }
+                    
+                    $string=substr($string, 0, -1);
+                }
                 $sql="select a.id_almacen from ubicacion as a inner join disposicion as b on a.id=b.idubicacion where 
-                a.id_almacen=".$almacen." and a.ocupado=2 and b.idcliente=".$cliente." and fecha_fin>=date(now()) group by a.id_almacen";
+                a.id_almacen=".$almacen." and a.ocupado=2 and b.idcliente=".$cliente." and fecha_fin>=date(now())  group by a.id_almacen";
+                //echo $sql;
                 $almacenesdispo = $conn->ObtenerFilasBySqlSelect($sql);
                 $quitar="";
                 foreach ($almacenesdispo as $i => $valores)
@@ -8342,7 +8398,16 @@ order by mb.cod_movimiento_ban";
                 {
                     $quitar="'-1'";
                 }
-                $campos = $conn->ObtenerFilasBySqlSelect("SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 and id_almacen not in (".$quitar.")");
+                if($string=='')
+                {
+                    $string="'-1'";
+                }
+                
+                $sql="SELECT * FROM ubicacion WHERE id_almacen='".$almacen."' and ocupado = 0 and id_almacen not in (".$quitar.") and id not in (".$string.")";
+                
+                
+                $campos = $conn->ObtenerFilasBySqlSelect($sql);
+                
                 if (count($campos) == 0) 
                 {
                     echo "[{band:'-1'}]";

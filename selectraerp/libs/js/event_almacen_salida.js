@@ -22,9 +22,21 @@ Ext.onReady(function(){
         {
             idcliente=$("#proveedor").val();
         }
+        array=[];
+        //eliminar_serial
+        $("input[name='_ubicacion[]']").each(function(indice, elemento) 
+        {
+            //console.log('El elemento con el índice '+indice+' contiene '+$(elemento).val());
+            array.push($(elemento).val());
+        });
+        
+        /*
+        /Modificado el 7-02-2019 wwjimenez
+        //debemos mandar el array con las ubicaciones que no deben salir
+        */
         $.ajax({
             type: 'POST',
-            data: 'opt=cargaUbicacion&idAlmacen='+idAlmacen+'&cliente='+idcliente,
+            data: 'opt=cargaUbicacion&idAlmacen='+idAlmacen+'&cliente='+idcliente+'&ubicacionQuitar='+array,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
                 $("#ubicacion").find("option").remove();

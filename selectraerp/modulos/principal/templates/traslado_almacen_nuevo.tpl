@@ -14,9 +14,23 @@ $(document).ready(function() {
         {
             cliente=$("#id_proveedor").val();
         }
+        
+        array=[];
+        //eliminar_serial
+        $("input[name='_id_ubicacion_entrada[]']").each(function(indice, elemento) 
+        {
+            //console.log('El elemento con el índice '+indice+' contiene '+$(elemento).val());
+            array.push($(elemento).val());
+        });
+        
+        /*
+        /Modificado el 7-02-2019 wwjimenez
+        //debemos mandar el array con las ubicaciones que no deben salir
+        */
+        
         $.ajax({
             type: 'POST',
-            data: 'opt=cargaUbicacionTraslado&idAlmacen=' + idAlmacen+ '&cliente='+ cliente,
+            data: 'opt=cargaUbicacionTraslado&idAlmacen=' + idAlmacen+ '&cliente='+ cliente+"&ubicacionesQuitar="+array,
             url: '../../libs/php/ajax/ajax.php',
             beforeSend: function() {
                 $("#ubicacion_entrada").find("option").remove();
@@ -158,7 +172,20 @@ $(document).ready(function() {
     function listarubicacionesdestino(idalmacen, tipoSql, idubicacion)
     {
         cliente=$("#id_proveedor").val();
-        var paramentros="opt=cargaUbicacionNuevodestino&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente;
+        array=[];
+        //eliminar_serial
+        $("input[name='_id_ubicacion_entrada[]']").each(function(indice, elemento) 
+        {
+            //console.log('El elemento con el índice '+indice+' contiene '+$(elemento).val());
+            array.push($(elemento).val());
+        });
+        
+        /*
+        /Modificado el 7-02-2019 wwjimenez
+        //debemos mandar el array con las ubicaciones que no deben salir
+        */
+        
+        var paramentros="opt=cargaUbicacionNuevodestino&idUbicacion="+idubicacion+"&tipoSql="+tipoSql+"&cliente="+cliente+"&ubicacionesQuitar="+array;
         $.ajax({
             type: "POST",
             url: "../../libs/php/ajax/ajax.php",
@@ -178,6 +205,7 @@ $(document).ready(function() {
     function cargarsalidaubicaciones() {
         idAlmacen = $("#almacen_salida").val();
         cliente = $("#id_proveedor").val();
+        
         $.ajax({
             type: 'POST',
             data: 'opt=cargaUbicacionClienteDisposicion&idAlmacen=' + idAlmacen + '&cliente=' + cliente,
