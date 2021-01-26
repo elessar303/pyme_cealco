@@ -1333,10 +1333,11 @@ if (isset($_GET["opt"]) == true || isset($_POST["opt"]) == true) {
             }
             else
             { // cuando existe pedido pendiente
-                $kardexoriginal=$conn->ObtenerFilasBySqlSelect("select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'");
+		$sql="select id_transaccion from kardex_almacen where nro_factura='".$cargosoriginal[0]['cod_factura']."'";
+                $kardexoriginal=$conn->ObtenerFilasBySqlSelect($sql);
                 if($kardexoriginal==null)
                 { 
-                    echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador"; exit();
+                    echo "Error Interno, el Kardex no se ha podido localizar contacte al administrador"; exit(); 
                 }
                 $sql="UPDATE
                         `despacho_new`

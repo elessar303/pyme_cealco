@@ -606,8 +606,8 @@ $sql="SELECT MAX(a.id_factura) as max_despacho, MAX(b.id_factura) as max_factura
 $update_control=$almacen->ObtenerFilasBySqlSelect($sql);
 
 $instruccion_update="
-UPDATE $pyme.control_json SET id_control=".$update_control[0]['max_despacho']." WHERE tabla_control = 'despacho_new';
-UPDATE $pyme.control_json SET id_control=".$update_control[0]['max_factura']." WHERE tabla_control = 'factura';
+UPDATE $pyme.control_json SET id_control='".$update_control[0]['max_despacho']."' WHERE tabla_control = 'despacho_new';
+UPDATE $pyme.control_json SET id_control='".$update_control[0]['max_factura']."' WHERE tabla_control = 'factura';
 ";
 $almacen->Execute2($instruccion_update);
 
